@@ -3,230 +3,407 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Editor Button</title>
+    <title>Crowdin Editor Button</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f8f9fa;
-            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         
         .container {
-            max-width: 400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            padding: 24px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .header {
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             text-align: center;
-            margin-bottom: 24px;
+            max-width: 500px;
+            width: 100%;
         }
         
-        .header h1 {
-            margin: 0 0 8px 0;
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
             font-size: 24px;
-            color: #2c3e50;
         }
         
-        .header p {
-            margin: 0;
-            color: #7f8c8d;
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
             font-size: 14px;
         }
         
         .button-group {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
         
-        .custom-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        button {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
+            padding: 15px 25px;
+            border-radius: 50px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
-        .custom-button:hover {
+        button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
         
-        .custom-button:active {
+        button:active {
             transform: translateY(0);
         }
         
-        .custom-button.secondary {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
         
-        .custom-button.success {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        .debug-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .debug-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
         .status {
-            margin-top: 20px;
-            padding: 12px;
-            border-radius: 6px;
-            text-align: center;
-            font-size: 14px;
-            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 500;
         }
         
         .status.success {
-            background-color: #d4edda;
+            background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
         
         .status.error {
-            background-color: #f8d7da;
+            background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
         
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #ffffff;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 8px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .info-section {
-            margin-top: 24px;
-            padding: 16px;
-            background-color: #f8f9fa;
-            border-radius: 6px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .info-section h3 {
-            margin: 0 0 8px 0;
-            font-size: 16px;
-            color: #2c3e50;
-        }
-        
-        .info-section p {
-            margin: 0;
-            font-size: 14px;
-            color: #7f8c8d;
-            line-height: 1.5;
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🎯 Custom Editor Button</h1>
-            <p>Enhance your Crowdin editing experience</p>
-        </div>
+        <h1>🎯 Crowdin Editor Button</h1>
+        <p class="subtitle">Custom actions for your translation workflow</p>
         
         <div class="button-group">
-            <button class="custom-button" onclick="performAction('primary')">
-                <span class="button-text">Primary Action</span>
+            <button onclick="performAction('get-string-info')" id="stringInfoBtn">
+                📝 Get String Info & Key
             </button>
-            
-            <button class="custom-button secondary" onclick="performAction('secondary')">
-                <span class="button-text">Secondary Action</span>
+            <button onclick="performAction('analyze-context')" id="analyzeBtn">
+                🔍 Analyze Full Context
             </button>
-            
-            <button class="custom-button success" onclick="performAction('validate')">
-                <span class="button-text">Validate Translation</span>
+            <button onclick="performAction('fetch-via-api')" id="apiBtn">
+                🌐 Fetch via Crowdin API
+            </button>
+            <button onclick="performAction('custom-action')" id="customBtn">
+                ⚡ Custom Action
             </button>
         </div>
         
-        <div id="status" class="status"></div>
+        <div id="status" class="status" style="display: none;"></div>
         
-        <div class="info-section">
-            <h3>About This App</h3>
-            <p>This custom button integrates with your Crowdin editor to provide additional functionality. Click any button above to see it in action!</p>
+        <div class="debug-info">
+            <div class="debug-title">🐛 Debug Information</div>
+            <div id="debug-content">
+                <strong>Current URL:</strong> <span id="current-url"></span><br>
+                <strong>URL Parameters:</strong> <span id="url-params"></span><br>
+                <strong>Referrer:</strong> <span id="referrer"></span><br>
+                <strong>In iframe:</strong> <span id="in-iframe"></span><br>
+                <strong>Crowdin Context:</strong> <span id="crowdin-context">Detecting...</span><br>
+                <strong>String Key:</strong> <span id="string-key">Not available</span><br>
+                <strong>String ID:</strong> <span id="string-id">Not available</span><br>
+            </div>
         </div>
     </div>
 
     <script>
-        async function performAction(actionType) {
-            const button = event.target;
-            const buttonText = button.querySelector('.button-text');
-            const originalText = buttonText.textContent;
-            const statusDiv = document.getElementById('status');
+        // Enhanced context detection
+        function getCrowdinContext() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const context = {};
             
-            // Show loading state
-            buttonText.innerHTML = '<span class="loading"></span>Processing...';
+            // Standard Crowdin parameters
+            const crowdinParams = [
+                'projectId', 'fileId', 'stringId', 'languageId', 'userId', 'mode',
+                'stringKey', 'identifier', 'key', 'sourceString', 'targetString',
+                'context', 'maxLength', 'isPlural', 'pluralForm', 'origin', 'client_id', 'clientId', 'jwtToken'
+            ];
+            
+            crowdinParams.forEach(param => {
+                const value = urlParams.get(param);
+                if (value) {
+                    context[param] = value;
+                }
+            });
+            
+            // Try to get context from parent window if in iframe
+            if (window.parent && window.parent !== window) {
+                try {
+                    // Try to access parent URL parameters
+                    const parentParams = new URLSearchParams(window.parent.location.search);
+                    crowdinParams.forEach(param => {
+                        const value = parentParams.get(param);
+                        if (value && !context[param]) {
+                            context[param] = value;
+                        }
+                    });
+                } catch (e) {
+                    console.log('Cannot access parent window parameters (cross-origin)');
+                }
+                
+                // Request context from parent via postMessage
+                try {
+                    window.parent.postMessage({
+                        type: 'request-context',
+                        source: 'crowdin-app'
+                    }, '*');
+                } catch (e) {
+                    console.log('Cannot send postMessage to parent');
+                }
+            }
+            
+            // Try to get context from Crowdin API if available
+            if (window.crowdin && window.crowdin.getContext) {
+                try {
+                    const crowdinContext = window.crowdin.getContext();
+                    Object.assign(context, crowdinContext);
+                } catch (e) {
+                    console.log('Crowdin API not available');
+                }
+            }
+            
+            // Try to get context from global variables that Crowdin might set
+            if (window.CROWDIN_CONTEXT) {
+                Object.assign(context, window.CROWDIN_CONTEXT);
+            }
+            
+            if (window.crowdinContext) {
+                Object.assign(context, window.crowdinContext);
+            }
+            
+            return context;
+        }
+        
+        function updateDebugInfo() {
+            const context = getEnhancedCrowdinContext();
+            
+            document.getElementById('current-url').textContent = window.location.href;
+            document.getElementById('url-params').textContent = window.location.search || 'None';
+            document.getElementById('referrer').textContent = document.referrer || 'None';
+            document.getElementById('in-iframe').textContent = window.self !== window.top ? 'Yes' : 'No';
+            document.getElementById('crowdin-context').textContent = Object.keys(context).length > 0 ? JSON.stringify(context, null, 2) : 'No context detected';
+            document.getElementById('string-key').textContent = context.stringKey || context.identifier || context.key || 'Not available';
+            document.getElementById('string-id').textContent = context.stringId || 'Not available';
+            
+            // Log context for debugging
+            if (Object.keys(context).length > 0) {
+                console.log('Current context:', context);
+            }
+        }
+        
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            statusEl.style.display = 'block';
+            
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        async function performAction(action) {
+            const button = document.getElementById(action === 'get-string-info' ? 'stringInfoBtn' : 
+                                                action === 'analyze-context' ? 'analyzeBtn' : 
+                                                action === 'fetch-via-api' ? 'apiBtn' : 'customBtn');
+            
             button.disabled = true;
-            statusDiv.style.display = 'none';
+            showStatus('Processing...', 'loading');
             
             try {
+                const crowdinContext = getEnhancedCrowdinContext();
+                
+                const requestData = {
+                    action: action,
+                    timestamp: new Date().toISOString(),
+                    crowdinContext: crowdinContext,
+                    userAgent: navigator.userAgent,
+                    referrer: document.referrer,
+                    url: window.location.href,
+                    inIframe: window.self !== window.top,
+                    // Additional context that might contain string key
+                    windowLocation: {
+                        href: window.location.href,
+                        search: window.location.search,
+                        hash: window.location.hash,
+                        pathname: window.location.pathname
+                    }
+                };
+                
+                console.log('Sending request:', requestData);
+                
                 const response = await fetch('/api/button-action', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        action: actionType,
-                        timestamp: new Date().toISOString(),
-                        // You can add more context data here
-                        // like current translation, source text, etc.
-                    })
+                    body: JSON.stringify(requestData)
                 });
                 
                 const result = await response.json();
+                console.log('Response:', result);
                 
                 if (result.success) {
-                    showStatus('Action completed successfully!', 'success');
+                    showStatus(`✅ ${result.message}`, 'success');
+                    
+                    // Update debug info with response
+                    if (result.extractedStringInfo) {
+                        document.getElementById('string-key').textContent = 
+                            result.extractedStringInfo.stringKey || 'Not found';
+                    }
                 } else {
-                    showStatus('Action failed. Please try again.', 'error');
+                    showStatus(`❌ Action failed: ${result.message}`, 'error');
                 }
                 
             } catch (error) {
-                console.error('Error performing action:', error);
-                showStatus('Network error. Please check your connection.', 'error');
+                console.error('Error:', error);
+                showStatus(`❌ Error: ${error.message}`, 'error');
             } finally {
-                // Restore button state
-                buttonText.textContent = originalText;
                 button.disabled = false;
             }
         }
         
-        function showStatus(message, type) {
-            const statusDiv = document.getElementById('status');
-            statusDiv.textContent = message;
-            statusDiv.className = `status ${type}`;
-            statusDiv.style.display = 'block';
+        // Function to actively request context from Crowdin
+        function requestCrowdinContext() {
+            if (window.parent && window.parent !== window) {
+                // Try multiple message types that Crowdin might respond to
+                const messages = [
+                    { type: 'get-context' },
+                    { type: 'request-context' },
+                    { type: 'app-ready' },
+                    { type: 'get-editor-context' },
+                    { type: 'get-string-context' },
+                    { action: 'getContext' },
+                    { action: 'getCurrentString' }
+                ];
+                
+                messages.forEach(message => {
+                    try {
+                        window.parent.postMessage(message, '*');
+                    } catch (e) {
+                        console.log('Failed to send message:', message);
+                    }
+                });
+            }
             
-            // Auto-hide after 3 seconds
+            // Also try to access Crowdin's global objects
             setTimeout(() => {
-                statusDiv.style.display = 'none';
-            }, 3000);
+                if (window.parent && window.parent.crowdin) {
+                    try {
+                        const context = window.parent.crowdin.getContext();
+                        if (context) {
+                            receivedContext = { ...receivedContext, ...context };
+                            updateDebugInfo();
+                        }
+                    } catch (e) {
+                        console.log('Cannot access parent crowdin object');
+                    }
+                }
+            }, 1000);
         }
         
-        // Initialize the app
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Custom Editor Button loaded successfully');
+            updateDebugInfo();
             
-            // You can add initialization logic here
-            // For example, check if we're running inside Crowdin editor
-            // and adjust the interface accordingly
+            // Request context immediately
+            requestCrowdinContext();
+            
+            // Request context again after a short delay
+            setTimeout(requestCrowdinContext, 500);
+            setTimeout(requestCrowdinContext, 2000);
+            
+            // Update debug info every 2 seconds to catch dynamic changes
+            setInterval(updateDebugInfo, 2000);
         });
+        
+        // Store received context data
+        let receivedContext = {};
+        
+        // Listen for messages from parent window (if in iframe)
+        window.addEventListener('message', function(event) {
+            console.log('Received message from parent:', event.data);
+            
+            // Handle different types of messages from Crowdin
+            if (event.data) {
+                if (event.data.type === 'crowdin-context' || event.data.type === 'context') {
+                    receivedContext = { ...receivedContext, ...event.data.context };
+                    updateDebugInfo();
+                }
+                
+                // Handle direct context data
+                if (event.data.stringId || event.data.stringKey || event.data.projectId) {
+                    receivedContext = { ...receivedContext, ...event.data };
+                    updateDebugInfo();
+                }
+                
+                // Handle Crowdin app framework messages
+                if (event.data.type === 'app-context' || event.data.type === 'editor-context') {
+                    receivedContext = { ...receivedContext, ...event.data };
+                    updateDebugInfo();
+                }
+            }
+        });
+        
+        // Enhanced context getter that includes received messages
+        function getEnhancedCrowdinContext() {
+            const urlContext = getCrowdinContext();
+            return { ...urlContext, ...receivedContext };
+        }
     </script>
 </body>
 </html> 

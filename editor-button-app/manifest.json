@@ -10,6 +10,7 @@
   "modules": {
     "editor-right-panel": [
       {
+
         "key": "editor-button",
         "name": "Custom Editor Button",
         "modes": ["translate", "comfortable", "side-by-side", "multilingual"],

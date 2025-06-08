@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page - Crowdin App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .log {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Crowdin App Test Page</h1>
+        <p>This page helps test the app functionality outside of Crowdin.</p>
+        
+        <h3>Test Buttons:</h3>
+        <button onclick="testAPI('simple')">Simple Test</button>
+        <button onclick="testAPI('with-context')">Test with Mock Context</button>
+        <button onclick="testAPI('with-params')">Test with URL Params</button>
+        <button onclick="clearLog()">Clear Log</button>
+        
+        <h3>Test Results:</h3>
+        <div id="log" class="log">
+            <div>Ready to test...</div>
+        </div>
+        
+        <h3>Current Environment:</h3>
+        <div class="log">
+            <strong>URL:</strong> <span id="current-url"></span><br>
+            <strong>Search Params:</strong> <span id="search-params"></span><br>
+            <strong>Referrer:</strong> <span id="referrer"></span><br>
+            <strong>User Agent:</strong> <span id="user-agent"></span><br>
+            <strong>In iframe:</strong> <span id="in-iframe"></span>
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
+            logDiv.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '<div>Log cleared...</div>';
+        }
+        
+        async function testAPI(testType) {
+            log(`Starting ${testType} test...`);
+            
+            let testData = {
+                action: testType,
+                timestamp: new Date().toISOString(),
+                testType: testType
+            };
+            
+            if (testType === 'with-context') {
+                testData.crowdinContext = {
+                    projectId: '123456',
+                    fileId: '789',
+                    stringId: '456',
+                    languageId: 'es',
+                    userId: 'test-user',
+                    mode: 'translate'
+                };
+            }
+            
+            if (testType === 'with-params') {
+                // Add URL parameters
+                const url = new URL(window.location);
+                url.searchParams.set('projectId', '999');
+                url.searchParams.set('fileId', '888');
+                window.history.replaceState({}, '', url);
+                
+                testData.crowdinContext = {
+                    projectId: '999',
+                    fileId: '888'
+                };
+            }
+            
+            try {
+                log(`Sending request: ${JSON.stringify(testData, null, 2)}`);
+                
+                const response = await fetch('/api/button-action', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const result = await response.json();
+                log(`Response received: ${JSON.stringify(result, null, 2)}`, 'success');
+                
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Update environment info
+        function updateEnvironmentInfo() {
+            document.getElementById('current-url').textContent = window.location.href;
+            document.getElementById('search-params').textContent = window.location.search || 'None';
+            document.getElementById('referrer').textContent = document.referrer || 'None';
+            document.getElementById('user-agent').textContent = navigator.userAgent;
+            document.getElementById('in-iframe').textContent = window.self !== window.top ? 'Yes' : 'No';
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateEnvironmentInfo();
+            log('Test page loaded successfully');
+        });
+    </script>
+</body>
+</html> 
