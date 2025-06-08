@@ -1,0 +1,23 @@
+{
+  "name": "editor-button-app",
+  "version": "1.0.0",
+  "description": "A Crowdin app that adds a custom button to the editor",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["crowdin", "editor", "button", "app"],
+  "author": "David Cardinal",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

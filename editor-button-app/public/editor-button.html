@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Editor Button</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .header h1 {
+            margin: 0 0 8px 0;
+            font-size: 24px;
+            color: #2c3e50;
+        }
+        
+        .header p {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .custom-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .custom-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .custom-button:active {
+            transform: translateY(0);
+        }
+        
+        .custom-button.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .custom-button.success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .info-section {
+            margin-top: 24px;
+            padding: 16px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .info-section h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        
+        .info-section p {
+            margin: 0;
+            font-size: 14px;
+            color: #7f8c8d;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Custom Editor Button</h1>
+            <p>Enhance your Crowdin editing experience</p>
+        </div>
+        
+        <div class="button-group">
+            <button class="custom-button" onclick="performAction('primary')">
+                <span class="button-text">Primary Action</span>
+            </button>
+            
+            <button class="custom-button secondary" onclick="performAction('secondary')">
+                <span class="button-text">Secondary Action</span>
+            </button>
+            
+            <button class="custom-button success" onclick="performAction('validate')">
+                <span class="button-text">Validate Translation</span>
+            </button>
+        </div>
+        
+        <div id="status" class="status"></div>
+        
+        <div class="info-section">
+            <h3>About This App</h3>
+            <p>This custom button integrates with your Crowdin editor to provide additional functionality. Click any button above to see it in action!</p>
+        </div>
+    </div>
+
+    <script>
+        async function performAction(actionType) {
+            const button = event.target;
+            const buttonText = button.querySelector('.button-text');
+            const originalText = buttonText.textContent;
+            const statusDiv = document.getElementById('status');
+            
+            // Show loading state
+            buttonText.innerHTML = '<span class="loading"></span>Processing...';
+            button.disabled = true;
+            statusDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/button-action', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: actionType,
+                        timestamp: new Date().toISOString(),
+                        // You can add more context data here
+                        // like current translation, source text, etc.
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('Action completed successfully!', 'success');
+                } else {
+                    showStatus('Action failed. Please try again.', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error performing action:', error);
+                showStatus('Network error. Please check your connection.', 'error');
+            } finally {
+                // Restore button state
+                buttonText.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Custom Editor Button loaded successfully');
+            
+            // You can add initialization logic here
+            // For example, check if we're running inside Crowdin editor
+            // and adjust the interface accordingly
+        });
+    </script>
+</body>
+</html> 
