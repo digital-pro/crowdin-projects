@@ -12,7 +12,7 @@
       {
         "key": "editor-button",
         "name": "Custom Editor Button",
-        "modes": ["translate"],
+        "modes": ["translate", "comfortable", "side-by-side", "multilingual"],
         "url": "/editor-button",
         "environments": ["crowdin"]
       }
