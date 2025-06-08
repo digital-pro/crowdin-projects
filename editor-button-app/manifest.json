@@ -2,21 +2,20 @@
   "identifier": "editor-button-app",
   "name": "Editor Button App",
   "description": "Adds a custom button to the Crowdin editor window",
-  "version": "1.0.0",
-  "author": {
-    "name": "David Cardinal",
-    "email": "david@example.com"
+  "baseUrl": "https://editor-button-app.vercel.app",
+  "authentication": {
+    "type": "none"
   },
-  "website": "https://your-website.com",
   "scopes": ["project"],
-  "modules": [
-    {
-      "key": "editor-button",
-      "name": "Custom Editor Button",
-      "description": "A custom button in the editor",
-      "url": "/editor-button",
-      "environments": ["crowdin"],
-      "contexts": ["editor"]
-    }
-  ]
+  "modules": {
+    "editor-right-panel": [
+      {
+        "key": "editor-button",
+        "name": "Custom Editor Button",
+        "modes": ["translate"],
+        "url": "/editor-button",
+        "environments": ["crowdin"]
+      }
+    ]
+  }
 }
