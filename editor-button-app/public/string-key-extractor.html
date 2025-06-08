@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>String Key Extractor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .extract-button {
+            background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            width: 100%;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .extract-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .extract-button:active {
+            transform: translateY(0);
+        }
+
+        .extract-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-section {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .result-section.success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .result-section.error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .result-section.info {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-title.success {
+            color: #155724;
+        }
+
+        .result-title.error {
+            color: #721c24;
+        }
+
+        .result-title.info {
+            color: #856404;
+        }
+
+        .string-key-display {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: bold;
+            word-break: break-all;
+            position: relative;
+        }
+
+        .copy-key-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-key-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .extraction-method {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+
+        .limitation-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .limitation-notice h3 {
+            color: #856404;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .limitation-notice p {
+            color: #856404;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .limitation-notice ul {
+            color: #856404;
+            margin-left: 20px;
+            line-height: 1.6;
+        }
+
+        .methods-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .method-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .method-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .method-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .method-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .method-status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .method-status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .alternatives-section {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .alternatives-section h3 {
+            color: #0056b3;
+            margin-bottom: 15px;
+        }
+
+        .alternatives-section ol {
+            color: #0056b3;
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .alternatives-section li {
+            margin-bottom: 10px;
+        }
+
+        .alternatives-section code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .debug-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .debug-section h3 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+
+        .debug-info {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .api-config-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .api-config-section h3 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .config-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .config-item label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .config-item input {
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        .config-item small {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .test-api-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .test-api-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .api-test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        .api-test-result.success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .api-test-result.error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .api-test-result.info {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+
+        .string-selection-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .string-option {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            cursor: pointer;
+            width: calc(50% - 10px);
+        }
+
+        .string-identifier {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .string-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .string-meta {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .project-id-notification {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .project-id-notification.success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .project-id-notification.error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .help-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .help-btn:hover {
+            background: #5a6268;
+        }
+
+        .help-btn-large {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .help-btn-large:hover {
+            background: #138496;
+            transform: translateY(-1px);
+        }
+
+        .project-id-help {
+            background: #e9ecef;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .project-id-help h4 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .project-id-help ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .project-id-help li {
+            margin-bottom: 5px;
+        }
+
+        .project-id-help code {
+            background: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔑 String Key Extractor</h1>
+            <p>Extract current string keys from Crowdin Editor</p>
+        </div>
+
+        <div class="content">
+            <!-- Main Extract Button -->
+            <button id="extractBtn" class="extract-button" onclick="extractCurrentStringKey()">
+                <span id="extractIcon">🎯</span>
+                <span id="extractText">Extract Current String Key</span>
+            </button>
+
+            <!-- Result Section -->
+            <div id="resultSection" class="result-section">
+                <div id="resultTitle" class="result-title">
+                    <span id="resultIcon"></span>
+                    <span id="resultTitleText"></span>
+                </div>
+                <div id="resultContent"></div>
+            </div>
+
+            <!-- Methods Status -->
+            <div class="methods-status">
+                <div class="method-card">
+                    <div class="method-name">URL Parameters</div>
+                    <div id="urlStatus" class="method-status pending">Ready</div>
+                </div>
+                <div class="method-card">
+                    <div class="method-name">PostMessage API</div>
+                    <div id="postmessageStatus" class="method-status pending">Ready</div>
+                </div>
+                <div class="method-card">
+                    <div class="method-name">Global Variables</div>
+                    <div id="globalsStatus" class="method-status pending">Ready</div>
+                </div>
+                <div class="method-card">
+                    <div class="method-name">DOM Analysis</div>
+                    <div id="domStatus" class="method-status pending">Ready</div>
+                </div>
+                <div class="method-card">
+                    <div class="method-name">Crowdin API</div>
+                    <div id="apiStatus" class="method-status pending">Ready</div>
+                </div>
+            </div>
+
+            <!-- API Configuration Section -->
+            <div class="api-config-section">
+                <h3>🔐 Crowdin API Configuration</h3>
+                <p>To use the Crowdin API method, provide your API token and project details:</p>
+                
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label for="apiToken">API Token:</label>
+                        <input type="password" id="apiToken" placeholder="Your Crowdin API token" value="161834fde81833a72996c125d9c1a1c801ae99ef15eb1d3889dfe9fbc55077aaea02b62f1e24278e" />
+                        <small>Get your token from <a href="https://crowdin.com/settings#api-key" target="_blank" rel="noopener">Crowdin Account Settings</a></small>
+                    </div>
+                    <div class="config-item">
+                        <label for="projectId">Project ID:</label>
+                        <div style="display: flex; gap: 5px;">
+                            <input type="text" id="projectId" placeholder="e.g., 123456 or project-name" value="756721" style="flex: 1;" />
+                            <button type="button" onclick="showProjectIdHelp()" class="help-btn" title="How to find Project ID">?</button>
+                        </div>
+                        <small>Will be auto-detected from URL if available</small>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button id="testApiBtn" class="test-api-btn" onclick="testCrowdinAPI()">
+                        🧪 Test API Connection
+                    </button>
+                    <button type="button" class="help-btn-large" onclick="showProjectIdHelp()">
+                        📋 How to find Project ID
+                    </button>
+                    <button type="button" class="help-btn-large" onclick="discoverProjects()" style="background: #28a745;">
+                        🔍 Find My Projects
+                    </button>
+                    <button type="button" class="help-btn-large" onclick="testProjectEndpoint()" style="background: #6f42c1;">
+                        🧪 Test Endpoint
+                    </button>
+                    <button type="button" class="help-btn-large" onclick="runFullDiagnostic()" style="background: #fd7e14;">
+                        🔧 Full API Diagnostic
+                    </button>
+                </div>
+                
+                <div id="apiTestResult" class="api-test-result" style="display: none;"></div>
+            </div>
+
+            <!-- Limitation Notice -->
+            <div class="limitation-notice">
+                <h3>
+                    ⚠️ Important Limitations
+                </h3>
+                <p><strong>Crowdin App Architecture Limitation:</strong></p>
+                <p>Due to Crowdin's security architecture, editor panel apps have very limited access to current string context. This is by design to maintain security and prevent unauthorized access to project data.</p>
+                <ul>
+                    <li><strong>editor-right-panel</strong> modules: Limited string context access</li>
+                    <li><strong>editor-translations-panel</strong> modules: Even more limited access</li>
+                    <li><strong>String keys</strong> are not passed in URL parameters for these module types</li>
+                    <li><strong>Current string context</strong> requires authenticated API access with proper permissions</li>
+                </ul>
+            </div>
+
+            <!-- Alternative Solutions -->
+            <div class="alternatives-section">
+                <h3>💡 Alternative Solutions</h3>
+                <p><strong>Since direct string key extraction is limited, here are recommended approaches:</strong></p>
+                <ol>
+                    <li><strong>Use Crowdin API directly:</strong> Access string data via authenticated API calls with proper project permissions</li>
+                    <li><strong>Copy String URL feature:</strong> Use the built-in "Copy String URL" option in the Crowdin Editor string menu (⋮)</li>
+                    <li><strong>Browser Developer Tools:</strong> Inspect network requests in the Editor to find string IDs in API calls</li>
+                    <li><strong>Export project data:</strong> Download project files or use API to get complete string lists with identifiers</li>
+                    <li><strong>Webhook integration:</strong> Set up webhooks to capture string events and identifiers</li>
+                    <li><strong>Custom integration:</strong> Build a server-side integration using Crowdin API with proper authentication</li>
+                </ol>
+            </div>
+
+            <!-- Debug Information -->
+            <div class="debug-section">
+                <h3>🔧 Debug Information</h3>
+                <div class="debug-info" id="debugInfo">Click "Extract Current String Key" to see debug information...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let extractedStringKey = null;
+        let extractionMethod = null;
+
+        // Main extraction function
+        async function extractCurrentStringKey() {
+            const extractBtn = document.getElementById('extractBtn');
+            const extractIcon = document.getElementById('extractIcon');
+            const extractText = document.getElementById('extractText');
+            
+            // Disable button and show loading
+            extractBtn.disabled = true;
+            extractIcon.innerHTML = '<span class="loading-spinner"></span>';
+            extractText.textContent = 'Extracting String Key...';
+            
+            // Reset result section
+            hideResultSection();
+            resetMethodStatuses();
+            
+            let stringKey = null;
+            let method = null;
+            let allContext = {};
+            
+            try {
+                // Method 1: URL Parameters
+                updateMethodStatus('urlStatus', 'pending', 'Checking...');
+                const urlResult = await extractFromURL();
+                Object.assign(allContext, urlResult.context);
+                
+                if (urlResult.stringKey) {
+                    stringKey = urlResult.stringKey;
+                    method = 'URL Parameters';
+                    updateMethodStatus('urlStatus', 'success', 'Found!');
+                } else {
+                    updateMethodStatus('urlStatus', 'error', 'Not found');
+                }
+                
+                // Method 2: PostMessage API
+                if (!stringKey) {
+                    updateMethodStatus('postmessageStatus', 'pending', 'Listening...');
+                    const postMessageResult = await extractFromPostMessage();
+                    Object.assign(allContext, postMessageResult.context);
+                    
+                    if (postMessageResult.stringKey) {
+                        stringKey = postMessageResult.stringKey;
+                        method = 'PostMessage API';
+                        updateMethodStatus('postmessageStatus', 'success', 'Found!');
+                    } else {
+                        updateMethodStatus('postmessageStatus', 'error', 'Not found');
+                    }
+                }
+                
+                // Method 3: Global Variables
+                if (!stringKey) {
+                    updateMethodStatus('globalsStatus', 'pending', 'Scanning...');
+                    const globalsResult = await extractFromGlobals();
+                    Object.assign(allContext, globalsResult.context);
+                    
+                    if (globalsResult.stringKey) {
+                        stringKey = globalsResult.stringKey;
+                        method = 'Global Variables';
+                        updateMethodStatus('globalsStatus', 'success', 'Found!');
+                    } else {
+                        updateMethodStatus('globalsStatus', 'error', 'Not found');
+                    }
+                }
+                
+                // Method 4: DOM Analysis
+                if (!stringKey) {
+                    updateMethodStatus('domStatus', 'pending', 'Analyzing...');
+                    const domResult = await extractFromDOM();
+                    Object.assign(allContext, domResult.context);
+                    
+                    if (domResult.stringKey) {
+                        stringKey = domResult.stringKey;
+                        method = 'DOM Analysis';
+                        updateMethodStatus('domStatus', 'success', 'Found!');
+                    } else {
+                        updateMethodStatus('domStatus', 'error', 'Not found');
+                    }
+                }
+                
+                // Method 5: Crowdin API
+                if (!stringKey) {
+                    updateMethodStatus('apiStatus', 'pending', 'Calling API...');
+                    const apiResult = await extractFromCrowdinAPI();
+                    Object.assign(allContext, apiResult.context);
+                    
+                    if (apiResult.stringKey) {
+                        stringKey = apiResult.stringKey;
+                        method = 'Crowdin API';
+                        updateMethodStatus('apiStatus', 'success', 'Found!');
+                        
+                        // Show result with API data
+                        showSuccessResult(stringKey, method, apiResult.apiData);
+                        updateDebugInfo(allContext);
+                        await logExtractionAttempt(allContext, stringKey, method);
+                        return; // Early return for API success
+                    } else {
+                        updateMethodStatus('apiStatus', 'error', 'Not found');
+                    }
+                }
+                
+                // Update debug info
+                updateDebugInfo(allContext);
+                
+                // Send to server for logging
+                await logExtractionAttempt(allContext, stringKey, method);
+                
+                // Show result
+                if (stringKey) {
+                    showSuccessResult(stringKey, method);
+                } else {
+                    showErrorResult('No string key found using any available method.');
+                }
+                
+            } catch (error) {
+                console.error('Extraction error:', error);
+                showErrorResult(`Extraction failed: ${error.message}`);
+                updateDebugInfo({ error: error.message, stack: error.stack });
+            } finally {
+                // Re-enable button
+                extractBtn.disabled = false;
+                extractIcon.textContent = '🎯';
+                extractText.textContent = 'Extract Current String Key';
+            }
+        }
+
+        // Enhanced Method 1: URL Parameters with better parsing
+        async function extractFromURL() {
+            const context = {
+                search: window.location.search,
+                hash: window.location.hash,
+                urlParams: {},
+                referrerParams: {},
+                parentUrl: null
+            };
+            
+            // Parse current URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            for (const [key, value] of urlParams) {
+                context.urlParams[key] = value;
+            }
+            
+            // Try to get parent window URL (if accessible)
+            try {
+                if (window.parent && window.parent !== window) {
+                    context.parentUrl = window.parent.location.href;
+                    const parentParams = new URLSearchParams(window.parent.location.search);
+                    for (const [key, value] of parentParams) {
+                        context.referrerParams[key] = value;
+                    }
+                }
+            } catch (e) {
+                console.log('Cannot access parent URL due to cross-origin restrictions');
+            }
+            
+            // Parse referrer URL
+            if (document.referrer) {
+                try {
+                    const referrerUrl = new URL(document.referrer);
+                    const referrerParams = new URLSearchParams(referrerUrl.search);
+                    for (const [key, value] of referrerParams) {
+                        context.referrerParams[key] = value;
+                    }
+                    
+                    // Extract string info from referrer path
+                    const pathParts = referrerUrl.pathname.split('/');
+                    const stringIndex = pathParts.findIndex(part => part === 'strings' || part === 'string');
+                    if (stringIndex !== -1 && pathParts[stringIndex + 1]) {
+                        context.referrerParams.stringId = pathParts[stringIndex + 1];
+                    }
+                } catch (e) {
+                    console.log('Failed to parse referrer URL');
+                }
+            }
+            
+            // Look for string identifiers in all parameters
+            const allParams = { ...context.urlParams, ...context.referrerParams };
+            const possibleKeys = [
+                'stringKey', 'string_key', 'key', 'identifier', 'string_identifier',
+                'sourceKey', 'source_key', 'translationKey', 'translation_key',
+                'stringId', 'string_id', 'id', 'translation_id'
+            ];
+            
+            for (const param of possibleKeys) {
+                if (allParams[param] && allParams[param] !== '') {
+                    return { stringKey: allParams[param], context };
+                }
+            }
+            
+            return { stringKey: null, context };
+        }
+
+        // Enhanced Method 2: PostMessage API with better listening
+        async function extractFromPostMessage() {
+            const context = { postMessages: [], listeners: [] };
+            
+            return new Promise((resolve) => {
+                const timeout = setTimeout(() => {
+                    resolve({ stringKey: null, context });
+                }, 2000);
+                
+                // Listen for messages from parent window
+                const messageHandler = (event) => {
+                    context.postMessages.push({
+                        origin: event.origin,
+                        data: event.data,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    // Try to extract string info from message data
+                    if (event.data && typeof event.data === 'object') {
+                        const stringKey = event.data.stringKey || 
+                                        event.data.string_key || 
+                                        event.data.key || 
+                                        event.data.identifier ||
+                                        event.data.stringId ||
+                                        event.data.string_id;
+                        
+                        if (stringKey) {
+                            clearTimeout(timeout);
+                            window.removeEventListener('message', messageHandler);
+                            resolve({ stringKey, context });
+                            return;
+                        }
+                    }
+                };
+                
+                window.addEventListener('message', messageHandler);
+                context.listeners.push('message');
+                
+                // Request string context from parent
+                try {
+                    window.parent.postMessage({ 
+                        type: 'REQUEST_STRING_CONTEXT',
+                        source: 'crowdin-string-extractor'
+                    }, '*');
+                    
+                    window.parent.postMessage({ 
+                        type: 'GET_CURRENT_STRING',
+                        source: 'crowdin-string-extractor'
+                    }, '*');
+                } catch (e) {
+                    console.log('Cannot send postMessage to parent');
+                }
+            });
+        }
+
+        // Enhanced Method 3: Global Variables with deeper inspection
+        async function extractFromGlobals() {
+            const context = { globalVariables: {}, crowdinObjects: {} };
+            
+            // Check for Crowdin-specific global variables
+            const crowdinGlobals = [
+                'crowdin', 'Crowdin', 'CROWDIN',
+                'crowdinContext', 'CrowdinContext',
+                'stringContext', 'StringContext',
+                'translationContext', 'TranslationContext',
+                'editorContext', 'EditorContext'
+            ];
+            
+            for (const globalName of crowdinGlobals) {
+                if (window[globalName]) {
+                    context.globalVariables[globalName] = window[globalName];
+                    
+                    // Try to extract string info from global object
+                    const obj = window[globalName];
+                    if (obj && typeof obj === 'object') {
+                        const stringKey = obj.stringKey || 
+                                        obj.string_key || 
+                                        obj.key || 
+                                        obj.identifier ||
+                                        obj.currentString?.key ||
+                                        obj.currentString?.identifier;
+                        
+                        if (stringKey) {
+                            return { stringKey, context };
+                        }
+                    }
+                }
+            }
+            
+            // Check parent window globals (if accessible)
+            try {
+                if (window.parent && window.parent !== window) {
+                    for (const globalName of crowdinGlobals) {
+                        if (window.parent[globalName]) {
+                            context.crowdinObjects[globalName] = 'Found in parent (details restricted)';
+                            
+                            // Try to access string info
+                            try {
+                                const obj = window.parent[globalName];
+                                const stringKey = obj.stringKey || obj.string_key || obj.key || obj.identifier;
+                                if (stringKey) {
+                                    return { stringKey, context };
+                                }
+                            } catch (e) {
+                                // Access restricted
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                context.parentAccessError = e.message;
+            }
+            
+            return { stringKey: null, context };
+        }
+
+        // Enhanced Method 4: DOM Analysis with better selectors
+        async function extractFromDOM() {
+            const context = { domElements: [], attributes: [] };
+            
+            // Look for elements with string-related attributes
+            const selectors = [
+                '[data-string-key]', '[data-string-id]', '[data-key]', '[data-identifier]',
+                '[data-translation-key]', '[data-translation-id]',
+                '.string-key', '.translation-key', '.source-string',
+                '[id*="string"]', '[class*="string"]', '[data-testid*="string"]'
+            ];
+            
+            for (const selector of selectors) {
+                try {
+                    const elements = document.querySelectorAll(selector);
+                    elements.forEach(el => {
+                        const elementInfo = {
+                            tagName: el.tagName,
+                            className: el.className,
+                            id: el.id,
+                            attributes: {}
+                        };
+                        
+                        // Get all attributes
+                        for (const attr of el.attributes) {
+                            elementInfo.attributes[attr.name] = attr.value;
+                        }
+                        
+                        context.domElements.push(elementInfo);
+                        
+                        // Check for string key in attributes
+                        const stringKey = el.getAttribute('data-string-key') ||
+                                        el.getAttribute('data-string-id') ||
+                                        el.getAttribute('data-key') ||
+                                        el.getAttribute('data-identifier') ||
+                                        el.getAttribute('data-translation-key') ||
+                                        el.textContent?.trim();
+                        
+                        if (stringKey && stringKey.length > 0 && stringKey.length < 200) {
+                            return { stringKey, context };
+                        }
+                    });
+                } catch (e) {
+                    console.log(`Failed to query selector ${selector}:`, e);
+                }
+            }
+            
+            // Check for string info in page title or meta tags
+            const title = document.title;
+            if (title.includes('string') || title.includes('translation')) {
+                context.pageTitle = title;
+            }
+            
+            const metaTags = document.querySelectorAll('meta[name*="string"], meta[property*="string"]');
+            metaTags.forEach(meta => {
+                context.attributes.push({
+                    name: meta.getAttribute('name') || meta.getAttribute('property'),
+                    content: meta.getAttribute('content')
+                });
+            });
+            
+            return { stringKey: null, context };
+        }
+
+        // Helper function to extract project ID from URL with better detection
+        function extractProjectIdFromURL() {
+            // Method 1: Check URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            let projectId = urlParams.get('projectId') || urlParams.get('project_id');
+            
+            if (projectId) {
+                console.log('Project ID found in URL params:', projectId);
+                return projectId;
+            }
+            
+            // Method 2: Check referrer URL
+            if (document.referrer) {
+                try {
+                    const referrerUrl = new URL(document.referrer);
+                    
+                    // Extract from referrer path (e.g., /project/123/translate)
+                    const pathParts = referrerUrl.pathname.split('/');
+                    const projectIndex = pathParts.findIndex(part => part === 'project');
+                    if (projectIndex !== -1 && pathParts[projectIndex + 1]) {
+                        projectId = pathParts[projectIndex + 1];
+                        console.log('Project ID found in referrer path:', projectId);
+                        return projectId;
+                    }
+                    
+                    // Extract from referrer subdomain (e.g., projectname.crowdin.com)
+                    const hostname = referrerUrl.hostname;
+                    if (hostname.includes('.crowdin.com') && !hostname.startsWith('crowdin.com')) {
+                        const subdomain = hostname.split('.')[0];
+                        if (subdomain && subdomain !== 'www' && subdomain !== 'api') {
+                            projectId = subdomain;
+                            console.log('Project ID found in referrer subdomain:', projectId);
+                            return projectId;
+                        }
+                    }
+                    
+                    // Extract from referrer parameters
+                    const referrerParams = new URLSearchParams(referrerUrl.search);
+                    projectId = referrerParams.get('projectId') || referrerParams.get('project_id');
+                    if (projectId) {
+                        console.log('Project ID found in referrer params:', projectId);
+                        return projectId;
+                    }
+                    
+                } catch (e) {
+                    console.log('Failed to parse referrer URL for project ID');
+                }
+            }
+            
+            // Method 3: Try to extract from parent window (if accessible)
+            try {
+                if (window.parent && window.parent !== window) {
+                    const parentUrl = window.parent.location.href;
+                    const parentUrlObj = new URL(parentUrl);
+                    const pathParts = parentUrlObj.pathname.split('/');
+                    const projectIndex = pathParts.findIndex(part => part === 'project');
+                    if (projectIndex !== -1 && pathParts[projectIndex + 1]) {
+                        projectId = pathParts[projectIndex + 1];
+                        console.log('Project ID found in parent URL:', projectId);
+                        return projectId;
+                    }
+                }
+            } catch (e) {
+                console.log('Cannot access parent URL for project ID extraction');
+            }
+            
+            console.log('No project ID found in any URL source');
+            return null;
+        }
+
+        // Enhanced Method 5: Crowdin API with better error handling
+        async function extractFromCrowdinAPI() {
+            const context = { apiCall: null, searchStrategies: [] };
+            const token = document.getElementById('apiToken').value;
+            let projectId = document.getElementById('projectId').value;
+            
+            // If no manual project ID, try to auto-detect
+            if (!projectId) {
+                projectId = extractProjectIdFromURL();
+                if (projectId) {
+                    document.getElementById('projectId').value = projectId;
+                    showProjectIdDetected(projectId);
+                }
+            }
+            
+            if (!token) {
+                return { stringKey: null, context: { ...context, error: 'No API token provided' } };
+            }
+            
+            if (!projectId) {
+                showProjectIdRequired();
+                return { stringKey: null, context: { ...context, error: 'No project ID available - please enter manually' } };
+            }
+            
+            try {
+                // Strategy 1: Try to get recent strings and let user choose
+                context.searchStrategies.push('recent_strings');
+                const response = await fetch('/api/crowdin/extract-string', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        projectId,
+                        strategy: 'recent_strings',
+                        limit: 20,
+                        token
+                    })
+                });
+                
+                const data = await response.json();
+                context.apiCall = data;
+                
+                if (data.success && data.strings && data.strings.length > 0) {
+                    // Show string selection UI
+                    showStringSelectionUI(data.strings, data.debugInfo);
+                    return { 
+                        stringKey: null, // Don't auto-select, let user choose
+                        context, 
+                        method: 'Crowdin API (Selection Required)',
+                        apiData: data.strings
+                    };
+                } else if (data.success && data.string) {
+                    const extractedKey = data.string.identifier || data.string.id || data.string.text;
+                    return { 
+                        stringKey: extractedKey, 
+                        context, 
+                        method: 'Crowdin API',
+                        apiData: data.string
+                    };
+                } else {
+                    // Show detailed error with debug info
+                    showAPIDebugInfo(data.debugInfo, data.error);
+                    return { 
+                        stringKey: null, 
+                        context: { ...context, error: data.error || 'No strings found in project', debugInfo: data.debugInfo }
+                    };
+                }
+                
+            } catch (error) {
+                return { 
+                    stringKey: null, 
+                    context: { ...context, error: error.message }
+                };
+            }
+        }
+
+        // Show project ID detection notification
+        function showProjectIdDetected(projectId) {
+            const notification = document.createElement('div');
+            notification.className = 'project-id-notification success';
+            notification.innerHTML = `✅ Project ID auto-detected: <strong>${projectId}</strong>`;
+            
+            const configSection = document.querySelector('.api-config-section');
+            configSection.insertBefore(notification, configSection.firstChild);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Show project ID required notification
+        function showProjectIdRequired() {
+            const notification = document.createElement('div');
+            notification.className = 'project-id-notification error';
+            notification.innerHTML = `
+                ⚠️ <strong>Project ID Required</strong><br>
+                Please enter your project ID manually. You can find it in:
+                <ul style="margin: 5px 0; padding-left: 20px;">
+                    <li>Crowdin project URL: /project/<strong>PROJECT_ID</strong>/</li>
+                    <li>Project Settings → General → Project ID</li>
+                    <li>API documentation for your project</li>
+                </ul>
+            `;
+            
+            const configSection = document.querySelector('.api-config-section');
+            const existingNotification = configSection.querySelector('.project-id-notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            configSection.insertBefore(notification, configSection.firstChild);
+            
+            // Focus on project ID input
+            document.getElementById('projectId').focus();
+            document.getElementById('projectId').style.borderColor = '#dc3545';
+            
+            setTimeout(() => {
+                document.getElementById('projectId').style.borderColor = '#dee2e6';
+            }, 3000);
+        }
+
+        // Show API debug information
+        function showAPIDebugInfo(debugInfo, error) {
+            const resultSection = document.getElementById('resultSection');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultTitleText = document.getElementById('resultTitleText');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultSection.className = 'result-section error';
+            resultTitle.className = 'result-title error';
+            resultIcon.textContent = '🔍';
+            resultTitleText.textContent = 'API Debug Information';
+            
+            let debugHtml = `<div style="text-align: left;">`;
+            debugHtml += `<p><strong>Error:</strong> ${error}</p>`;
+            
+            if (debugInfo) {
+                if (debugInfo.projectInfo) {
+                    debugHtml += `
+                        <div style="margin: 15px 0; padding: 10px; background: #e7f3ff; border-radius: 4px;">
+                            <strong>✅ Project Access Successful:</strong><br>
+                            Name: ${debugInfo.projectInfo.name}<br>
+                            ID: ${debugInfo.projectInfo.id}<br>
+                            Type: ${debugInfo.projectInfo.type}<br>
+                            Source Language: ${debugInfo.projectInfo.sourceLanguageId}
+                        </div>
+                    `;
+                }
+                
+                if (debugInfo.attempts && debugInfo.attempts.length > 0) {
+                    debugHtml += `<div style="margin: 15px 0;"><strong>API Attempts:</strong><ul>`;
+                    debugInfo.attempts.forEach((attempt, index) => {
+                        const statusIcon = attempt.status === 'success' ? '✅' : 
+                                         attempt.status === 'error' ? '❌' : 
+                                         attempt.status === 'empty' ? '⚠️' : '🔄';
+                        debugHtml += `<li>${statusIcon} ${attempt.method || attempt.endpoint || `Attempt ${index + 1}`}`;
+                        if (attempt.count) debugHtml += ` (${attempt.count} strings)`;
+                        if (attempt.error) debugHtml += ` - ${attempt.error}`;
+                        debugHtml += `</li>`;
+                    });
+                    debugHtml += `</ul></div>`;
+                }
+                
+                if (typeof debugInfo.filesFound !== 'undefined') {
+                    debugHtml += `<p><strong>Files Found:</strong> ${debugInfo.filesFound}</p>`;
+                }
+                
+                if (debugInfo.errors && debugInfo.errors.length > 0) {
+                    debugHtml += `<div style="margin: 15px 0;"><strong>Detailed Errors:</strong><ul>`;
+                    debugInfo.errors.forEach(err => {
+                        debugHtml += `<li>❌ ${err}</li>`;
+                    });
+                    debugHtml += `</ul></div>`;
+                }
+            }
+            
+            debugHtml += `
+                <div style="margin-top: 20px; padding: 10px; background: #fff3cd; border-radius: 4px;">
+                    <strong>💡 Possible Solutions:</strong>
+                    <ol style="margin: 10px 0; padding-left: 20px;">
+                        <li>Verify your project ID is correct (check project URL or settings)</li>
+                        <li>Ensure your API token has "Project" scope permissions</li>
+                        <li>Check if the project has any strings/files uploaded</li>
+                        <li>Try a different project ID format (numeric vs string)</li>
+                        <li>Verify you have access to this specific project</li>
+                    </ol>
+                </div>
+            `;
+            debugHtml += `</div>`;
+            
+            resultContent.innerHTML = debugHtml;
+            resultSection.style.display = 'block';
+        }
+
+        // Show string selection UI when multiple strings are found
+        function showStringSelectionUI(strings, debugInfo = null) {
+            const resultSection = document.getElementById('resultSection');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultTitleText = document.getElementById('resultTitleText');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultSection.className = 'result-section info';
+            resultTitle.className = 'result-title info';
+            resultIcon.textContent = '📋';
+            resultTitleText.textContent = 'Select String Key';
+            
+            const stringOptions = strings.map((string, index) => `
+                <div class="string-option" onclick="selectString('${string.identifier || string.id}', '${string.identifier || string.id}', ${JSON.stringify(string).replace(/'/g, "&apos;")})">
+                    <div class="string-identifier">${string.identifier || `ID: ${string.id}`}</div>
+                    <div class="string-text">${string.text?.substring(0, 100)}${string.text?.length > 100 ? '...' : ''}</div>
+                    <div class="string-meta">File ID: ${string.fileId || 'N/A'} | Created: ${string.createdAt ? new Date(string.createdAt).toLocaleDateString() : 'N/A'}</div>
+                </div>
+            `).join('');
+            
+            resultContent.innerHTML = `
+                <p>Found ${strings.length} strings in your project. Select the one you're working with:</p>
+                <div class="string-selection-list">
+                    ${stringOptions}
+                </div>
+                <p style="margin-top: 15px; font-size: 0.9rem; color: #6c757d;">
+                    Click on a string to copy its key/identifier.
+                </p>
+            `;
+            
+            resultSection.style.display = 'block';
+        }
+
+        // Handle string selection
+        function selectString(stringKey, identifier, stringData) {
+            extractedStringKey = stringKey;
+            extractionMethod = 'Crowdin API (User Selected)';
+            
+            showSuccessResult(stringKey, extractionMethod, JSON.parse(stringData.replace(/&apos;/g, "'")));
+        }
+
+        // Test Crowdin API connection
+        async function testCrowdinAPI() {
+            const token = document.getElementById('apiToken').value;
+            const testBtn = document.getElementById('testApiBtn');
+            const resultDiv = document.getElementById('apiTestResult');
+            
+            if (!token) {
+                showApiTestResult('error', 'Please enter an API token');
+                return;
+            }
+            
+            testBtn.disabled = true;
+            testBtn.textContent = '🔄 Testing...';
+            
+            try {
+                const response = await fetch('/api/crowdin/test-connection', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ token })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showApiTestResult('success', `✅ Connected successfully! User: ${data.user.username}`);
+                } else {
+                    showApiTestResult('error', `❌ Connection failed: ${data.error}`);
+                }
+                
+            } catch (error) {
+                showApiTestResult('error', `❌ Connection failed: ${error.message}`);
+            } finally {
+                testBtn.disabled = false;
+                testBtn.textContent = '🧪 Test API Connection';
+            }
+        }
+
+        // Discover user's projects
+        async function discoverProjects() {
+            console.log('🔍 discoverProjects function called');
+            
+            const token = document.getElementById('apiToken').value;
+            console.log('Token length:', token ? token.length : 'No token');
+            
+            if (!token) {
+                console.log('❌ No token provided');
+                showApiTestResult('error', 'Please enter an API token first');
+                return;
+            }
+            
+            const discoverBtn = event.target;
+            const originalText = discoverBtn.textContent;
+            console.log('Button clicked:', originalText);
+            
+            discoverBtn.disabled = true;
+            discoverBtn.textContent = '🔄 Finding Projects...';
+            
+            // Show immediate feedback
+            showApiTestResult('info', '🔄 Searching for your projects...');
+            
+            try {
+                console.log('📡 Making API request to /api/crowdin/discover-projects');
+                
+                const response = await fetch('/api/crowdin/discover-projects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ token })
+                });
+                
+                console.log('📡 Response status:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ HTTP Error:', response.status, errorText);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('📊 Project discovery response:', data);
+                
+                // Detailed logging of each project
+                if (data.projects && Array.isArray(data.projects)) {
+                    console.log(`📋 Projects array length: ${data.projects.length}`);
+                    data.projects.forEach((project, index) => {
+                        console.log(`Project ${index}:`, {
+                            id: project.id,
+                            name: project.name,
+                            type: project.type,
+                            sourceLanguageId: project.sourceLanguageId,
+                            fullProject: project
+                        });
+                    });
+                }
+                
+                if (data.success && data.projects && Array.isArray(data.projects) && data.projects.length > 0) {
+                    console.log(`✅ Found ${data.projects.length} projects`);
+                    showProjectSelectionUI(data.projects);
+                } else {
+                    const errorMsg = data.error || 'No accessible projects found';
+                    console.log('⚠️ No projects:', errorMsg);
+                    showApiTestResult('error', `❌ No projects found: ${errorMsg}`);
+                }
+                
+            } catch (error) {
+                console.error('❌ Project discovery error:', error);
+                showApiTestResult('error', `❌ Failed to discover projects: ${error.message}`);
+            } finally {
+                discoverBtn.disabled = false;
+                discoverBtn.textContent = originalText;
+                console.log('🔄 Button reset');
+            }
+        }
+
+        // Show project selection UI
+        function showProjectSelectionUI(projects) {
+            try {
+                console.log('Showing project selection UI for projects:', projects);
+                
+                if (!Array.isArray(projects) || projects.length === 0) {
+                    showApiTestResult('error', '❌ No projects data received');
+                    return;
+                }
+                
+                const resultSection = document.getElementById('resultSection');
+                const resultTitle = document.getElementById('resultTitle');
+                const resultTitleText = document.getElementById('resultTitleText');
+                const resultIcon = document.getElementById('resultIcon');
+                const resultContent = document.getElementById('resultContent');
+                
+                resultSection.className = 'result-section info';
+                resultTitle.className = 'result-title info';
+                resultIcon.textContent = '📋';
+                resultTitleText.textContent = 'Select Your Project';
+                
+                const projectOptions = projects.map((project, index) => {
+                    try {
+                        console.log(`Processing project ${index}:`, project);
+                        
+                        // More robust project ID extraction
+                        let projectId = project.id;
+                        if (projectId === null || projectId === undefined || projectId === '') {
+                            console.warn(`Project ${index} has invalid ID:`, projectId, 'Full project:', project);
+                            projectId = `invalid-project-${index}`;
+                        }
+                        
+                        const projectName = project.name || 'Unnamed Project';
+                        const safeProjectName = projectName.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+                        const projectType = project.type || 'N/A';
+                        const sourceLanguage = project.sourceLanguageId || 'N/A';
+                        
+                        console.log(`Project ${index} processed: ID=${projectId}, Name=${projectName}, Type=${projectType}`);
+                        
+                        // Show warning for invalid project IDs
+                        const warningStyle = (projectId.toString().startsWith('invalid-project-')) ? 
+                            'style="opacity: 0.5; border: 2px solid #dc3545;"' : '';
+                        
+                        return `
+                            <div class="string-option" onclick="selectProject('${projectId}', '${safeProjectName}')" ${warningStyle}>
+                                <div class="string-identifier">ID: ${projectId}</div>
+                                <div class="string-text">${projectName}</div>
+                                <div class="string-meta">Type: ${projectType} | Language: ${sourceLanguage}</div>
+                                ${projectId.toString().startsWith('invalid-project-') ? 
+                                    '<div style="color: #dc3545; font-size: 0.8rem;">⚠️ Invalid project ID - check API response</div>' : ''}
+                            </div>
+                        `;
+                    } catch (error) {
+                        console.error('Error processing project:', project, error);
+                        return `
+                            <div class="string-option" style="opacity: 0.5; border: 2px solid #dc3545;">
+                                <div class="string-identifier">Error processing project</div>
+                                <div class="string-text">Project data: ${JSON.stringify(project).substring(0, 100)}...</div>
+                                <div style="color: #dc3545; font-size: 0.8rem;">❌ Processing error: ${error.message}</div>
+                            </div>
+                        `;
+                    }
+                }).join('');
+                
+                resultContent.innerHTML = `
+                    <p>Found ${projects.length} accessible projects. Click on your project to use its ID:</p>
+                    <div class="string-selection-list">
+                        ${projectOptions}
+                    </div>
+                    <p style="margin-top: 15px; font-size: 0.9rem; color: #6c757d;">
+                        Click on a project to automatically fill in the Project ID field.
+                    </p>
+                `;
+                
+                resultSection.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error in showProjectSelectionUI:', error);
+                showApiTestResult('error', `❌ Error displaying projects: ${error.message}`);
+            }
+        }
+
+        // Handle project selection
+        function selectProject(projectId, projectName) {
+            document.getElementById('projectId').value = projectId;
+            
+            // Show success notification
+            const notification = document.createElement('div');
+            notification.className = 'project-id-notification success';
+            notification.innerHTML = `✅ Project selected: <strong>${projectName.replace(/&apos;/g, "'")}</strong> (ID: ${projectId})`;
+            
+            const configSection = document.querySelector('.api-config-section');
+            const existingNotification = configSection.querySelector('.project-id-notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            configSection.insertBefore(notification, configSection.firstChild);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+            
+            // Hide the result section
+            document.getElementById('resultSection').style.display = 'none';
+        }
+
+        // Test the project endpoint directly
+        async function testProjectEndpoint() {
+            console.log('🧪 Testing project endpoint');
+            
+            const token = document.getElementById('apiToken').value;
+            
+            if (!token) {
+                showApiTestResult('error', 'Please enter an API token first');
+                return;
+            }
+            
+            const testBtn = event.target;
+            const originalText = testBtn.textContent;
+            testBtn.disabled = true;
+            testBtn.textContent = '🔄 Testing...';
+            
+            try {
+                console.log('📡 Testing /api/crowdin/discover-projects endpoint');
+                
+                const response = await fetch('/api/crowdin/discover-projects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ token })
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                    console.log('Parsed response:', data);
+                } catch (parseError) {
+                    console.error('JSON parse error:', parseError);
+                    showApiTestResult('error', `❌ Invalid JSON response: ${responseText.substring(0, 100)}`);
+                    return;
+                }
+                
+                if (response.ok) {
+                    showApiTestResult('success', `✅ Endpoint works! Status: ${response.status}, Projects: ${data.projects ? data.projects.length : 'N/A'}`);
+                } else {
+                    showApiTestResult('error', `❌ Endpoint error: ${response.status} - ${data.error || 'Unknown error'}`);
+                }
+                
+            } catch (error) {
+                console.error('❌ Test error:', error);
+                showApiTestResult('error', `❌ Test failed: ${error.message}`);
+            } finally {
+                testBtn.disabled = false;
+                testBtn.textContent = originalText;
+            }
+        }
+
+        // Full API diagnostic
+        async function runFullDiagnostic() {
+            console.log('🔧 Running full API diagnostic');
+            
+            const token = document.getElementById('apiToken').value;
+            
+            if (!token) {
+                showApiTestResult('error', 'Please enter an API token first');
+                return;
+            }
+            
+            const diagnosticBtn = event.target;
+            const originalText = diagnosticBtn.textContent;
+            diagnosticBtn.disabled = true;
+            diagnosticBtn.textContent = '🔄 Running Diagnostic...';
+            
+            const results = [];
+            
+            try {
+                // Test 1: Basic API connectivity
+                results.push('🔍 Testing basic API connectivity...');
+                showApiTestResult('info', '🔍 Step 1/5: Testing basic API connectivity...');
+                
+                try {
+                    const response = await fetch('https://api.crowdin.com/api/v2/user', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const userData = await response.json();
+                        results.push(`✅ API connectivity: SUCCESS`);
+                        results.push(`👤 User: ${userData.data.username} (${userData.data.fullName})`);
+                        console.log('User data:', userData);
+                    } else {
+                        const errorText = await response.text();
+                        results.push(`❌ API connectivity: FAILED (${response.status})`);
+                        results.push(`Error: ${errorText}`);
+                        console.error('User API error:', response.status, errorText);
+                    }
+                } catch (error) {
+                    results.push(`❌ API connectivity: FAILED`);
+                    results.push(`Error: ${error.message}`);
+                    console.error('User API error:', error);
+                }
+                
+                // Test 2: Projects list
+                results.push('\n🔍 Testing projects access...');
+                showApiTestResult('info', '🔍 Step 2/5: Testing projects access...');
+                
+                try {
+                    const response = await fetch('https://api.crowdin.com/api/v2/projects?limit=100', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const projectsData = await response.json();
+                        results.push(`✅ Projects access: SUCCESS`);
+                        results.push(`📁 Found ${projectsData.data.length} projects`);
+                        
+                        if (projectsData.data.length > 0) {
+                            results.push('\n📋 Your projects:');
+                            projectsData.data.forEach((projectWrapper, index) => {
+                                // Show raw project data for debugging
+                                console.log(`Raw project wrapper ${index}:`, projectWrapper);
+                                
+                                // Handle nested data structure
+                                const project = projectWrapper.data || projectWrapper;
+                                console.log(`Actual project data ${index}:`, project);
+                                console.log(`Project ID: ${project.id}, Name: ${project.name}, Identifier: ${project.identifier}`);
+                                
+                                const projectId = project.id || project.identifier || 'NO_ID';
+                                const projectName = project.name || 'NO_NAME';
+                                const projectType = project.type !== undefined ? project.type : 'NO_TYPE';
+                                const projectIdentifier = project.identifier || 'NO_IDENTIFIER';
+                                
+                                results.push(`  ${index + 1}. ID: ${projectId} | Name: "${projectName}" | Type: ${projectType}`);
+                                results.push(`     Identifier: "${projectIdentifier}"`);
+                                
+                                // Show all available properties
+                                const wrapperProps = Object.keys(projectWrapper).join(', ');
+                                const projectProps = Object.keys(project).join(', ');
+                                results.push(`     Wrapper properties: ${wrapperProps}`);
+                                results.push(`     Project properties: ${projectProps}`);
+                            });
+                        }
+                        console.log('Projects data:', projectsData);
+                    } else {
+                        const errorText = await response.text();
+                        results.push(`❌ Projects access: FAILED (${response.status})`);
+                        results.push(`Error: ${errorText}`);
+                        console.error('Projects API error:', response.status, errorText);
+                    }
+                } catch (error) {
+                    results.push(`❌ Projects access: FAILED`);
+                    results.push(`Error: ${error.message}`);
+                    console.error('Projects API error:', error);
+                }
+                
+                // Test 3: Test specific project with correct ID (756721)
+                results.push('\n🔍 Testing specific project with ID 756721...');
+                showApiTestResult('info', '🔍 Step 3/5: Testing project 756721...');
+                
+                // Try direct access with correct numeric ID
+                try {
+                    const response = await fetch('https://api.crowdin.com/api/v2/projects/756721', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const projectData = await response.json();
+                        results.push(`✅ Project 756721: FOUND (direct access)`);
+                        results.push(`📁 Name: "${projectData.data.name}"`);
+                        results.push(`🏷️ Type: ${projectData.data.type}`);
+                        results.push(`🌐 Source Language: ${projectData.data.sourceLanguageId}`);
+                        results.push(`🔑 Identifier: "${projectData.data.identifier}"`);
+                        console.log('Specific project data:', projectData);
+                    } else {
+                        const errorText = await response.text();
+                        results.push(`❌ Project 756721: NOT FOUND via direct access (${response.status})`);
+                        results.push(`Error: ${errorText}`);
+                        console.error('Direct project access error:', response.status, errorText);
+                        
+                        // Try to find by identifier in project list
+                        results.push(`🔍 Searching for project with identifier "levantetranslations"...`);
+                        try {
+                            const listResponse = await fetch('https://api.crowdin.com/api/v2/projects?limit=100', {
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                            
+                            if (listResponse.ok) {
+                                const listData = await listResponse.json();
+                                console.log('Full project list data for search:', listData);
+                                
+                                const matchingProject = listData.data.find(projectWrapper => {
+                                    const p = projectWrapper.data || projectWrapper;
+                                    const identifier = p.identifier || '';
+                                    const name = p.name || '';
+                                    
+                                    return identifier === 'levantetranslations' || 
+                                           name.toLowerCase().includes('levante') ||
+                                           identifier.toLowerCase().includes('levante');
+                                });
+                                
+                                if (matchingProject) {
+                                    const project = matchingProject.data || matchingProject;
+                                    results.push(`✅ Found matching project by identifier!`);
+                                    results.push(`📁 ID: ${project.id} | Name: "${project.name}"`);
+                                    results.push(`🏷️ Identifier: "${project.identifier}"`);
+                                    results.push(`🔑 Use ID "${project.id}" for API calls`);
+                                } else {
+                                    results.push(`❌ No project found with identifier "levantetranslations"`);
+                                    results.push(`💡 Available projects:`);
+                                    listData.data.slice(0, 5).forEach((projectWrapper, idx) => {
+                                        const p = projectWrapper.data || projectWrapper;
+                                        const id = p.id || 'NO_ID';
+                                        const identifier = p.identifier || 'NO_IDENTIFIER';
+                                        const name = p.name || 'NO_NAME';
+                                        results.push(`   ${idx + 1}. ID: ${id} | Identifier: "${identifier}" | Name: "${name}"`);
+                                        
+                                        // Show raw data for debugging
+                                        console.log(`Search result project wrapper ${idx}:`, projectWrapper);
+                                        console.log(`Search result project data ${idx}:`, p);
+                                    });
+                                }
+                            }
+                        } catch (searchError) {
+                            results.push(`❌ Failed to search projects: ${searchError.message}`);
+                        }
+                    }
+                } catch (error) {
+                    results.push(`❌ Project "levantetranslations": FAILED`);
+                    results.push(`Error: ${error.message}`);
+                    console.error('Specific project error:', error);
+                }
+                
+                // Test 4: Test our app's project discovery endpoint
+                results.push('\n🔍 Testing app project discovery endpoint...');
+                showApiTestResult('info', '🔍 Step 4/5: Testing app project discovery...');
+                
+                try {
+                    const response = await fetch('/api/crowdin/discover-projects', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ token })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        results.push(`✅ App endpoint: SUCCESS`);
+                        results.push(`📁 Found ${data.projects ? data.projects.length : 0} projects via app`);
+                        console.log('App endpoint data:', data);
+                    } else {
+                        const errorText = await response.text();
+                        results.push(`❌ App endpoint: FAILED (${response.status})`);
+                        results.push(`Error: ${errorText}`);
+                        console.error('App endpoint error:', response.status, errorText);
+                    }
+                } catch (error) {
+                    results.push(`❌ App endpoint: FAILED`);
+                    results.push(`Error: ${error.message}`);
+                    console.error('App endpoint error:', error);
+                }
+                
+                // Test 5: Token permissions check
+                results.push('\n🔍 Testing token permissions...');
+                showApiTestResult('info', '🔍 Step 5/5: Testing token permissions...');
+                
+                try {
+                    const response = await fetch('https://api.crowdin.com/api/v2/user', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const userData = await response.json();
+                        results.push(`✅ Token permissions: VALID`);
+                        results.push(`🔑 Token belongs to: ${userData.data.username}`);
+                        results.push(`📧 Email: ${userData.data.email || 'N/A'}`);
+                        results.push(`🏢 Organization: ${userData.data.organization || 'Personal'}`);
+                    }
+                } catch (error) {
+                    results.push(`❌ Token permissions: ERROR`);
+                    results.push(`Error: ${error.message}`);
+                }
+                
+                // Display results
+                const resultSection = document.getElementById('resultSection');
+                const resultTitle = document.getElementById('resultTitle');
+                const resultTitleText = document.getElementById('resultTitleText');
+                const resultIcon = document.getElementById('resultIcon');
+                const resultContent = document.getElementById('resultContent');
+                
+                resultSection.className = 'result-section info';
+                resultTitle.className = 'result-title info';
+                resultIcon.textContent = '🔧';
+                resultTitleText.textContent = 'API Diagnostic Results';
+                
+                resultContent.innerHTML = `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-line; font-size: 0.9rem; line-height: 1.4;">
+${results.join('\n')}
+                    </div>
+                    <p style="margin-top: 15px; font-size: 0.9rem; color: #6c757d;">
+                        Check the browser console for detailed API responses.
+                    </p>
+                `;
+                
+                resultSection.style.display = 'block';
+                showApiTestResult('success', '✅ Diagnostic complete! Check results above.');
+                
+            } catch (error) {
+                console.error('❌ Diagnostic error:', error);
+                showApiTestResult('error', `❌ Diagnostic failed: ${error.message}`);
+            } finally {
+                diagnosticBtn.disabled = false;
+                diagnosticBtn.textContent = originalText;
+            }
+        }
+
+        // Show API test result
+        function showApiTestResult(type, message) {
+            const resultDiv = document.getElementById('apiTestResult');
+            resultDiv.className = `api-test-result ${type}`;
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Show project ID help
+        function showProjectIdHelp() {
+            const configSection = document.querySelector('.api-config-section');
+            let helpDiv = configSection.querySelector('.project-id-help');
+            
+            if (helpDiv) {
+                helpDiv.remove();
+                return;
+            }
+            
+            helpDiv = document.createElement('div');
+            helpDiv.className = 'project-id-help';
+            helpDiv.innerHTML = `
+                <h4>🔍 How to Find Your Project ID</h4>
+                <p>Your Crowdin Project ID can be found in several places:</p>
+                <ol>
+                    <li><strong>Project URL:</strong> Look at your browser's address bar when in your project:<br>
+                        <code>https://crowdin.com/project/YOUR_PROJECT_ID/...</code></li>
+                    <li><strong>Project Settings:</strong> Go to Project Settings → General → Project ID</li>
+                    <li><strong>API Documentation:</strong> Check your project's API documentation page</li>
+                    <li><strong>Project Dashboard:</strong> The ID is often displayed in the project overview</li>
+                </ol>
+                <p><strong>Examples:</strong></p>
+                <ul>
+                    <li>Numeric ID: <code>123456</code></li>
+                    <li>String ID: <code>my-project-name</code></li>
+                    <li>Enterprise: <code>company-project-123</code></li>
+                </ul>
+                <p style="margin-top: 10px;">
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
+                        ✕ Close Help
+                    </button>
+                </p>
+            `;
+            
+            configSection.appendChild(helpDiv);
+        }
+
+        // UI Helper Functions
+        function updateMethodStatus(statusId, status, text) {
+            const element = document.getElementById(statusId);
+            element.className = `method-status ${status}`;
+            element.textContent = text;
+        }
+
+        function resetMethodStatuses() {
+            ['urlStatus', 'postmessageStatus', 'globalsStatus', 'domStatus', 'apiStatus'].forEach(id => {
+                updateMethodStatus(id, 'pending', 'Ready');
+            });
+        }
+
+        function showSuccessResult(stringKey, method, apiData = null) {
+            extractedStringKey = stringKey;
+            extractionMethod = method;
+            
+            const resultSection = document.getElementById('resultSection');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultTitleText = document.getElementById('resultTitleText');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultSection.className = 'result-section success';
+            resultTitle.className = 'result-title success';
+            resultIcon.textContent = '✅';
+            resultTitleText.textContent = 'String Key Found!';
+            
+            let additionalInfo = '';
+            if (apiData) {
+                additionalInfo = `
+                    <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-size: 0.9rem;">
+                        <strong>API Details:</strong><br>
+                        ID: ${apiData.id}<br>
+                        Text: ${apiData.text?.substring(0, 100)}${apiData.text?.length > 100 ? '...' : ''}<br>
+                        File ID: ${apiData.fileId || 'N/A'}
+                    </div>
+                `;
+            }
+            
+            resultContent.innerHTML = `
+                <div class="string-key-display">${stringKey}</div>
+                <div class="extraction-method">Extracted using: ${method}</div>
+                ${additionalInfo}
+                <button class="copy-key-btn" onclick="copyStringKey()">📋 Copy String Key</button>
+            `;
+            
+            resultSection.style.display = 'block';
+        }
+
+        function showErrorResult(message) {
+            const resultSection = document.getElementById('resultSection');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultTitleText = document.getElementById('resultTitleText');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultSection.className = 'result-section error';
+            resultTitle.className = 'result-title error';
+            resultIcon.textContent = '❌';
+            resultTitleText.textContent = 'No String Key Found';
+            
+            resultContent.innerHTML = `
+                <p>${message}</p>
+                <p style="margin-top: 15px; font-size: 0.9rem; color: #6c757d;">
+                    This is expected due to Crowdin's security architecture. 
+                    Please see the alternative solutions below.
+                </p>
+            `;
+            
+            resultSection.style.display = 'block';
+        }
+
+        function hideResultSection() {
+            document.getElementById('resultSection').style.display = 'none';
+        }
+
+        function copyStringKey() {
+            if (extractedStringKey) {
+                navigator.clipboard.writeText(extractedStringKey).then(() => {
+                    const btn = event.target;
+                    const originalText = btn.textContent;
+                    btn.textContent = '✅ Copied!';
+                    btn.style.background = '#218838';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.background = '#28a745';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy:', err);
+                    alert('Failed to copy to clipboard');
+                });
+            }
+        }
+
+        function updateDebugInfo(context) {
+            const debugInfo = document.getElementById('debugInfo');
+            const fullContext = {
+                timestamp: new Date().toISOString(),
+                url: window.location.href,
+                referrer: document.referrer,
+                userAgent: navigator.userAgent,
+                frameDepth: getFrameDepth(),
+                parentOrigin: getParentOrigin(),
+                extractedKey: extractedStringKey,
+                extractionMethod: extractionMethod,
+                ...context
+            };
+            
+            debugInfo.textContent = JSON.stringify(fullContext, null, 2);
+        }
+
+        function getFrameDepth() {
+            let depth = 0;
+            let currentWindow = window;
+            try {
+                while (currentWindow !== currentWindow.parent) {
+                    depth++;
+                    currentWindow = currentWindow.parent;
+                    if (depth > 10) break;
+                }
+            } catch (e) {
+                return `${depth} (access restricted)`;
+            }
+            return depth;
+        }
+
+        function getParentOrigin() {
+            try {
+                return window.parent.location.origin;
+            } catch (e) {
+                return 'Access restricted (cross-origin)';
+            }
+        }
+
+        async function logExtractionAttempt(context, stringKey, method) {
+            try {
+                await fetch('/extract-context', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'extract_string_key_button_click',
+                        extractedKey: stringKey,
+                        extractionMethod: method,
+                        context: context,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+            } catch (err) {
+                console.log('Failed to log extraction attempt:', err);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔑 String Key Extractor loaded and ready');
+            updateDebugInfo({ status: 'initialized' });
+            
+            // Auto-populate project ID if available in URL
+            const projectId = extractProjectIdFromURL();
+            if (projectId) {
+                document.getElementById('projectId').value = projectId;
+            }
+        });
+    </script>
+</body>
+</html> 
+

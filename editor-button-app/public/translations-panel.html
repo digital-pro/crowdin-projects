@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crowdin Translations Panel</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 20px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .debug-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .debug-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            text-align: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .status {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 12px;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .string-info {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        
+        .string-info h4 {
+            margin: 0 0 5px 0;
+            color: #0066cc;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Translations Panel</h1>
+        <p class="subtitle">Enhanced string context detection</p>
+        
+        <div class="button-group">
+            <button onclick="performAction('get-current-string')" id="currentStringBtn">
+                🎯 Get Current String
+            </button>
+            <button onclick="performAction('analyze-translations-context')" id="contextBtn">
+                🔍 Analyze Context
+            </button>
+            <button onclick="performAction('fetch-string-details')" id="detailsBtn">
+                📊 Fetch String Details
+            </button>
+            <button onclick="performAction('test-api-access')" id="apiTestBtn">
+                🌐 Test API Access
+            </button>
+            <button onclick="showStringKeyInfo()" id="infoBtn">
+                💡 String Key Info
+            </button>
+        </div>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div id="string-info" class="string-info" style="display: none;">
+            <h4>🔑 Current String Information</h4>
+            <div id="string-details"></div>
+        </div>
+        
+        <div id="info-panel" class="string-info" style="display: none; background: #f0f8ff; border-color: #4a90e2;">
+            <h4>💡 String Key Access in Translations Panel</h4>
+            <div id="info-content">
+                <p><strong>Current Status:</strong> String keys are not directly available in editor-translations-panel modules.</p>
+                
+                <p><strong>Why?</strong> The translations panel is designed for general translation tools rather than string-specific operations.</p>
+                
+                <p><strong>Available Alternatives:</strong></p>
+                <ul>
+                    <li><strong>API Access:</strong> Use Crowdin API with authentication to fetch string details</li>
+                    <li><strong>Webhooks:</strong> Set up webhooks to capture string events</li>
+                    <li><strong>Different Module:</strong> Consider using other module types for string-specific needs</li>
+                    <li><strong>URL Parameters:</strong> Some context may be passed via URL in specific scenarios</li>
+                </ul>
+                
+                <p><strong>What We Can Access:</strong></p>
+                <ul>
+                    <li>✅ Project context (origin, basic parameters)</li>
+                    <li>✅ User interface integration</li>
+                    <li>✅ General translation tools</li>
+                    <li>❌ Current string ID/key (requires API)</li>
+                    <li>❌ Real-time string selection events</li>
+                </ul>
+                
+                <p><strong>Next Steps:</strong> If you need string-specific data, consider implementing OAuth authentication to access the Crowdin API.</p>
+            </div>
+        </div>
+        
+        <div class="debug-info">
+            <div class="debug-title">🐛 Translations Panel Debug</div>
+            <div id="debug-content">
+                <strong>Panel URL:</strong> <span id="current-url"></span><br>
+                <strong>URL Parameters:</strong> <span id="url-params"></span><br>
+                <strong>Referrer:</strong> <span id="referrer"></span><br>
+                <strong>In iframe:</strong> <span id="in-iframe"></span><br>
+                <strong>Module Type:</strong> <span class="highlight">editor-translations-panel</span><br>
+                <strong>App Status:</strong> <span id="app-status" class="highlight">✅ Running</span><br>
+                <strong>Crowdin API:</strong> <span id="crowdin-api-status">Checking...</span><br>
+                <strong>Context Data:</strong> <span id="context-data">Detecting...</span><br>
+                <strong>String ID:</strong> <span id="string-id">Not available (requires API)</span><br>
+                <strong>String Key:</strong> <span id="string-key">Not available (requires API)</span><br>
+                <strong>Source Text:</strong> <span id="source-text">Not available (requires API)</span><br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced context detection for translations panel
+        function getCrowdinTranslationsContext() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const context = {};
+            
+            // Enhanced parameter detection for translations panel
+            const crowdinParams = [
+                'projectId', 'fileId', 'stringId', 'languageId', 'userId', 'mode',
+                'stringKey', 'identifier', 'key', 'sourceString', 'targetString',
+                'context', 'maxLength', 'isPlural', 'pluralForm', 'origin', 
+                'client_id', 'clientId', 'jwtToken', 'translationId', 'branchId',
+                'directoryId', 'taskId', 'workflowStepId'
+            ];
+            
+            crowdinParams.forEach(param => {
+                const value = urlParams.get(param);
+                if (value) {
+                    context[param] = value;
+                }
+            });
+            
+            // Try to access Crowdin's translations panel API (safely)
+            try {
+                if (window.parent && typeof window.parent.crowdin !== 'undefined') {
+                    // Try different methods to get current string context
+                    if (typeof window.parent.crowdin.getCurrentString === 'function') {
+                        const currentString = window.parent.crowdin.getCurrentString();
+                        if (currentString) {
+                            Object.assign(context, currentString);
+                        }
+                    }
+                    
+                    if (typeof window.parent.crowdin.getSelectedString === 'function') {
+                        const selectedString = window.parent.crowdin.getSelectedString();
+                        if (selectedString) {
+                            Object.assign(context, selectedString);
+                        }
+                    }
+                    
+                    if (typeof window.parent.crowdin.getContext === 'function') {
+                        const crowdinContext = window.parent.crowdin.getContext();
+                        if (crowdinContext) {
+                            Object.assign(context, crowdinContext);
+                        }
+                    }
+                } else {
+                    console.log('📝 Crowdin API not available in translations panel context');
+                }
+            } catch (e) {
+                console.log('📝 Cannot access parent crowdin object (expected for translations panel):', e.message);
+            }
+            
+            // Try to get context from global variables
+            if (window.CROWDIN_STRING_CONTEXT) {
+                Object.assign(context, window.CROWDIN_STRING_CONTEXT);
+            }
+            
+            if (window.crowdinStringContext) {
+                Object.assign(context, window.crowdinStringContext);
+            }
+            
+            return context;
+        }
+        
+        // Store received context data from messages
+        let receivedContext = {};
+        
+        // Enhanced message listener for translations panel
+        window.addEventListener('message', function(event) {
+            try {
+                console.log('📨 Received message in translations panel:', event.data);
+                
+                if (event.data && typeof event.data === 'object') {
+                    // Handle string-specific messages
+                    if (event.data.type === 'string-selected' || event.data.type === 'string-changed') {
+                        receivedContext = { ...receivedContext, ...event.data };
+                        updateDebugInfo();
+                        showStringInfo(event.data);
+                    }
+                    
+                    // Handle context messages
+                    if (event.data.type === 'translations-context' || event.data.type === 'editor-context') {
+                        receivedContext = { ...receivedContext, ...event.data };
+                        updateDebugInfo();
+                    }
+                    
+                    // Handle direct string data
+                    if (event.data.stringId || event.data.stringKey || event.data.identifier) {
+                        receivedContext = { ...receivedContext, ...event.data };
+                        updateDebugInfo();
+                        showStringInfo(event.data);
+                    }
+                }
+            } catch (e) {
+                console.log('📝 Error handling message:', e.message);
+            }
+        });
+        
+        // Enhanced context getter
+        function getEnhancedTranslationsContext() {
+            const urlContext = getCrowdinTranslationsContext();
+            return { ...urlContext, ...receivedContext };
+        }
+        
+        function updateDebugInfo() {
+            const context = getEnhancedTranslationsContext();
+            
+            document.getElementById('current-url').textContent = window.location.href;
+            document.getElementById('url-params').textContent = window.location.search || 'None';
+            document.getElementById('referrer').textContent = document.referrer || 'None';
+            document.getElementById('in-iframe').textContent = window.self !== window.top ? 'Yes' : 'No';
+            
+            // Check Crowdin API availability
+            try {
+                const apiAvailable = window.parent && typeof window.parent.crowdin !== 'undefined';
+                document.getElementById('crowdin-api-status').textContent = apiAvailable ? 
+                    '✅ Available' : '❌ Not available (normal for translations panel)';
+            } catch (e) {
+                document.getElementById('crowdin-api-status').textContent = '❌ Not accessible';
+            }
+            
+            document.getElementById('context-data').textContent = Object.keys(context).length > 0 ? 
+                JSON.stringify(context, null, 2) : 'No context detected';
+            document.getElementById('string-key').textContent = context.stringKey || context.identifier || context.key || 'Not available (requires API)';
+            document.getElementById('string-id').textContent = context.stringId || 'Not available (requires API)';
+            document.getElementById('source-text').textContent = context.sourceString || context.text || 'Not available (requires API)';
+            
+            // Log context for debugging
+            if (Object.keys(context).length > 0) {
+                console.log('📝 Current translations context:', context);
+            }
+        }
+        
+        function showStringInfo(stringData) {
+            const infoDiv = document.getElementById('string-info');
+            const detailsDiv = document.getElementById('string-details');
+            
+            if (stringData && (stringData.stringId || stringData.stringKey || stringData.identifier)) {
+                let html = '';
+                if (stringData.stringId) html += `<strong>ID:</strong> ${stringData.stringId}<br>`;
+                if (stringData.stringKey || stringData.identifier) html += `<strong>Key:</strong> ${stringData.stringKey || stringData.identifier}<br>`;
+                if (stringData.sourceString || stringData.text) html += `<strong>Source:</strong> ${stringData.sourceString || stringData.text}<br>`;
+                if (stringData.context) html += `<strong>Context:</strong> ${stringData.context}<br>`;
+                if (stringData.maxLength) html += `<strong>Max Length:</strong> ${stringData.maxLength}<br>`;
+                
+                detailsDiv.innerHTML = html;
+                infoDiv.style.display = 'block';
+            } else {
+                infoDiv.style.display = 'none';
+            }
+        }
+        
+        function showStringKeyInfo() {
+            const infoPanel = document.getElementById('info-panel');
+            const isVisible = infoPanel.style.display !== 'none';
+            
+            if (isVisible) {
+                infoPanel.style.display = 'none';
+                document.getElementById('infoBtn').textContent = '💡 String Key Info';
+            } else {
+                infoPanel.style.display = 'block';
+                document.getElementById('infoBtn').textContent = '❌ Hide Info';
+            }
+        }
+        
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            statusEl.style.display = 'block';
+            
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        async function performAction(action) {
+            const button = document.getElementById(
+                action === 'get-current-string' ? 'currentStringBtn' : 
+                action === 'analyze-translations-context' ? 'contextBtn' : 
+                action === 'fetch-string-details' ? 'detailsBtn' : 'apiTestBtn'
+            );
+            
+            button.disabled = true;
+            showStatus('Processing...', 'loading');
+            
+            try {
+                const context = getEnhancedTranslationsContext();
+                
+                const requestData = {
+                    action: action,
+                    timestamp: new Date().toISOString(),
+                    crowdinContext: context,
+                    moduleType: 'editor-translations-panel',
+                    userAgent: navigator.userAgent,
+                    referrer: document.referrer,
+                    url: window.location.href,
+                    inIframe: window.self !== window.top,
+                    windowLocation: {
+                        href: window.location.href,
+                        search: window.location.search,
+                        hash: window.location.hash,
+                        pathname: window.location.pathname
+                    }
+                };
+                
+                console.log('📤 Sending translations panel request:', requestData);
+                
+                const response = await fetch('/api/button-action', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const result = await response.json();
+                console.log('📥 Response:', result);
+                
+                if (result.success) {
+                    showStatus(`✅ ${result.message}`, 'success');
+                    
+                    // Update string info if available
+                    if (result.extractedStringInfo && (result.extractedStringInfo.stringKey || result.extractedStringInfo.stringId)) {
+                        showStringInfo(result.extractedStringInfo);
+                        document.getElementById('string-key').textContent = 
+                            result.extractedStringInfo.stringKey || 'Not found';
+                        document.getElementById('string-id').textContent = 
+                            result.extractedStringInfo.stringId || 'Not found';
+                        document.getElementById('source-text').textContent = 
+                            result.extractedStringInfo.sourceString || 'Not found';
+                    }
+                } else {
+                    showStatus(`❌ Action failed: ${result.message}`, 'error');
+                }
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+            }
+        }
+        
+        // Function to actively request string context
+        function requestStringContext() {
+            try {
+                if (window.parent && window.parent !== window) {
+                    // Try multiple message types for translations panel
+                    const messages = [
+                        { type: 'get-current-string' },
+                        { type: 'get-selected-string' },
+                        { type: 'request-string-context' },
+                        { type: 'translations-panel-ready' },
+                        { type: 'get-string-details' },
+                        { action: 'getCurrentString' },
+                        { action: 'getStringContext' }
+                    ];
+                    
+                    messages.forEach(message => {
+                        try {
+                            window.parent.postMessage(message, '*');
+                        } catch (e) {
+                            console.log('📝 Failed to send message:', message, e.message);
+                        }
+                    });
+                } else {
+                    console.log('📝 Not in iframe context - cannot request string context');
+                }
+            } catch (e) {
+                console.log('📝 Error requesting string context:', e.message);
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📝 Translations panel loaded');
+            updateDebugInfo();
+            
+            // Request string context immediately
+            requestStringContext();
+            
+            // Request context again after delays
+            setTimeout(requestStringContext, 500);
+            setTimeout(requestStringContext, 2000);
+            
+            // Update debug info every 3 seconds
+            setInterval(updateDebugInfo, 3000);
+        });
+    </script>
+</body>
+</html> 

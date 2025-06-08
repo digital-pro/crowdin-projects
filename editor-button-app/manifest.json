@@ -1,7 +1,7 @@
 {
-  "identifier": "editor-button-app",
-  "name": "Editor Button App",
-  "description": "Adds a custom button to the Crowdin editor window",
+  "identifier": "string-key-extractor",
+  "name": "String Key Extractor",
+  "description": "Extract current string keys and context from Crowdin editor",
   "baseUrl": "https://editor-button-app.vercel.app",
   "authentication": {
     "type": "none"
@@ -10,11 +10,10 @@
   "modules": {
     "editor-right-panel": [
       {
-
-        "key": "editor-button",
-        "name": "Custom Editor Button",
+        "key": "string-key-panel",
+        "name": "String Key Extractor",
         "modes": ["translate", "comfortable", "side-by-side", "multilingual"],
-        "url": "/editor-button",
+        "url": "/string-key-extractor",
         "environments": ["crowdin"]
       }
     ]
