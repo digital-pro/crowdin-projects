@@ -675,7 +675,11 @@
                             id: currentStringCache.stringId,
                             text: currentStringCache.text,
                             fileId: currentStringCache.fileId,
+                            fileName: currentStringCache.fileName,
                             context: currentStringCache.context,
+                            label: currentStringCache.label,
+                            labels: currentStringCache.labels,
+                            maxLength: currentStringCache.maxLength,
                             sourceLanguageId: currentStringCache.sourceLanguageId,
                             targetLanguageId: currentStringCache.targetLanguageId,
                             sourceLanguageName: currentStringCache.sourceLanguageName,
@@ -2133,7 +2137,11 @@ ${results.join('\n')}
             identifier: null,
             text: null,
             context: null,
+            label: null,
+            labels: null,
+            maxLength: null,
             fileId: null,
+            fileName: null,
             projectId: null,
             sourceLanguageId: null,
             targetLanguageId: null,
@@ -2290,7 +2298,11 @@ ${results.join('\n')}
                 identifier: stringData.string?.identifier || stringData.identifier || stringData.key || currentStringCache.identifier,
                 text: stringData.string?.text || stringData.text || currentStringCache.text,
                 context: stringData.string?.context || stringData.context || currentStringCache.context,
+                label: stringData.string?.label || stringData.label || currentStringCache.label,
+                labels: stringData.string?.labels || stringData.labels || currentStringCache.labels,
+                maxLength: stringData.string?.max_length !== undefined ? stringData.string.max_length : (stringData.max_length !== undefined ? stringData.max_length : currentStringCache.maxLength),
                 fileId: stringData.string?.file?.id || stringData.file?.id || currentStringCache.fileId,
+                fileName: stringData.string?.file?.name || stringData.file?.name || currentStringCache.fileName,
                 projectId: stringData.string?.project?.id || stringData.project?.id || currentStringCache.projectId,
                 sourceLanguageId: sourceLanguageId,
                 targetLanguageId: targetLanguageId,
@@ -2304,6 +2316,7 @@ ${results.join('\n')}
             updateLanguageNamesInCache();
             
             console.log('📝 Updated string cache:', JSON.stringify(currentStringCache, null, 2));
+            console.log('🔍 String data properties available:', Object.keys(stringData.string || stringData));
             
             // Update the UI to show we have cached string data
             updateStringCacheStatus();
@@ -2471,6 +2484,30 @@ ${results.join('\n')}
                     languageInfo.push(`<strong>Target:</strong> ${targetName} (${currentStringCache.targetLanguageId})`);
                 }
                 
+                // Build additional info array
+                const additionalInfo = [];
+                if (currentStringCache.label) {
+                    additionalInfo.push(`<strong>Label:</strong> ${currentStringCache.label}`);
+                }
+                if (currentStringCache.labels && Array.isArray(currentStringCache.labels) && currentStringCache.labels.length > 0) {
+                    additionalInfo.push(`<strong>Labels:</strong> ${currentStringCache.labels.join(', ')}`);
+                }
+                if (currentStringCache.maxLength !== null && currentStringCache.maxLength !== undefined) {
+                    additionalInfo.push(`<strong>Max Length:</strong> ${currentStringCache.maxLength === 0 ? 'No limit' : currentStringCache.maxLength}`);
+                }
+                if (currentStringCache.fileName) {
+                    additionalInfo.push(`<strong>File:</strong> ${currentStringCache.fileName}`);
+                }
+                
+                // Debug: Log what additional info we're showing
+                console.log('🔍 Additional info being displayed:', {
+                    label: currentStringCache.label,
+                    labels: currentStringCache.labels,
+                    maxLength: currentStringCache.maxLength,
+                    fileName: currentStringCache.fileName,
+                    additionalInfoCount: additionalInfo.length
+                });
+                
                 document.getElementById('stringCacheStatus').innerHTML = `
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
                         <span style="font-size: 1.2rem;">🎯</span>
@@ -2482,6 +2519,7 @@ ${results.join('\n')}
                         <strong>ID:</strong> ${currentStringCache.stringId || 'N/A'}<br>
                         <strong>Text:</strong> ${currentStringCache.text ? currentStringCache.text.substring(0, 100) + (currentStringCache.text.length > 100 ? '...' : '') : 'N/A'}
                         ${languageInfo.length > 0 ? '<br>' + languageInfo.join('<br>') : ''}
+                        ${additionalInfo.length > 0 ? '<br>' + additionalInfo.join('<br>') : ''}
                     </div>
                     <div style="font-size: 0.9rem; opacity: 0.8;">
                         Source: ${currentStringCache.source || 'Unknown'}
@@ -2558,7 +2596,11 @@ ${results.join('\n')}
                 identifier: null,
                 text: null,
                 context: null,
+                label: null,
+                labels: null,
+                maxLength: null,
                 fileId: null,
+                fileName: null,
                 projectId: null
             };
             
@@ -2598,9 +2640,32 @@ ${results.join('\n')}
                         result.found = true;
                     }
                     
+                    // Check for label patterns
+                    if (key.toLowerCase().includes('label') && value) {
+                        if (Array.isArray(value)) {
+                            result.labels = value;
+                        } else {
+                            result.label = value;
+                        }
+                        result.found = true;
+                    }
+                    
+                    // Check for max length patterns
+                    if ((key.toLowerCase().includes('maxlength') || key.toLowerCase().includes('max_length')) && value) {
+                        result.maxLength = value;
+                        result.found = true;
+                    }
+                    
                     // Check for file ID patterns
                     if ((key.toLowerCase().includes('fileid') || key.toLowerCase().includes('file_id')) && value) {
                         result.fileId = value;
+                        result.found = true;
+                    }
+                    
+                    // Check for file name patterns
+                    if ((key.toLowerCase().includes('filename') || key.toLowerCase().includes('file_name') || 
+                         (key === 'name' && path.toLowerCase().includes('file'))) && typeof value === 'string') {
+                        result.fileName = value;
                         result.found = true;
                     }
                     
