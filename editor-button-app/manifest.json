@@ -12,7 +12,7 @@
     "editor-right-panel": [
       {
         "key": "audio-previewer-panel",
-        "name": "Audio Previewer",
+        "name": "Preview Audio",
         "modes": ["translate", "comfortable", "side-by-side", "multilingual"],
         "url": "/audio-previewer",
         "environments": ["crowdin"]
