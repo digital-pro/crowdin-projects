@@ -1,7 +1,7 @@
 {
-  "identifier": "string-key-extractor",
-  "name": "String Key Extractor",
-  "description": "Extract current string keys and context from Crowdin editor",
+  "identifier": "audio-previewer",
+  "name": "Audio Previewer",
+  "description": "Preview audio for current strings in Crowdin editor",
   "logo": "/favicon.svg",
   "baseUrl": "https://editor-button-app.vercel.app",
   "authentication": {
@@ -11,8 +11,8 @@
   "modules": {
     "editor-right-panel": [
       {
-        "key": "string-key-panel",
-        "name": "String Key Extractor",
+        "key": "audio-preview-panel",
+        "name": "Audio Previewer",
         "modes": ["translate", "comfortable", "side-by-side", "multilingual"],
         "url": "/string-key-extractor",
         "environments": ["crowdin"]

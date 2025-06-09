@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>String Key Extractor</title>
+    <title>Audio Previewer</title>
     <script src="https://cdn.crowdin.com/apps/dist/iframe.js"></script>
     <style>
         * {
@@ -505,21 +505,15 @@
 <body>
             <div class="container">
             <div class="header">
-                <h1>🔑 String Key Extractor</h1>
-                <p>Extract current string keys from Crowdin Editor</p>
-                <div style="margin-top: 10px;">
-                    <label style="font-size: 0.9rem; color: #666;">
-                        <input type="checkbox" id="debugMode" style="margin-right: 5px;">
-                        Enable debug mode
-                    </label>
-                </div>
+                <h1>🎵 Audio Previewer</h1>
+                <p>Preview audio for the current string in Crowdin Editor</p>
             </div>
 
         <div class="content">
-            <!-- Main Extract Button -->
+            <!-- Main Play Audio Button -->
             <button id="extractBtn" class="extract-button" onclick="extractCurrentStringKey()">
-                <span id="extractIcon">🎯</span>
-                <span id="extractText">Extract Current String Key</span>
+                <span id="extractIcon">🎵</span>
+                <span id="extractText">Play Current Audio</span>
             </button>
 
             <!-- Result Section -->
@@ -637,7 +631,15 @@
             <!-- Debug Information (Debug Mode) -->
             <div id="debugInfoSection" class="debug-section" style="display: none;">
                 <h3>🔧 Debug Information</h3>
-                <div class="debug-info" id="debugInfo">Click "Extract Current String Key" to see debug information...</div>
+                <div class="debug-info" id="debugInfo">Click "Play Current Audio" to see debug information...</div>
+            </div>
+            
+            <!-- Debug Mode Toggle (Bottom) -->
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
+                <label style="font-size: 0.9rem; color: #666; cursor: pointer;">
+                    <input type="checkbox" id="debugMode" style="margin-right: 5px;">
+                    Enable debug mode
+                </label>
             </div>
         </div>
     </div>
@@ -655,7 +657,7 @@
             // Disable button and show loading
             extractBtn.disabled = true;
             extractIcon.innerHTML = '<span class="loading-spinner"></span>';
-            extractText.textContent = 'Extracting String Key...';
+            extractText.textContent = 'Loading Audio...';
             
             // Reset result section
             hideResultSection();
@@ -810,8 +812,8 @@
             } finally {
                 // Re-enable button
                 extractBtn.disabled = false;
-                extractIcon.textContent = '🎯';
-                extractText.textContent = 'Extract Current String Key';
+                extractIcon.textContent = '🎵';
+                extractText.textContent = 'Play Current Audio';
             }
         }
 
@@ -2716,7 +2718,7 @@ ${results.join('\n')}
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔑 String Key Extractor loaded and ready');
+            console.log('🎵 Audio Previewer loaded and ready');
             updateDebugInfo({ status: 'initialized' });
             
             // Initialize Crowdin API
