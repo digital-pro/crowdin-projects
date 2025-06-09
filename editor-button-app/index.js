@@ -529,11 +529,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve the manifest file dynamically
 app.get('/manifest.json', (req, res) => {
-  console.log('📋 Manifest requested');
-  
   // Get the current deployment URL
   const baseUrl = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}` 
+    ? `https://editor-button-app.vercel.app` 
     : `http://localhost:${PORT}`;
   
   const manifest = {
@@ -561,8 +559,6 @@ app.get('/manifest.json', (req, res) => {
   
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.json(manifest);
 });
 

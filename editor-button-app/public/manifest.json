@@ -3,7 +3,7 @@
   "name": "String Key Extractor",
   "description": "Extract current string keys and context from Crowdin editor",
   "logo": "/favicon.svg",
-  "baseUrl": "https://editor-button-gxmpc9a03-digitalpros-projects.vercel.app",
+  "baseUrl": "https://editor-button-app.vercel.app",
   "authentication": {
     "type": "none"
   },

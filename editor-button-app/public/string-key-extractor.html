@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>String Key Extractor</title>
+    <script src="https://cdn.crowdin.com/apps/dist/iframe.js"></script>
     <style>
         * {
             margin: 0;
@@ -527,6 +528,10 @@
             <!-- Methods Status -->
             <div class="methods-status">
                 <div class="method-card">
+                    <div class="method-name">🎯 Cached String Data</div>
+                    <div id="cacheStatus" class="method-status pending">Waiting...</div>
+                </div>
+                <div class="method-card">
                     <div class="method-name">URL Parameters</div>
                     <div id="urlStatus" class="method-status pending">Ready</div>
                 </div>
@@ -651,6 +656,43 @@
             let allContext = {};
             
             try {
+                // Method 0: Cached String Data (Priority Method)
+                updateMethodStatus('cacheStatus', 'pending', 'Checking...');
+                if (currentStringCache.stringKey || currentStringCache.stringId) {
+                    console.log('🎯 Using cached string data:', currentStringCache);
+                    
+                    const cachedKey = currentStringCache.stringKey || 
+                                    currentStringCache.identifier || 
+                                    currentStringCache.stringId;
+                    
+                    if (cachedKey) {
+                        stringKey = cachedKey;
+                        method = 'Cached String Data (Crowdin Apps JS API)';
+                        updateMethodStatus('cacheStatus', 'success', 'Found!');
+                        
+                        // Show success with cached data
+                        const cacheData = {
+                            id: currentStringCache.stringId,
+                            text: currentStringCache.text,
+                            fileId: currentStringCache.fileId,
+                            context: currentStringCache.context,
+                            source: currentStringCache.source,
+                            lastUpdated: currentStringCache.lastUpdated
+                        };
+                        
+                        showSuccessResult(stringKey, method, cacheData);
+                        updateDebugInfo({ 
+                            ...allContext, 
+                            cachedData: currentStringCache,
+                            extractionSource: 'cache'
+                        });
+                        await logExtractionAttempt(allContext, stringKey, method);
+                        return; // Early return for cached success
+                    }
+                } else {
+                    updateMethodStatus('cacheStatus', 'error', 'No cache');
+                }
+                
                 // Method 1: URL Parameters
                 updateMethodStatus('urlStatus', 'pending', 'Checking...');
                 const urlResult = await extractFromURL();
@@ -1928,8 +1970,13 @@ ${results.join('\n')}
         }
 
         function resetMethodStatuses() {
-            ['urlStatus', 'postmessageStatus', 'globalsStatus', 'domStatus', 'apiStatus'].forEach(id => {
-                updateMethodStatus(id, 'pending', 'Ready');
+            ['cacheStatus', 'urlStatus', 'postmessageStatus', 'globalsStatus', 'domStatus', 'apiStatus'].forEach(id => {
+                if (id === 'cacheStatus') {
+                    const hasCache = currentStringCache.stringKey || currentStringCache.stringId;
+                    updateMethodStatus(id, hasCache ? 'success' : 'pending', hasCache ? 'Available' : 'Waiting...');
+                } else {
+                    updateMethodStatus(id, 'pending', 'Ready');
+                }
             });
         }
 
@@ -2075,10 +2122,369 @@ ${results.join('\n')}
             }
         }
 
+        // Crowdin API String Cache
+        let currentStringCache = {
+            stringId: null,
+            stringKey: null,
+            identifier: null,
+            text: null,
+            context: null,
+            fileId: null,
+            projectId: null,
+            lastUpdated: null,
+            source: null
+        };
+
+        // Crowdin Apps JS API Integration
+        function initializeCrowdinAPI() {
+            console.log('🔗 Initializing Crowdin Apps JS API...');
+            
+            // Wait a bit for AP to be available
+            setTimeout(() => {
+                try {
+                    // Check if AP (Crowdin Apps JS) is available
+                    if (typeof AP !== 'undefined') {
+                        console.log('✅ Crowdin Apps JS (AP) is available');
+                        
+                        // Register for string change events
+                        AP.events.on('string.change', function(stringData) {
+                            console.log('🎯 String changed:', stringData);
+                            updateStringCacheFromCrowdinEvent(stringData, 'string.change');
+                        });
+                        
+                        // Register for string selected events  
+                        AP.events.on('string.selected', function(stringData) {
+                            console.log('🎯 String selected:', stringData);
+                            updateStringCacheFromCrowdinEvent(stringData, 'string.selected');
+                        });
+                        
+                        // Register for textarea edited events
+                        AP.events.on('textarea.edited', function(stringData) {
+                            console.log('🎯 Textarea edited:', stringData);
+                            updateStringCacheFromCrowdinEvent(stringData, 'textarea.edited');
+                        });
+                        
+                        // Register for translation events
+                        AP.events.on('translation.added', function(translationData) {
+                            console.log('🎯 Translation added:', translationData);
+                            if (translationData.string) {
+                                updateStringCacheFromCrowdinEvent(translationData.string, 'translation.added');
+                            }
+                        });
+                        
+                        // Get current string data immediately
+                        AP.editor.getString(function(stringData) {
+                            if (stringData) {
+                                console.log('🎯 Current string from AP.editor.getString:', stringData);
+                                updateStringCacheFromCrowdinEvent(stringData, 'AP.editor.getString');
+                            }
+                        });
+                        
+                        console.log('✅ Registered for Crowdin Apps JS events');
+                    } else {
+                        console.log('⚠️ Crowdin Apps JS (AP) not available, falling back to postMessage');
+                        initializeFallbackAPI();
+                    }
+                } catch (error) {
+                    console.error('❌ Error initializing Crowdin Apps JS API:', error);
+                    initializeFallbackAPI();
+                }
+            }, 1000); // Wait 1 second for AP to be available
+        }
+
+        // Fallback to postMessage API if Crowdin Apps JS is not available
+        function initializeFallbackAPI() {
+            console.log('🔗 Initializing fallback postMessage API...');
+            
+            // Listen for string selection changes
+            if (window.parent && window.parent.postMessage) {
+                try {
+                    // Register for string.selected events
+                    window.parent.postMessage({
+                        type: 'crowdin.api.register',
+                        event: 'string.selected'
+                    }, '*');
+                    
+                    // Register for string.changed events
+                    window.parent.postMessage({
+                        type: 'crowdin.api.register',
+                        event: 'string.changed'
+                    }, '*');
+                    
+                    // Register for additional potential events
+                    const additionalEvents = [
+                        'string.focused',
+                        'string.activated',
+                        'translation.selected',
+                        'editor.string.selected',
+                        'editor.string.changed'
+                    ];
+                    
+                    additionalEvents.forEach(eventName => {
+                        try {
+                            window.parent.postMessage({
+                                type: 'crowdin.api.register',
+                                event: eventName
+                            }, '*');
+                        } catch (e) {
+                            console.log(`Failed to register for ${eventName}:`, e);
+                        }
+                    });
+                    
+                    console.log('✅ Registered for fallback postMessage events');
+                } catch (error) {
+                    console.log('⚠️ Failed to register for fallback API events:', error);
+                }
+            }
+        }
+
+        // Update string cache from Crowdin event data
+        function updateStringCacheFromCrowdinEvent(stringData, eventType) {
+            if (!stringData) return;
+            
+            console.log('📝 Processing string data from event:', eventType, stringData);
+            
+            // Update cache with new information
+            currentStringCache = {
+                stringId: stringData.id || currentStringCache.stringId,
+                stringKey: stringData.identifier || stringData.key || currentStringCache.stringKey,
+                identifier: stringData.identifier || stringData.key || currentStringCache.identifier,
+                text: stringData.text || currentStringCache.text,
+                context: stringData.context || currentStringCache.context,
+                fileId: stringData.file?.id || currentStringCache.fileId,
+                projectId: stringData.project?.id || currentStringCache.projectId,
+                lastUpdated: new Date().toISOString(),
+                source: eventType
+            };
+            
+            console.log('📝 Updated string cache:', currentStringCache);
+            
+            // Update the UI to show we have cached string data
+            updateStringCacheStatus();
+            
+            // Update method status indicator
+            updateMethodStatus('cacheStatus', 'success', 'Available');
+        }
+
+        // Enhanced message handler for Crowdin API events
+        function handleCrowdinAPIMessage(event) {
+            if (!event.data || typeof event.data !== 'object') return;
+            
+            const { type, data } = event.data;
+            
+            // Check for any Crowdin API string-related events
+            const crowdinStringEvents = [
+                'crowdin.api.string.selected',
+                'crowdin.api.string.changed',
+                'crowdin.api.string.focused',
+                'crowdin.api.string.activated',
+                'crowdin.api.translation.selected',
+                'crowdin.api.editor.string.selected',
+                'crowdin.api.editor.string.changed'
+            ];
+            
+            if (crowdinStringEvents.includes(type)) {
+                console.log(`🎯 Received ${type} event:`, data);
+                
+                // Update the string cache
+                if (data) {
+                    currentStringCache = {
+                        stringId: data.stringId || data.id || null,
+                        stringKey: data.stringKey || data.identifier || data.key || null,
+                        identifier: data.identifier || data.stringKey || data.key || null,
+                        text: data.text || data.sourceString || null,
+                        context: data.context || null,
+                        fileId: data.fileId || null,
+                        projectId: data.projectId || null,
+                        lastUpdated: new Date().toISOString(),
+                        source: type
+                    };
+                    
+                    console.log('📝 Updated string cache:', currentStringCache);
+                    
+                    // Update the UI to show we have cached string data
+                    updateStringCacheStatus();
+                    
+                    // Update method status indicator
+                    updateMethodStatus('cacheStatus', 'success', 'Available');
+                }
+            }
+        }
+
+        // Update UI to show string cache status
+        function updateStringCacheStatus() {
+            const cacheStatus = document.getElementById('stringCacheStatus');
+            if (!cacheStatus) {
+                // Create cache status element if it doesn't exist
+                const statusElement = document.createElement('div');
+                statusElement.id = 'stringCacheStatus';
+                statusElement.style.cssText = `
+                    background: #d4edda;
+                    border: 1px solid #c3e6cb;
+                    border-radius: 8px;
+                    padding: 15px;
+                    margin-bottom: 20px;
+                    color: #155724;
+                `;
+                
+                const extractButton = document.querySelector('.extract-button');
+                extractButton.parentNode.insertBefore(statusElement, extractButton);
+            }
+            
+            if (currentStringCache.stringKey || currentStringCache.stringId) {
+                document.getElementById('stringCacheStatus').innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <span style="font-size: 1.2rem;">🎯</span>
+                        <strong>Current String Cached</strong>
+                        <span style="font-size: 0.8rem; opacity: 0.7;">(${currentStringCache.lastUpdated})</span>
+                    </div>
+                    <div style="font-family: monospace; background: white; padding: 8px; border-radius: 4px; margin: 5px 0;">
+                        <strong>Key:</strong> ${currentStringCache.stringKey || currentStringCache.identifier || 'N/A'}<br>
+                        <strong>ID:</strong> ${currentStringCache.stringId || 'N/A'}<br>
+                        <strong>Text:</strong> ${currentStringCache.text ? currentStringCache.text.substring(0, 100) + (currentStringCache.text.length > 100 ? '...' : '') : 'N/A'}
+                    </div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">
+                        Source: ${currentStringCache.source || 'Unknown'}
+                    </div>
+                `;
+            } else {
+                document.getElementById('stringCacheStatus').innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.2rem;">⏳</span>
+                        <span>Waiting for string selection... Select a string in the editor to cache its information.</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Enhanced message handler that includes API events
+        function enhancedMessageHandler(event) {
+            // Handle Crowdin API events
+            handleCrowdinAPIMessage(event);
+            
+            // Log all messages for debugging (only from Crowdin)
+            if (event.origin && event.origin.includes('crowdin.com')) {
+                console.log('📨 Received message from Crowdin:', {
+                    origin: event.origin,
+                    type: event.data?.type,
+                    data: event.data
+                });
+                
+                // Try to extract any string-related data from any message
+                if (event.data && typeof event.data === 'object') {
+                    const possibleStringData = extractStringDataFromMessage(event.data);
+                    if (possibleStringData.found) {
+                        console.log('🎯 Found potential string data in message:', possibleStringData);
+                        
+                        // Update cache with found data
+                        currentStringCache = {
+                            stringId: possibleStringData.stringId,
+                            stringKey: possibleStringData.stringKey,
+                            identifier: possibleStringData.identifier,
+                            text: possibleStringData.text,
+                            context: possibleStringData.context,
+                            fileId: possibleStringData.fileId,
+                            projectId: possibleStringData.projectId,
+                            lastUpdated: new Date().toISOString(),
+                            source: 'message_extraction'
+                        };
+                        
+                        updateStringCacheStatus();
+                        updateMethodStatus('cacheStatus', 'success', 'Available');
+                    }
+                }
+            }
+        }
+        
+        // Helper function to extract string data from any message
+        function extractStringDataFromMessage(data) {
+            const result = {
+                found: false,
+                stringId: null,
+                stringKey: null,
+                identifier: null,
+                text: null,
+                context: null,
+                fileId: null,
+                projectId: null
+            };
+            
+            // Recursively search for string-related properties
+            function searchObject(obj, path = '') {
+                if (!obj || typeof obj !== 'object') return;
+                
+                for (const [key, value] of Object.entries(obj)) {
+                    const currentPath = path ? `${path}.${key}` : key;
+                    
+                    // Check for string ID patterns
+                    if ((key.toLowerCase().includes('stringid') || key.toLowerCase().includes('string_id') || 
+                         (key === 'id' && path.toLowerCase().includes('string'))) && value) {
+                        result.stringId = value;
+                        result.found = true;
+                    }
+                    
+                    // Check for string key patterns
+                    if ((key.toLowerCase().includes('stringkey') || key.toLowerCase().includes('string_key') ||
+                         key.toLowerCase().includes('identifier') || key.toLowerCase().includes('key')) && 
+                         typeof value === 'string' && value.length > 0 && value.length < 200) {
+                        result.stringKey = value;
+                        result.identifier = value;
+                        result.found = true;
+                    }
+                    
+                    // Check for text patterns
+                    if ((key.toLowerCase().includes('text') || key.toLowerCase().includes('source') ||
+                         key.toLowerCase().includes('content')) && typeof value === 'string' && value.length > 0) {
+                        result.text = value;
+                        result.found = true;
+                    }
+                    
+                    // Check for context patterns
+                    if (key.toLowerCase().includes('context') && value) {
+                        result.context = value;
+                        result.found = true;
+                    }
+                    
+                    // Check for file ID patterns
+                    if ((key.toLowerCase().includes('fileid') || key.toLowerCase().includes('file_id')) && value) {
+                        result.fileId = value;
+                        result.found = true;
+                    }
+                    
+                    // Check for project ID patterns
+                    if ((key.toLowerCase().includes('projectid') || key.toLowerCase().includes('project_id')) && value) {
+                        result.projectId = value;
+                        result.found = true;
+                    }
+                    
+                    // Recursively search nested objects
+                    if (typeof value === 'object' && value !== null) {
+                        searchObject(value, currentPath);
+                    }
+                }
+            }
+            
+            searchObject(data);
+            return result;
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🔑 String Key Extractor loaded and ready');
             updateDebugInfo({ status: 'initialized' });
+            
+            // Initialize Crowdin API
+            initializeCrowdinAPI();
+            
+            // Set up enhanced message handler
+            // Remove any existing message handler (if it exists)
+            if (typeof messageHandler !== 'undefined') {
+                window.removeEventListener('message', messageHandler);
+            }
+            window.addEventListener('message', enhancedMessageHandler);
+            
+            // Initialize string cache status
+            updateStringCacheStatus();
             
             // Auto-populate project ID if available in URL
             const projectId = extractProjectIdFromURL();
