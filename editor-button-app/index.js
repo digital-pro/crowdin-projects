@@ -751,7 +751,7 @@ app.get('/translations-panel', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'translations-panel.html'));
 });
 
-// String key extractor route
+// String key extractor route (legacy)
 app.get('/string-key-extractor', (req, res) => {
   console.log('🔑 String key extractor requested');
   console.log('Query params:', req.query);
@@ -763,6 +763,20 @@ app.get('/string-key-extractor', (req, res) => {
   });
   
   res.sendFile(path.join(__dirname, 'public', 'string-key-extractor.html'));
+});
+
+// Audio previewer route
+app.get('/audio-previewer', (req, res) => {
+  console.log('🎵 Audio previewer requested');
+  console.log('Query params:', req.query);
+  console.log('Headers:', req.headers);
+  
+  // Log all parameters for debugging
+  Object.keys(req.query).forEach(key => {
+    console.log(`  ${key}: ${req.query[key]}`);
+  });
+  
+  res.sendFile(path.join(__dirname, 'public', 'audio-previewer.html'));
 });
 
 // Test page route
@@ -1058,9 +1072,9 @@ app.post('/extract-context', (req, res) => {
     });
 });
 
-// Root route - redirect to string key extractor
+// Root route - redirect to audio previewer
 app.get('/', (req, res) => {
-  res.redirect('/string-key-extractor');
+  res.redirect('/audio-previewer');
 });
 
 // Health check endpoint

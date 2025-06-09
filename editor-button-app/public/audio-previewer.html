@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Previewer</title>
+    <script src="https://cdn.crowdin.com/apps/dist/iframe.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .play-button {
+            background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            width: 100%;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .play-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .play-button:active {
+            transform: translateY(0);
+        }
+
+        .play-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .result-section.success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .result-section.error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-title.success {
+            color: #155724;
+        }
+
+        .result-title.error {
+            color: #721c24;
+        }
+
+        .string-info {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .string-cache {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #155724;
+        }
+
+        .label-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-right: 4px;
+            display: inline-block;
+            margin-bottom: 2px;
+        }
+
+        .debug-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .debug-toggle {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid #dee2e6;
+            margin-top: 20px;
+        }
+
+        .debug-toggle label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            cursor: pointer;
+        }
+
+        .debug-toggle input {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Audio Previewer</h1>
+            <p>Play audio for the currently selected string in Crowdin</p>
+        </div>
+        
+        <div class="content">
+            <!-- String Cache Status -->
+            <div id="stringCacheStatus" class="string-cache" style="display: none;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.2rem;">⏳</span>
+                    <span>Waiting for string selection... Select a string in the editor to cache its information.</span>
+                </div>
+            </div>
+
+            <!-- Play Audio Button -->
+            <button id="playBtn" class="play-button" onclick="playCurrentAudio()">
+                <span id="playIcon">🎵</span>
+                <span id="playText">Play Current Audio</span>
+            </button>
+            
+            <!-- Result Section -->
+            <div id="resultSection" class="result-section">
+                <div id="resultTitle" class="result-title"></div>
+                <div id="resultContent"></div>
+            </div>
+
+            <!-- Debug Toggle -->
+            <div class="debug-toggle">
+                <label>
+                    <input type="checkbox" id="debugMode"> Show debug information
+                </label>
+            </div>
+
+            <!-- Debug Section -->
+            <div id="debugSection" class="debug-section" style="display: none;">
+                <h4>Debug Information</h4>
+                <pre id="debugInfo">Waiting for debug data...</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentStringCache = {
+            stringId: null,
+            stringKey: null,
+            identifier: null,
+            text: null,
+            context: null,
+            labels: null,
+            maxLength: null,
+            fileId: null,
+            fileName: null,
+            projectId: null,
+            sourceLanguageId: null,
+            targetLanguageId: null,
+            sourceLanguageName: null,
+            targetLanguageName: null,
+            lastUpdated: null,
+            source: null
+        };
+
+        // Main audio playing function
+        async function playCurrentAudio() {
+            const playBtn = document.getElementById('playBtn');
+            const playIcon = document.getElementById('playIcon');
+            const playText = document.getElementById('playText');
+            
+            // Disable button and show loading
+            playBtn.disabled = true;
+            playIcon.innerHTML = '<div class="loading-spinner"></div>';
+            playText.textContent = 'Loading Audio...';
+            
+            // Hide previous results
+            hideResultSection();
+            
+            try {
+                // Check if we have a cached string
+                if (!currentStringCache.stringId && !currentStringCache.stringKey) {
+                    showErrorResult('Please select a string in the Crowdin editor first.');
+                    return;
+                }
+                
+                console.log('🎵 Playing audio for string:', currentStringCache);
+                
+                // Try to find and play audio for the current string
+                const audioResult = await findAndPlayAudio();
+                
+                if (audioResult.success) {
+                    showSuccessResult(
+                        currentStringCache.stringKey || currentStringCache.identifier || currentStringCache.stringId,
+                        `Audio Playback (${audioResult.source})`,
+                        {
+                            id: currentStringCache.stringId,
+                            text: currentStringCache.text,
+                            audioSource: audioResult.source,
+                            audioUrl: audioResult.audioUrl,
+                            message: audioResult.message
+                        }
+                    );
+                } else {
+                    showErrorResult(audioResult.message);
+                }
+                
+            } catch (error) {
+                console.error('Audio playback error:', error);
+                showErrorResult(`Audio playback failed: ${error.message}`);
+            } finally {
+                // Re-enable button
+                playBtn.disabled = false;
+                playIcon.textContent = '🎵';
+                playText.textContent = 'Play Current Audio';
+            }
+        }
+
+        // Find and play audio for the current string
+        async function findAndPlayAudio() {
+            console.log('🎵 Looking for audio for string:', currentStringCache.stringId, currentStringCache.stringKey);
+            
+            // Try multiple approaches to find audio
+            const audioSources = [
+                () => findAudioByStringKey(currentStringCache.stringKey || currentStringCache.identifier),
+                () => findAudioByFileName(currentStringCache.fileName, currentStringCache.stringKey || currentStringCache.identifier),
+                () => generateTextToSpeech(currentStringCache.text)
+            ];
+            
+            for (const audioSource of audioSources) {
+                try {
+                    const result = await audioSource();
+                    if (result.success) {
+                        await playAudio(result.audioUrl, result.source, result.text);
+                        return {
+                            success: true,
+                            source: result.source,
+                            audioUrl: result.audioUrl,
+                            message: `Playing audio for "${currentStringCache.stringKey || currentStringCache.identifier}" from ${result.source}`
+                        };
+                    }
+                } catch (error) {
+                    console.log('🎵 Audio source failed:', error.message);
+                }
+            }
+            
+            return {
+                success: false,
+                message: `No audio found for string "${currentStringCache.stringKey || currentStringCache.identifier}" (ID: ${currentStringCache.stringId}). Tried file system and text-to-speech.`
+            };
+        }
+
+        // Try to find audio by string key (common naming convention)
+        async function findAudioByStringKey(stringKey) {
+            if (!stringKey) throw new Error('No string key available');
+            
+            const commonAudioExtensions = ['mp3', 'wav', 'ogg', 'm4a'];
+            const commonPaths = [
+                `audio/${stringKey}`,
+                `sounds/${stringKey}`,
+                `assets/audio/${stringKey}`,
+                `public/audio/${stringKey}`,
+                `media/${stringKey}`,
+                stringKey
+            ];
+            
+            for (const path of commonPaths) {
+                for (const ext of commonAudioExtensions) {
+                    const audioUrl = `${path}.${ext}`;
+                    console.log('🎵 Trying audio URL:', audioUrl);
+                    
+                    if (await checkAudioExists(audioUrl)) {
+                        return { success: true, audioUrl, source: 'file_system' };
+                    }
+                }
+            }
+            
+            throw new Error('No audio file found by string key');
+        }
+
+        // Try to find audio by file name pattern
+        async function findAudioByFileName(fileName, stringKey) {
+            if (!fileName || !stringKey) throw new Error('Missing file name or string key');
+            
+            // Extract base name from file (remove extension)
+            const baseName = fileName.replace(/\.[^/.]+$/, "");
+            const commonExtensions = ['mp3', 'wav', 'ogg', 'm4a'];
+            
+            const audioPaths = [
+                `audio/${baseName}/${stringKey}`,
+                `sounds/${baseName}/${stringKey}`,
+                `assets/${baseName}/${stringKey}`,
+                `media/${baseName}/${stringKey}`
+            ];
+            
+            for (const path of audioPaths) {
+                for (const ext of commonExtensions) {
+                    const audioUrl = `${path}.${ext}`;
+                    console.log('🎵 Trying file-based audio URL:', audioUrl);
+                    
+                    if (await checkAudioExists(audioUrl)) {
+                        return { success: true, audioUrl, source: 'file_structure' };
+                    }
+                }
+            }
+            
+            throw new Error('No audio found by file structure');
+        }
+
+        // Generate text-to-speech as fallback
+        async function generateTextToSpeech(text) {
+            if (!text) throw new Error('No text available for TTS');
+            
+            // Use Web Speech API for text-to-speech
+            if ('speechSynthesis' in window) {
+                return { 
+                    success: true, 
+                    audioUrl: null, // Will use TTS directly
+                    source: 'text_to_speech',
+                    text: text
+                };
+            }
+            
+            throw new Error('Text-to-speech not supported');
+        }
+
+        // Check if audio file exists
+        async function checkAudioExists(url) {
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                return response.ok;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        // Play audio from URL or use TTS
+        async function playAudio(audioUrl, source, text) {
+            if (source === 'text_to_speech') {
+                // Use Web Speech API
+                const utterance = new SpeechSynthesisUtterance(text || currentStringCache.text);
+                utterance.rate = 0.8;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                
+                // Try to use a specific voice if available
+                const voices = speechSynthesis.getVoices();
+                const preferredVoice = voices.find(voice => 
+                    voice.lang.startsWith(currentStringCache.sourceLanguageId || 'en')
+                );
+                if (preferredVoice) {
+                    utterance.voice = preferredVoice;
+                }
+                
+                speechSynthesis.speak(utterance);
+                console.log('🎵 Playing TTS for:', text || currentStringCache.text);
+            } else {
+                // Play audio file
+                const audio = new Audio(audioUrl);
+                audio.volume = 0.8;
+                
+                return new Promise((resolve, reject) => {
+                    audio.onloadeddata = () => {
+                        console.log('🎵 Playing audio file:', audioUrl);
+                        audio.play().then(resolve).catch(reject);
+                    };
+                    audio.onerror = () => reject(new Error('Failed to load audio file'));
+                    audio.load();
+                });
+            }
+        }
+
+        // Show success result
+        function showSuccessResult(stringKey, method, data) {
+            const resultSection = document.getElementById('resultSection');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultTitle.className = 'result-title success';
+            resultTitle.innerHTML = `<span>✅</span> ${method}`;
+            
+            let content = `<div class="string-info">`;
+            content += `<strong>String Key:</strong> ${stringKey}<br>`;
+            if (data.id) content += `<strong>ID:</strong> ${data.id}<br>`;
+            if (data.text) content += `<strong>Text:</strong> ${data.text.substring(0, 100)}${data.text.length > 100 ? '...' : ''}<br>`;
+            if (data.audioSource) content += `<strong>Audio Source:</strong> ${data.audioSource}<br>`;
+            if (data.audioUrl) content += `<strong>Audio URL:</strong> ${data.audioUrl}<br>`;
+            if (data.message) content += `<strong>Status:</strong> ${data.message}`;
+            content += `</div>`;
+            
+            resultContent.innerHTML = content;
+            resultSection.className = 'result-section success';
+            resultSection.style.display = 'block';
+        }
+
+        // Show error result
+        function showErrorResult(message) {
+            const resultSection = document.getElementById('resultSection');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultTitle.className = 'result-title error';
+            resultTitle.innerHTML = `<span>❌</span> Audio Not Found`;
+            
+            resultContent.innerHTML = `<div class="string-info">${message}</div>`;
+            resultSection.className = 'result-section error';
+            resultSection.style.display = 'block';
+        }
+
+        // Hide result section
+        function hideResultSection() {
+            document.getElementById('resultSection').style.display = 'none';
+        }
+
+        // Initialize Crowdin API
+        function initializeCrowdinAPI() {
+            if (typeof AP !== 'undefined') {
+                console.log('🎯 Crowdin Apps JS API available');
+                
+                // Register for string events
+                try {
+                    AP.events.on('string.change', function(stringData) {
+                        console.log('🎯 String changed:', stringData);
+                        updateStringCacheFromCrowdinEvent(stringData, 'string.change');
+                    });
+                    
+                    AP.events.on('string.selected', function(stringData) {
+                        console.log('🎯 String selected:', stringData);
+                        updateStringCacheFromCrowdinEvent(stringData, 'string.selected');
+                    });
+                    
+                    console.log('✅ Registered for Crowdin API events');
+                } catch (error) {
+                    console.log('⚠️ Failed to register for Crowdin API events:', error);
+                }
+            } else {
+                console.log('⚠️ Crowdin Apps JS API not available');
+            }
+        }
+
+        // Update string cache from Crowdin event data
+        function updateStringCacheFromCrowdinEvent(stringData, eventType) {
+            if (!stringData) return;
+            
+            console.log('📝 Processing string data from event:', eventType, JSON.stringify(stringData, null, 2));
+            
+            // Extract language information from string data
+            let sourceLanguageId = currentStringCache.sourceLanguageId;
+            let targetLanguageId = currentStringCache.targetLanguageId;
+            
+            // Look for target language in translations
+            if (stringData.translations) {
+                const targetLangs = Object.keys(stringData.translations);
+                if (targetLangs.length > 0) {
+                    targetLanguageId = targetLangs[0]; // Get the first (and usually only) target language
+                }
+                
+                // Also check target_language_id in translation objects
+                for (const lang in stringData.translations) {
+                    const translations = stringData.translations[lang];
+                    if (Array.isArray(translations) && translations.length > 0) {
+                        const firstTranslation = translations[0];
+                        if (firstTranslation.target_language_id) {
+                            targetLanguageId = firstTranslation.target_language_id;
+                        }
+                    }
+                }
+            }
+
+            // Extract potential string ID, being careful not to confuse with file ID
+            const potentialStringId = stringData.string?.id || stringData.id;
+            const potentialFileId = stringData.string?.file?.id || stringData.file?.id;
+            
+            // Only update stringId if we get a large number (actual string ID) or if we don't have one yet
+            let newStringId = currentStringCache.stringId;
+            if (potentialStringId && potentialStringId > 1000) {
+                newStringId = potentialStringId;
+                console.log('📝 ✅ Using new string ID:', newStringId);
+            } else if (!currentStringCache.stringId && potentialStringId) {
+                newStringId = potentialStringId;
+                console.log('📝 ⚠️ Using potential string ID (no existing ID):', newStringId);
+            } else if (potentialStringId && potentialStringId <= 1000) {
+                console.log('📝 ❌ Ignoring small ID (likely file ID):', potentialStringId, 'keeping existing:', currentStringCache.stringId);
+            }
+            
+            // Update cache with new information
+            currentStringCache = {
+                stringId: newStringId,
+                stringKey: stringData.string?.identifier || stringData.identifier || stringData.key || currentStringCache.stringKey,
+                identifier: stringData.string?.identifier || stringData.identifier || stringData.key || currentStringCache.identifier,
+                text: stringData.string?.text || stringData.text || currentStringCache.text,
+                context: stringData.string?.context || stringData.context || currentStringCache.context,
+                label: stringData.string?.label || stringData.label || currentStringCache.label,
+                labels: stringData.string?.labels || stringData.labels || currentStringCache.labels,
+                maxLength: stringData.string?.max_length !== undefined ? stringData.string.max_length : (stringData.max_length !== undefined ? stringData.max_length : currentStringCache.maxLength),
+                fileId: potentialFileId || currentStringCache.fileId,
+                fileName: stringData.string?.file?.name || stringData.file?.name || currentStringCache.fileName,
+                projectId: stringData.string?.project?.id || stringData.project?.id || currentStringCache.projectId,
+                sourceLanguageId: sourceLanguageId,
+                targetLanguageId: targetLanguageId,
+                sourceLanguageName: currentStringCache.sourceLanguageName,
+                targetLanguageName: currentStringCache.targetLanguageName,
+                lastUpdated: new Date().toISOString(),
+                source: eventType
+            };
+            
+            // Update language names if we have the language list
+            updateLanguageNamesInCache();
+            
+            // Fetch string labels if we have a string ID (and it's not a file ID)
+            if (currentStringCache.stringId && !currentStringCache.labels && currentStringCache.stringId > 1000) {
+                console.log('🏷️ Auto-fetching labels for string ID:', currentStringCache.stringId);
+                updateStringLabelsInCache();
+            } else if (currentStringCache.stringId && currentStringCache.stringId <= 1000) {
+                console.log('🏷️ Skipping auto-fetch for small ID (likely file ID):', currentStringCache.stringId);
+            }
+            
+            // Update the UI to show we have cached string data
+            updateStringCacheStatus();
+        }
+
+        // Helper function to update language names in cache
+        function updateLanguageNamesInCache() {
+            // Try to get language names from the available languages list
+            if (typeof AP !== 'undefined' && AP.editor && AP.editor.getProjectTargetLanguages) {
+                AP.editor.getProjectTargetLanguages(function(languages) {
+                    if (languages && Array.isArray(languages)) {
+                        // Find source and target language names
+                        languages.forEach(lang => {
+                            if (lang.code === currentStringCache.sourceLanguageId || lang.internal_code === currentStringCache.sourceLanguageId) {
+                                currentStringCache.sourceLanguageName = lang.name;
+                            }
+                            if (lang.code === currentStringCache.targetLanguageId || lang.internal_code === currentStringCache.targetLanguageId) {
+                                currentStringCache.targetLanguageName = lang.name;
+                            }
+                        });
+                        
+                        // Update UI with language information
+                        updateStringCacheStatus();
+                        console.log('🌍 Updated language names in cache:', {
+                            sourceLanguageId: currentStringCache.sourceLanguageId,
+                            targetLanguageId: currentStringCache.targetLanguageId,
+                            sourceLanguageName: currentStringCache.sourceLanguageName,
+                            targetLanguageName: currentStringCache.targetLanguageName
+                        });
+                    }
+                });
+            }
+        }
+
+        // Fetch label names from label IDs
+        async function fetchLabelNames(projectId, labelIds, token) {
+            if (!projectId || !labelIds || labelIds.length === 0 || !token) {
+                console.log('🏷️ Missing required parameters for label name fetching');
+                return [];
+            }
+
+            try {
+                console.log('🏷️ Fetching label names for IDs:', JSON.stringify(labelIds, null, 2));
+                
+                const labelPromises = labelIds.map(async (labelId) => {
+                    const url = `https://api.crowdin.com/api/v2/projects/${projectId}/labels/${labelId}`;
+                    console.log('🏷️ Fetching label:', url);
+                    
+                    const response = await fetch(url, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const labelData = await response.json();
+                        console.log('🏷️ Label API response:', JSON.stringify(labelData, null, 2));
+                        
+                        if (labelData && labelData.data) {
+                            return {
+                                id: labelData.data.id,
+                                title: labelData.data.title
+                            };
+                        }
+                    } else {
+                        console.error('🏷️ Failed to fetch label', labelId, ':', response.status);
+                    }
+                    return null;
+                });
+
+                const labelResults = await Promise.all(labelPromises);
+                const validLabels = labelResults.filter(label => label !== null);
+                
+                console.log('🏷️ Successfully fetched labels:', JSON.stringify(validLabels, null, 2));
+                return validLabels;
+            } catch (error) {
+                console.error('🏷️ Error fetching label names:', error);
+                return [];
+            }
+        }
+
+        // Fetch string labels from Crowdin API
+        async function fetchStringLabels(projectId, stringId, token) {
+            if (!projectId || !stringId || !token) {
+                console.log('🏷️ Missing required parameters for label fetching');
+                return [];
+            }
+
+            // Try direct string endpoint first
+            const directUrl = `https://api.crowdin.com/api/v2/projects/${projectId}/strings/${stringId}`;
+            
+            try {
+                console.log('🏷️ Fetching labels for string ID:', stringId);
+                console.log('🏷️ Trying direct endpoint:', directUrl);
+                
+                const response = await fetch(directUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('🏷️ Direct API response:', JSON.stringify(data, null, 2));
+                    
+                    if (data && data.data) {
+                        // Check multiple possible locations for labels
+                        const stringData = data.data;
+                        console.log('🏷️ String data structure:', JSON.stringify(stringData, null, 2));
+                        
+                        // Check if we have labelIds that need to be resolved
+                        if (stringData.labelIds && stringData.labelIds.length > 0) {
+                            console.log('🏷️ Found labelIds:', JSON.stringify(stringData.labelIds, null, 2));
+                            const labelNames = await fetchLabelNames(projectId, stringData.labelIds, token);
+                            console.log('🏷️ Resolved label names:', JSON.stringify(labelNames, null, 2));
+                            return labelNames;
+                        }
+                        
+                        const labels = stringData.labels || stringData.label || [];
+                        console.log('🏷️ Labels found:', JSON.stringify(labels, null, 2));
+                        return labels;
+                    }
+                }
+
+                console.log('🏷️ No string found with ID:', stringId);
+                return [];
+            } catch (error) {
+                console.error('🏷️ Error fetching string labels:', error);
+                return [];
+            }
+        }
+
+        // Update string cache with fetched labels
+        async function updateStringLabelsInCache() {
+            if (!currentStringCache.stringId) {
+                console.log('🏷️ No string ID available for label fetching');
+                return;
+            }
+
+            const projectId = '756721';
+            const token = '161834fde81833a72996c125d9c1a1c801ae99ef15eb1d3889dfe9fbc55077aaea02b62f1e24278e';
+
+            // Validate that we have a proper string ID (should be a large number, not a small file ID)
+            const stringId = currentStringCache.stringId;
+            console.log('🏷️ Attempting to fetch labels for string ID:', stringId, '(type:', typeof stringId, ')');
+            
+            // String IDs are typically much larger than file IDs (which are usually < 1000)
+            if (typeof stringId === 'number' && stringId < 1000) {
+                console.log('🏷️ Warning: String ID', stringId, 'seems too small, might be a file ID. Skipping label fetch.');
+                return;
+            }
+
+            try {
+                const labels = await fetchStringLabels(projectId, stringId, token);
+                
+                if (labels && labels.length > 0) {
+                    currentStringCache.labels = labels;
+                    console.log('🏷️ Updated cache with labels:', JSON.stringify(labels, null, 2));
+                    
+                    // Update UI to show the new labels
+                    updateStringCacheStatus();
+                } else {
+                    console.log('🏷️ No labels found for this string');
+                }
+            } catch (error) {
+                console.error('🏷️ Failed to update labels in cache:', error);
+            }
+        }
+
+        // Update UI to show string cache status
+        function updateStringCacheStatus() {
+            const cacheStatus = document.getElementById('stringCacheStatus');
+            
+            if (currentStringCache.stringKey || currentStringCache.stringId) {
+                const languageInfo = [];
+                if (currentStringCache.sourceLanguageId) {
+                    const sourceName = currentStringCache.sourceLanguageName || currentStringCache.sourceLanguageId;
+                    languageInfo.push(`<strong>Source:</strong> ${sourceName} (${currentStringCache.sourceLanguageId})`);
+                }
+                if (currentStringCache.targetLanguageId) {
+                    const targetName = currentStringCache.targetLanguageName || currentStringCache.targetLanguageId;
+                    languageInfo.push(`<strong>Target:</strong> ${targetName} (${currentStringCache.targetLanguageId})`);
+                }
+                
+                // Build additional info array
+                const additionalInfo = [];
+                if (currentStringCache.label) {
+                    additionalInfo.push(`<strong>Label:</strong> ${currentStringCache.label}`);
+                }
+                if (currentStringCache.labels && Array.isArray(currentStringCache.labels) && currentStringCache.labels.length > 0) {
+                    const labelTags = currentStringCache.labels.map(label => 
+                        `<span class="label-tag">${label.title || label.name || label}</span>`
+                    ).join('');
+                    additionalInfo.push(`<strong>Labels:</strong><br>${labelTags}`);
+                }
+                if (currentStringCache.maxLength !== null && currentStringCache.maxLength !== undefined) {
+                    additionalInfo.push(`<strong>Max Length:</strong> ${currentStringCache.maxLength === 0 ? 'No limit' : currentStringCache.maxLength}`);
+                }
+                if (currentStringCache.fileName) {
+                    additionalInfo.push(`<strong>File:</strong> ${currentStringCache.fileName}`);
+                }
+                
+                cacheStatus.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <span style="font-size: 1.2rem;">🎯</span>
+                        <strong>Current String Cached</strong>
+                        <span style="font-size: 0.8rem; opacity: 0.7;">(${currentStringCache.lastUpdated})</span>
+                    </div>
+                    <div style="font-family: monospace; background: white; padding: 8px; border-radius: 4px; margin: 5px 0;">
+                        <strong>Key:</strong> ${currentStringCache.stringKey || currentStringCache.identifier || 'N/A'}<br>
+                        <strong>ID:</strong> ${currentStringCache.stringId || 'N/A'}<br>
+                        <strong>Text:</strong> ${currentStringCache.text ? currentStringCache.text.substring(0, 100) + (currentStringCache.text.length > 100 ? '...' : '') : 'N/A'}
+                        ${languageInfo.length > 0 ? '<br>' + languageInfo.join('<br>') : ''}
+                        ${additionalInfo.length > 0 ? '<br>' + additionalInfo.join('<br>') : ''}
+                    </div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">
+                        Source: ${currentStringCache.source || 'Unknown'}
+                    </div>
+                `;
+                cacheStatus.style.display = 'block';
+            } else {
+                cacheStatus.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.2rem;">⏳</span>
+                        <span>Waiting for string selection... Select a string in the editor to cache its information.</span>
+                    </div>
+                `;
+                cacheStatus.style.display = 'block';
+            }
+        }
+
+        // Enhanced message handler that includes API events
+        function enhancedMessageHandler(event) {
+            // Log all messages for debugging (only from Crowdin)
+            if (event.origin && event.origin.includes('crowdin.com')) {
+                if (document.getElementById('debugMode')?.checked) {
+                    console.log('📨 Received message from Crowdin:', JSON.stringify({
+                        origin: event.origin,
+                        type: event.data?.type,
+                        data: event.data
+                    }, null, 2));
+                }
+                
+                // Try to extract any string-related data from any message
+                if (event.data && typeof event.data === 'object') {
+                    const possibleStringData = extractStringDataFromMessage(event.data);
+                    if (possibleStringData.found) {
+                        console.log('🎯 Found potential string data in message:', JSON.stringify(possibleStringData, null, 2));
+                        
+                        // Smart string ID handling for message extraction too
+                        let messageStringId = currentStringCache.stringId;
+                        if (possibleStringData.stringId && possibleStringData.stringId > 1000) {
+                            messageStringId = possibleStringData.stringId;
+                            console.log('📨 ✅ Using extracted string ID:', messageStringId);
+                        } else if (!currentStringCache.stringId && possibleStringData.stringId) {
+                            messageStringId = possibleStringData.stringId;
+                            console.log('📨 ⚠️ Using potential extracted string ID (no existing):', messageStringId);
+                        } else if (possibleStringData.stringId && possibleStringData.stringId <= 1000) {
+                            console.log('📨 ❌ Ignoring small extracted ID (likely file ID):', possibleStringData.stringId, 'keeping existing:', currentStringCache.stringId);
+                        }
+                        
+                        // Update cache with found data, preserving existing language info
+                        currentStringCache = {
+                            stringId: messageStringId,
+                            stringKey: possibleStringData.stringKey || currentStringCache.stringKey,
+                            identifier: possibleStringData.identifier || currentStringCache.identifier,
+                            text: possibleStringData.text || currentStringCache.text,
+                            context: possibleStringData.context || currentStringCache.context,
+                            fileId: possibleStringData.fileId || currentStringCache.fileId,
+                            projectId: possibleStringData.projectId || currentStringCache.projectId,
+                            sourceLanguageId: currentStringCache.sourceLanguageId,
+                            targetLanguageId: currentStringCache.targetLanguageId,
+                            sourceLanguageName: currentStringCache.sourceLanguageName,
+                            targetLanguageName: currentStringCache.targetLanguageName,
+                            lastUpdated: new Date().toISOString(),
+                            source: 'message_extraction'
+                        };
+                        
+                        updateStringCacheStatus();
+                        
+                        // Automatically fetch labels if we have a string ID (and it's not a file ID)
+                        if (possibleStringData.stringId && possibleStringData.stringId > 1000) {
+                            console.log('🏷️ Auto-fetching labels for extracted string ID:', possibleStringData.stringId);
+                            updateStringLabelsInCache();
+                        } else if (possibleStringData.stringId && possibleStringData.stringId <= 1000) {
+                            console.log('🏷️ Skipping auto-fetch for small extracted ID (likely file ID):', possibleStringData.stringId);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Helper function to extract string data from any message
+        function extractStringDataFromMessage(data) {
+            const result = {
+                found: false,
+                stringId: null,
+                stringKey: null,
+                identifier: null,
+                text: null,
+                context: null,
+                label: null,
+                labels: null,
+                maxLength: null,
+                fileId: null,
+                fileName: null,
+                projectId: null
+            };
+            
+            // Recursively search for string-related properties
+            function searchObject(obj, path = '') {
+                if (!obj || typeof obj !== 'object') return;
+                
+                for (const [key, value] of Object.entries(obj)) {
+                    const currentPath = path ? `${path}.${key}` : key;
+                    
+                    // Check for string ID patterns - be more specific to avoid file IDs
+                    if ((key.toLowerCase().includes('stringid') || key.toLowerCase().includes('string_id')) && value) {
+                        result.stringId = value;
+                        result.found = true;
+                    } else if (key === 'id' && path.toLowerCase().includes('string') && !path.toLowerCase().includes('file') && value > 1000) {
+                        // Only accept 'id' if it's in a string context, not a file context, and is a large number
+                        result.stringId = value;
+                        result.found = true;
+                    }
+                    
+                    // Check for string key patterns
+                    if ((key.toLowerCase().includes('stringkey') || key.toLowerCase().includes('string_key') ||
+                         key.toLowerCase().includes('identifier') || key.toLowerCase().includes('key')) && 
+                         typeof value === 'string' && value.length > 0 && value.length < 200) {
+                        result.stringKey = value;
+                        result.identifier = value;
+                        result.found = true;
+                    }
+                    
+                    // Check for text patterns
+                    if ((key.toLowerCase().includes('text') || key.toLowerCase().includes('source') ||
+                         key.toLowerCase().includes('content')) && typeof value === 'string' && value.length > 0) {
+                        result.text = value;
+                        result.found = true;
+                    }
+                    
+                    // Check for context patterns
+                    if (key.toLowerCase().includes('context') && value) {
+                        result.context = value;
+                        result.found = true;
+                    }
+                    
+                    // Check for label patterns
+                    if (key.toLowerCase().includes('label') && value) {
+                        if (Array.isArray(value)) {
+                            result.labels = value;
+                        } else {
+                            result.label = value;
+                        }
+                        result.found = true;
+                    }
+                    
+                    // Check for max length patterns
+                    if ((key.toLowerCase().includes('maxlength') || key.toLowerCase().includes('max_length')) && value) {
+                        result.maxLength = value;
+                        result.found = true;
+                    }
+                    
+                    // Check for file ID patterns
+                    if ((key.toLowerCase().includes('fileid') || key.toLowerCase().includes('file_id')) && value) {
+                        result.fileId = value;
+                        result.found = true;
+                    }
+                    
+                    // Check for file name patterns
+                    if ((key.toLowerCase().includes('filename') || key.toLowerCase().includes('file_name') || 
+                         (key === 'name' && path.toLowerCase().includes('file'))) && typeof value === 'string') {
+                        result.fileName = value;
+                        result.found = true;
+                    }
+                    
+                    // Check for project ID patterns
+                    if ((key.toLowerCase().includes('projectid') || key.toLowerCase().includes('project_id')) && value) {
+                        result.projectId = value;
+                        result.found = true;
+                    }
+                    
+                    // Recursively search nested objects
+                    if (typeof value === 'object' && value !== null) {
+                        searchObject(value, currentPath);
+                    }
+                }
+            }
+            
+            searchObject(data);
+            return result;
+        }
+
+        // Debug mode toggle
+        function toggleDebugMode() {
+            const debugMode = document.getElementById('debugMode').checked;
+            const debugSection = document.getElementById('debugSection');
+            
+            debugSection.style.display = debugMode ? 'block' : 'none';
+            
+            // Store debug mode preference
+            localStorage.setItem('crowdinAudioPreviewerDebugMode', debugMode);
+            
+            // Update debug info
+            updateDebugInfo();
+        }
+
+        // Update debug information
+        function updateDebugInfo() {
+            const debugInfo = document.getElementById('debugInfo');
+            if (debugInfo) {
+                debugInfo.textContent = JSON.stringify({
+                    currentStringCache,
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent,
+                    location: window.location.href
+                }, null, 2);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎵 Audio Previewer loaded and ready');
+            
+            // Initialize Crowdin API
+            initializeCrowdinAPI();
+            
+            // Set up enhanced message handler
+            window.addEventListener('message', enhancedMessageHandler);
+            
+            // Initialize string cache status
+            updateStringCacheStatus();
+            
+            // Set up debug mode toggle
+            const debugModeCheckbox = document.getElementById('debugMode');
+            debugModeCheckbox.addEventListener('change', toggleDebugMode);
+            
+            // Restore debug mode preference
+            const savedDebugMode = localStorage.getItem('crowdinAudioPreviewerDebugMode');
+            if (savedDebugMode === 'true') {
+                debugModeCheckbox.checked = true;
+                toggleDebugMode();
+            }
+            
+            updateDebugInfo();
+        });
+    </script>
+</body>
+</html> 
