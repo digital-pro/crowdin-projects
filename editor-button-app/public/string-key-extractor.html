@@ -648,7 +648,7 @@
         let extractedStringKey = null;
         let extractionMethod = null;
 
-        // Main extraction function
+        // Main audio playing function
         async function extractCurrentStringKey() {
             const extractBtn = document.getElementById('extractBtn');
             const extractIcon = document.getElementById('extractIcon');
@@ -663,157 +663,202 @@
             hideResultSection();
             resetMethodStatuses();
             
-            let stringKey = null;
-            let method = null;
-            let allContext = {};
-            
             try {
-                // Method 0: Cached String Data (Priority Method)
+                // Check if we have a cached string
                 updateMethodStatus('cacheStatus', 'pending', 'Checking...');
-                if (currentStringCache.stringKey || currentStringCache.stringId) {
-                    console.log('🎯 Using cached string data:', currentStringCache);
-                    
-                    const cachedKey = currentStringCache.stringKey || 
-                                    currentStringCache.identifier || 
-                                    currentStringCache.stringId;
-                    
-                    if (cachedKey) {
-                        stringKey = cachedKey;
-                        method = 'Cached String Data (Crowdin Apps JS API)';
-                        updateMethodStatus('cacheStatus', 'success', 'Found!');
-                        
-                        // Show success with cached data
-                        const cacheData = {
+                if (!currentStringCache.stringId && !currentStringCache.stringKey) {
+                    updateMethodStatus('cacheStatus', 'error', 'No string selected');
+                    showErrorResult('Please select a string in the Crowdin editor first.');
+                    return;
+                }
+                
+                updateMethodStatus('cacheStatus', 'success', 'String found!');
+                console.log('🎵 Playing audio for string:', currentStringCache);
+                
+                // Try to find and play audio for the current string
+                const audioResult = await findAndPlayAudio();
+                
+                if (audioResult.success) {
+                    showSuccessResult(
+                        currentStringCache.stringKey || currentStringCache.identifier || currentStringCache.stringId,
+                        `Audio Playback (${audioResult.source})`,
+                        {
                             id: currentStringCache.stringId,
                             text: currentStringCache.text,
-                            fileId: currentStringCache.fileId,
-                            fileName: currentStringCache.fileName,
-                            context: currentStringCache.context,
-                            label: currentStringCache.label,
-                            labels: currentStringCache.labels,
-                            maxLength: currentStringCache.maxLength,
-                            sourceLanguageId: currentStringCache.sourceLanguageId,
-                            targetLanguageId: currentStringCache.targetLanguageId,
-                            sourceLanguageName: currentStringCache.sourceLanguageName,
-                            targetLanguageName: currentStringCache.targetLanguageName,
-                            source: currentStringCache.source,
-                            lastUpdated: currentStringCache.lastUpdated
-                        };
-                        
-                        showSuccessResult(stringKey, method, cacheData);
-                        updateDebugInfo({ 
-                            ...allContext, 
-                            cachedData: currentStringCache,
-                            extractionSource: 'cache'
-                        });
-                        await logExtractionAttempt(allContext, stringKey, method);
-                        return; // Early return for cached success
-                    }
+                            audioSource: audioResult.source,
+                            audioUrl: audioResult.audioUrl,
+                            message: audioResult.message
+                        }
+                    );
                 } else {
-                    updateMethodStatus('cacheStatus', 'error', 'No cache');
-                }
-                
-                // Method 1: URL Parameters
-                updateMethodStatus('urlStatus', 'pending', 'Checking...');
-                const urlResult = await extractFromURL();
-                Object.assign(allContext, urlResult.context);
-                
-                if (urlResult.stringKey) {
-                    stringKey = urlResult.stringKey;
-                    method = 'URL Parameters';
-                    updateMethodStatus('urlStatus', 'success', 'Found!');
-                } else {
-                    updateMethodStatus('urlStatus', 'error', 'Not found');
-                }
-                
-                // Method 2: PostMessage API
-                if (!stringKey) {
-                    updateMethodStatus('postmessageStatus', 'pending', 'Listening...');
-                    const postMessageResult = await extractFromPostMessage();
-                    Object.assign(allContext, postMessageResult.context);
-                    
-                    if (postMessageResult.stringKey) {
-                        stringKey = postMessageResult.stringKey;
-                        method = 'PostMessage API';
-                        updateMethodStatus('postmessageStatus', 'success', 'Found!');
-                    } else {
-                        updateMethodStatus('postmessageStatus', 'error', 'Not found');
-                    }
-                }
-                
-                // Method 3: Global Variables
-                if (!stringKey) {
-                    updateMethodStatus('globalsStatus', 'pending', 'Scanning...');
-                    const globalsResult = await extractFromGlobals();
-                    Object.assign(allContext, globalsResult.context);
-                    
-                    if (globalsResult.stringKey) {
-                        stringKey = globalsResult.stringKey;
-                        method = 'Global Variables';
-                        updateMethodStatus('globalsStatus', 'success', 'Found!');
-                    } else {
-                        updateMethodStatus('globalsStatus', 'error', 'Not found');
-                    }
-                }
-                
-                // Method 4: DOM Analysis
-                if (!stringKey) {
-                    updateMethodStatus('domStatus', 'pending', 'Analyzing...');
-                    const domResult = await extractFromDOM();
-                    Object.assign(allContext, domResult.context);
-                    
-                    if (domResult.stringKey) {
-                        stringKey = domResult.stringKey;
-                        method = 'DOM Analysis';
-                        updateMethodStatus('domStatus', 'success', 'Found!');
-                    } else {
-                        updateMethodStatus('domStatus', 'error', 'Not found');
-                    }
-                }
-                
-                // Method 5: Crowdin API
-                if (!stringKey) {
-                    updateMethodStatus('apiStatus', 'pending', 'Calling API...');
-                    const apiResult = await extractFromCrowdinAPI();
-                    Object.assign(allContext, apiResult.context);
-                    
-                    if (apiResult.stringKey) {
-                        stringKey = apiResult.stringKey;
-                        method = 'Crowdin API';
-                        updateMethodStatus('apiStatus', 'success', 'Found!');
-                        
-                        // Show result with API data
-                        showSuccessResult(stringKey, method, apiResult.apiData);
-                        updateDebugInfo(allContext);
-                        await logExtractionAttempt(allContext, stringKey, method);
-                        return; // Early return for API success
-                    } else {
-                        updateMethodStatus('apiStatus', 'error', 'Not found');
-                    }
-                }
-                
-                // Update debug info
-                updateDebugInfo(allContext);
-                
-                // Send to server for logging
-                await logExtractionAttempt(allContext, stringKey, method);
-                
-                // Show result
-                if (stringKey) {
-                    showSuccessResult(stringKey, method);
-                } else {
-                    showErrorResult('No string key found using any available method.');
+                    showErrorResult(audioResult.message);
                 }
                 
             } catch (error) {
-                console.error('Extraction error:', error);
-                showErrorResult(`Extraction failed: ${error.message}`);
-                updateDebugInfo({ error: error.message, stack: error.stack });
+                console.error('Audio playback error:', error);
+                showErrorResult(`Audio playback failed: ${error.message}`);
             } finally {
                 // Re-enable button
                 extractBtn.disabled = false;
                 extractIcon.textContent = '🎵';
                 extractText.textContent = 'Play Current Audio';
+            }
+        }
+
+        // Find and play audio for the current string
+        async function findAndPlayAudio() {
+            const projectId = document.getElementById('projectId')?.value || '756721';
+            const token = document.getElementById('apiToken')?.value || '161834fde81833a72996c125d9c1a1c801ae99ef15eb1d3889dfe9fbc55077aaea02b62f1e24278e';
+            
+            console.log('🎵 Looking for audio for string:', currentStringCache.stringId, currentStringCache.stringKey);
+            
+            // Try multiple approaches to find audio
+            const audioSources = [
+                () => findAudioByStringKey(currentStringCache.stringKey || currentStringCache.identifier),
+                () => findAudioByFileName(currentStringCache.fileName, currentStringCache.stringKey || currentStringCache.identifier),
+                () => generateTextToSpeech(currentStringCache.text)
+            ];
+            
+            for (const audioSource of audioSources) {
+                try {
+                    const result = await audioSource();
+                    if (result.success) {
+                        await playAudio(result.audioUrl, result.source, result.text);
+                        return {
+                            success: true,
+                            source: result.source,
+                            audioUrl: result.audioUrl,
+                            message: `Playing audio for "${currentStringCache.stringKey || currentStringCache.identifier}" from ${result.source}`
+                        };
+                    }
+                } catch (error) {
+                    console.log('🎵 Audio source failed:', error.message);
+                }
+            }
+            
+            return {
+                success: false,
+                message: `No audio found for string "${currentStringCache.stringKey || currentStringCache.identifier}" (ID: ${currentStringCache.stringId}). Tried file system and text-to-speech.`
+            };
+        }
+
+        // Try to find audio by string key (common naming convention)
+        async function findAudioByStringKey(stringKey) {
+            if (!stringKey) throw new Error('No string key available');
+            
+            const commonAudioExtensions = ['mp3', 'wav', 'ogg', 'm4a'];
+            const commonPaths = [
+                `audio/${stringKey}`,
+                `sounds/${stringKey}`,
+                `assets/audio/${stringKey}`,
+                `public/audio/${stringKey}`,
+                `media/${stringKey}`,
+                stringKey
+            ];
+            
+            for (const path of commonPaths) {
+                for (const ext of commonAudioExtensions) {
+                    const audioUrl = `${path}.${ext}`;
+                    console.log('🎵 Trying audio URL:', audioUrl);
+                    
+                    if (await checkAudioExists(audioUrl)) {
+                        return { success: true, audioUrl, source: 'file_system' };
+                    }
+                }
+            }
+            
+            throw new Error('No audio file found by string key');
+        }
+
+        // Try to find audio by file name pattern
+        async function findAudioByFileName(fileName, stringKey) {
+            if (!fileName || !stringKey) throw new Error('Missing file name or string key');
+            
+            // Extract base name from file (remove extension)
+            const baseName = fileName.replace(/\.[^/.]+$/, "");
+            const commonExtensions = ['mp3', 'wav', 'ogg', 'm4a'];
+            
+            const audioPaths = [
+                `audio/${baseName}/${stringKey}`,
+                `sounds/${baseName}/${stringKey}`,
+                `assets/${baseName}/${stringKey}`,
+                `media/${baseName}/${stringKey}`
+            ];
+            
+            for (const path of audioPaths) {
+                for (const ext of commonExtensions) {
+                    const audioUrl = `${path}.${ext}`;
+                    console.log('🎵 Trying file-based audio URL:', audioUrl);
+                    
+                    if (await checkAudioExists(audioUrl)) {
+                        return { success: true, audioUrl, source: 'file_structure' };
+                    }
+                }
+            }
+            
+            throw new Error('No audio found by file structure');
+        }
+
+        // Generate text-to-speech as fallback
+        async function generateTextToSpeech(text) {
+            if (!text) throw new Error('No text available for TTS');
+            
+            // Use Web Speech API for text-to-speech
+            if ('speechSynthesis' in window) {
+                return { 
+                    success: true, 
+                    audioUrl: null, // Will use TTS directly
+                    source: 'text_to_speech',
+                    text: text
+                };
+            }
+            
+            throw new Error('Text-to-speech not supported');
+        }
+
+        // Check if audio file exists
+        async function checkAudioExists(url) {
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                return response.ok;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        // Play audio from URL or use TTS
+        async function playAudio(audioUrl, source, text) {
+            if (source === 'text_to_speech') {
+                // Use Web Speech API
+                const utterance = new SpeechSynthesisUtterance(text || currentStringCache.text);
+                utterance.rate = 0.8;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                
+                // Try to use a specific voice if available
+                const voices = speechSynthesis.getVoices();
+                const preferredVoice = voices.find(voice => 
+                    voice.lang.startsWith(currentStringCache.sourceLanguageId || 'en')
+                );
+                if (preferredVoice) {
+                    utterance.voice = preferredVoice;
+                }
+                
+                speechSynthesis.speak(utterance);
+                console.log('🎵 Playing TTS for:', text || currentStringCache.text);
+            } else {
+                // Play audio file
+                const audio = new Audio(audioUrl);
+                audio.volume = 0.8;
+                
+                return new Promise((resolve, reject) => {
+                    audio.onloadeddata = () => {
+                        console.log('🎵 Playing audio file:', audioUrl);
+                        audio.play().then(resolve).catch(reject);
+                    };
+                    audio.onerror = () => reject(new Error('Failed to load audio file'));
+                    audio.load();
+                });
             }
         }
 
@@ -2303,9 +2348,35 @@ ${results.join('\n')}
                 }
             }
             
+            // Extract potential string ID, being careful not to confuse with file ID
+            const potentialStringId = stringData.string?.id || stringData.id;
+            const potentialFileId = stringData.string?.file?.id || stringData.file?.id;
+            
+            // Only update stringId if we get a large number (actual string ID) or if we don't have one yet
+            let newStringId = currentStringCache.stringId;
+            console.log('📝 String ID analysis:', {
+                potentialStringId,
+                currentStringId: currentStringCache.stringId,
+                potentialFileId,
+                eventType,
+                stringDataKeys: Object.keys(stringData)
+            });
+            
+            if (potentialStringId && potentialStringId > 1000) {
+                newStringId = potentialStringId;
+                console.log('📝 ✅ Using new string ID:', newStringId);
+            } else if (!currentStringCache.stringId && potentialStringId) {
+                newStringId = potentialStringId;
+                console.log('📝 ⚠️ Using potential string ID (no existing ID):', newStringId);
+            } else if (potentialStringId && potentialStringId <= 1000) {
+                console.log('📝 ❌ Ignoring small ID (likely file ID):', potentialStringId, 'keeping existing:', currentStringCache.stringId);
+            } else {
+                console.log('📝 ➡️ No string ID change, keeping existing:', currentStringCache.stringId);
+            }
+            
             // Update cache with new information
             currentStringCache = {
-                stringId: stringData.string?.id || stringData.id || currentStringCache.stringId,
+                stringId: newStringId,
                 stringKey: stringData.string?.identifier || stringData.identifier || stringData.key || currentStringCache.stringKey,
                 identifier: stringData.string?.identifier || stringData.identifier || stringData.key || currentStringCache.identifier,
                 text: stringData.string?.text || stringData.text || currentStringCache.text,
@@ -2313,7 +2384,7 @@ ${results.join('\n')}
                 label: stringData.string?.label || stringData.label || currentStringCache.label,
                 labels: stringData.string?.labels || stringData.labels || currentStringCache.labels,
                 maxLength: stringData.string?.max_length !== undefined ? stringData.string.max_length : (stringData.max_length !== undefined ? stringData.max_length : currentStringCache.maxLength),
-                fileId: stringData.string?.file?.id || stringData.file?.id || currentStringCache.fileId,
+                fileId: potentialFileId || currentStringCache.fileId,
                 fileName: stringData.string?.file?.name || stringData.file?.name || currentStringCache.fileName,
                 projectId: stringData.string?.project?.id || stringData.project?.id || currentStringCache.projectId,
                 sourceLanguageId: sourceLanguageId,
@@ -2326,6 +2397,14 @@ ${results.join('\n')}
             
             // Update language names if we have the language list
             updateLanguageNamesInCache();
+            
+            // Fetch string labels if we have a string ID (and it's not a file ID)
+            if (currentStringCache.stringId && !currentStringCache.labels && currentStringCache.stringId > 1000) {
+                console.log('🏷️ Auto-fetching labels for string ID:', currentStringCache.stringId);
+                updateStringLabelsInCache();
+            } else if (currentStringCache.stringId && currentStringCache.stringId <= 1000) {
+                console.log('🏷️ Skipping auto-fetch for small ID (likely file ID):', currentStringCache.stringId);
+            }
             
             // Debug logging (only in debug mode)
             if (document.getElementById('debugMode')?.checked) {
@@ -2366,6 +2445,206 @@ ${results.join('\n')}
                         });
                     }
                 });
+            }
+        }
+
+        // Fetch label names from label IDs
+        async function fetchLabelNames(projectId, labelIds, token) {
+            if (!projectId || !labelIds || labelIds.length === 0 || !token) {
+                console.log('🏷️ Missing required parameters for label name fetching');
+                return [];
+            }
+
+            try {
+                console.log('🏷️ Fetching label names for IDs:', JSON.stringify(labelIds, null, 2));
+                
+                const labelPromises = labelIds.map(async (labelId) => {
+                    const url = `https://api.crowdin.com/api/v2/projects/${projectId}/labels/${labelId}`;
+                    console.log('🏷️ Fetching label:', url);
+                    
+                    const response = await fetch(url, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const labelData = await response.json();
+                        console.log('🏷️ Label API response:', JSON.stringify(labelData, null, 2));
+                        
+                        if (labelData && labelData.data) {
+                            return {
+                                id: labelData.data.id,
+                                title: labelData.data.title
+                            };
+                        }
+                    } else {
+                        console.error('🏷️ Failed to fetch label', labelId, ':', response.status);
+                    }
+                    return null;
+                });
+
+                const labelResults = await Promise.all(labelPromises);
+                const validLabels = labelResults.filter(label => label !== null);
+                
+                console.log('🏷️ Successfully fetched labels:', JSON.stringify(validLabels, null, 2));
+                return validLabels;
+            } catch (error) {
+                console.error('🏷️ Error fetching label names:', error);
+                return [];
+            }
+        }
+
+        // Fetch string labels from Crowdin API
+        async function fetchStringLabels(projectId, stringId, token) {
+            if (!projectId || !stringId || !token) {
+                console.log('🏷️ Missing required parameters for label fetching');
+                return [];
+            }
+
+            // Try direct string endpoint first
+            const directUrl = `https://api.crowdin.com/api/v2/projects/${projectId}/strings/${stringId}`;
+            
+            try {
+                console.log('🏷️ Fetching labels for string ID:', stringId);
+                console.log('🏷️ Trying direct endpoint:', directUrl);
+                
+                const response = await fetch(directUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('🏷️ Direct API response:', JSON.stringify(data, null, 2));
+                    
+                    if (data && data.data) {
+                        // Check multiple possible locations for labels
+                        const stringData = data.data;
+                        console.log('🏷️ String data structure:', JSON.stringify(stringData, null, 2));
+                        
+                        // Check if we have labelIds that need to be resolved
+                        if (stringData.labelIds && stringData.labelIds.length > 0) {
+                            console.log('🏷️ Found labelIds:', JSON.stringify(stringData.labelIds, null, 2));
+                            const labelNames = await fetchLabelNames(projectId, stringData.labelIds, token);
+                            console.log('🏷️ Resolved label names:', JSON.stringify(labelNames, null, 2));
+                            return labelNames;
+                        }
+                        
+                        const labels = stringData.labels || stringData.label || [];
+                        console.log('🏷️ Labels found:', JSON.stringify(labels, null, 2));
+                        
+                        // Also check if labels might be in a different format
+                        if (labels.length === 0) {
+                            console.log('🏷️ No labels in standard fields, checking all fields...');
+                            Object.keys(stringData).forEach(key => {
+                                if (key.toLowerCase().includes('label') || key.toLowerCase().includes('tag')) {
+                                    console.log(`🏷️ Found potential label field '${key}':`, JSON.stringify(stringData[key], null, 2));
+                                }
+                            });
+                        }
+                        
+                        return labels;
+                    }
+                } else {
+                    console.log('🏷️ Direct endpoint failed, trying CroQL approach...');
+                    
+                    // Fallback to CroQL query
+                    const listUrl = `https://api.crowdin.com/api/v2/projects/${projectId}/strings`;
+                    const croqlResponse = await fetch(listUrl + '?' + new URLSearchParams({
+                        croql: `id=${stringId}`,
+                        limit: 1
+                    }), {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (croqlResponse.ok) {
+                        const croqlData = await croqlResponse.json();
+                        console.log('🏷️ CroQL API response:', JSON.stringify(croqlData, null, 2));
+                        
+                        if (croqlData && croqlData.data && croqlData.data.length > 0) {
+                            const stringData = croqlData.data[0].data;
+                            console.log('🏷️ CroQL String data structure:', JSON.stringify(stringData, null, 2));
+                            
+                            // Check if we have labelIds that need to be resolved
+                            if (stringData.labelIds && stringData.labelIds.length > 0) {
+                                console.log('🏷️ Found labelIds via CroQL:', JSON.stringify(stringData.labelIds, null, 2));
+                                const labelNames = await fetchLabelNames(projectId, stringData.labelIds, token);
+                                console.log('🏷️ Resolved label names via CroQL:', JSON.stringify(labelNames, null, 2));
+                                return labelNames;
+                            }
+                            
+                            const labels = stringData.labels || stringData.label || [];
+                            console.log('🏷️ Labels fetched via CroQL:', JSON.stringify(labels, null, 2));
+                            return labels;
+                        }
+                    } else {
+                        const errorText = await croqlResponse.text();
+                        console.error('🏷️ CroQL API error:', croqlResponse.status, errorText);
+                    }
+                }
+
+                console.log('🏷️ No string found with ID:', stringId);
+                return [];
+            } catch (error) {
+                console.error('🏷️ Error fetching string labels:', error);
+                
+                // Try to get more detailed error information
+                if (error.response) {
+                    try {
+                        const errorData = await error.response.text();
+                        console.error('🏷️ API error details:', errorData);
+                    } catch (e) {
+                        console.error('🏷️ Could not parse error response');
+                    }
+                }
+                
+                return [];
+            }
+        }
+
+        // Update string cache with fetched labels
+        async function updateStringLabelsInCache() {
+            if (!currentStringCache.stringId) {
+                console.log('🏷️ No string ID available for label fetching');
+                console.log('🏷️ Current cache state:', JSON.stringify(currentStringCache, null, 2));
+                return;
+            }
+
+            const projectId = document.getElementById('projectId')?.value || '756721';
+            const token = document.getElementById('apiToken')?.value || '161834fde81833a72996c125d9c1a1c801ae99ef15eb1d3889dfe9fbc55077aaea02b62f1e24278e';
+
+            // Validate that we have a proper string ID (should be a large number, not a small file ID)
+            const stringId = currentStringCache.stringId;
+            console.log('🏷️ Attempting to fetch labels for string ID:', stringId, '(type:', typeof stringId, ')');
+            
+            // String IDs are typically much larger than file IDs (which are usually < 1000)
+            if (typeof stringId === 'number' && stringId < 1000) {
+                console.log('🏷️ Warning: String ID', stringId, 'seems too small, might be a file ID. Current cache:', JSON.stringify(currentStringCache, null, 2));
+                console.log('🏷️ Skipping label fetch to avoid API errors.');
+                return;
+            }
+
+            try {
+                const labels = await fetchStringLabels(projectId, stringId, token);
+                
+                if (labels && labels.length > 0) {
+                    currentStringCache.labels = labels;
+                    console.log('🏷️ Updated cache with labels:', JSON.stringify(labels, null, 2));
+                    
+                    // Update UI to show the new labels
+                    updateStringCacheStatus();
+                } else {
+                    console.log('🏷️ No labels found for this string');
+                }
+            } catch (error) {
+                console.error('🏷️ Failed to update labels in cache:', error);
             }
         }
 
@@ -2505,7 +2784,10 @@ ${results.join('\n')}
                     additionalInfo.push(`<strong>Label:</strong> ${currentStringCache.label}`);
                 }
                 if (currentStringCache.labels && Array.isArray(currentStringCache.labels) && currentStringCache.labels.length > 0) {
-                    additionalInfo.push(`<strong>Labels:</strong> ${currentStringCache.labels.join(', ')}`);
+                    const labelTags = currentStringCache.labels.map(label => 
+                        `<span style="background: #e3f2fd; color: #1976d2; padding: 2px 6px; border-radius: 12px; font-size: 0.8rem; margin-right: 4px;">${label.title || label.name || label}</span>`
+                    ).join('');
+                    additionalInfo.push(`<strong>Labels:</strong><br>${labelTags}`);
                 }
                 if (currentStringCache.maxLength !== null && currentStringCache.maxLength !== undefined) {
                     additionalInfo.push(`<strong>Max Length:</strong> ${currentStringCache.maxLength === 0 ? 'No limit' : currentStringCache.maxLength}`);
@@ -2580,9 +2862,28 @@ ${results.join('\n')}
                     if (possibleStringData.found) {
                         console.log('🎯 Found potential string data in message:', JSON.stringify(possibleStringData, null, 2));
                         
+                        // Smart string ID handling for message extraction too
+                        let messageStringId = currentStringCache.stringId;
+                        if (possibleStringData.stringId && possibleStringData.stringId > 1000) {
+                            messageStringId = possibleStringData.stringId;
+                            console.log('📨 ✅ Using extracted string ID:', messageStringId);
+                        } else if (!currentStringCache.stringId && possibleStringData.stringId) {
+                            messageStringId = possibleStringData.stringId;
+                            console.log('📨 ⚠️ Using potential extracted string ID (no existing):', messageStringId);
+                        } else if (possibleStringData.stringId && possibleStringData.stringId <= 1000) {
+                            console.log('📨 ❌ Ignoring small extracted ID (likely file ID):', possibleStringData.stringId, 'keeping existing:', currentStringCache.stringId);
+                        }
+                        
+                        console.log('📨 Message extraction analysis:', {
+                            extractedStringId: possibleStringData.stringId,
+                            currentStringId: currentStringCache.stringId,
+                            finalStringId: messageStringId,
+                            extractedData: possibleStringData
+                        });
+                        
                         // Update cache with found data, preserving existing language info
                         currentStringCache = {
-                            stringId: possibleStringData.stringId || currentStringCache.stringId,
+                            stringId: messageStringId,
                             stringKey: possibleStringData.stringKey || currentStringCache.stringKey,
                             identifier: possibleStringData.identifier || currentStringCache.identifier,
                             text: possibleStringData.text || currentStringCache.text,
@@ -2599,6 +2900,14 @@ ${results.join('\n')}
                         
                         updateStringCacheStatus();
                         updateMethodStatus('cacheStatus', 'success', 'Available');
+                        
+                        // Automatically fetch labels if we have a string ID (and it's not a file ID)
+                        if (possibleStringData.stringId && possibleStringData.stringId > 1000) {
+                            console.log('🏷️ Auto-fetching labels for extracted string ID:', possibleStringData.stringId);
+                            updateStringLabelsInCache();
+                        } else if (possibleStringData.stringId && possibleStringData.stringId <= 1000) {
+                            console.log('🏷️ Skipping auto-fetch for small extracted ID (likely file ID):', possibleStringData.stringId);
+                        }
                     }
                 }
             }
@@ -2628,9 +2937,12 @@ ${results.join('\n')}
                 for (const [key, value] of Object.entries(obj)) {
                     const currentPath = path ? `${path}.${key}` : key;
                     
-                    // Check for string ID patterns
-                    if ((key.toLowerCase().includes('stringid') || key.toLowerCase().includes('string_id') || 
-                         (key === 'id' && path.toLowerCase().includes('string'))) && value) {
+                    // Check for string ID patterns - be more specific to avoid file IDs
+                    if ((key.toLowerCase().includes('stringid') || key.toLowerCase().includes('string_id')) && value) {
+                        result.stringId = value;
+                        result.found = true;
+                    } else if (key === 'id' && path.toLowerCase().includes('string') && !path.toLowerCase().includes('file') && value > 1000) {
+                        // Only accept 'id' if it's in a string context, not a file context, and is a large number
                         result.stringId = value;
                         result.found = true;
                     }
