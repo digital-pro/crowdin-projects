@@ -751,18 +751,14 @@ app.get('/translations-panel', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'translations-panel.html'));
 });
 
-// String key extractor route (legacy)
+// String key extractor route (legacy) - REDIRECT TO AUDIO PREVIEWER
 app.get('/string-key-extractor', (req, res) => {
-  console.log('🔑 String key extractor requested');
+  console.log('🔑 Legacy string key extractor requested - redirecting to audio previewer');
   console.log('Query params:', req.query);
-  console.log('Headers:', req.headers);
   
-  // Log all parameters for string key detection
-  Object.keys(req.query).forEach(key => {
-    console.log(`  ${key}: ${req.query[key]}`);
-  });
-  
-  res.sendFile(path.join(__dirname, 'public', 'string-key-extractor.html'));
+  // Preserve query parameters in redirect
+  const queryString = Object.keys(req.query).length > 0 ? '?' + new URLSearchParams(req.query).toString() : '';
+  res.redirect(`/audio-previewer${queryString}`);
 });
 
 // Audio previewer route

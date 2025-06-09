@@ -220,18 +220,13 @@
             console.log('🎵 Trying Levante audio URL:', audioUrl);
             console.log('🎵 URL components:', { labelName, languageCode, cleanStringKey });
             
-            if (await checkAudioExists(audioUrl)) {
-                return { 
-                    success: true, 
-                    audioUrl, 
-                    source: 'levante_repository',
-                    details: { labelName, languageCode, cleanStringKey }
-                };
-            }
-            
-            const error = new Error(`No Levante audio found for ${languageCode}/${labelName}/${cleanStringKey}`);
-            error.attemptedUrl = audioUrl;
-            throw error;
+            // Skip CORS check and try to play directly (GitHub blocks fetch but allows audio loading)
+            return { 
+                success: true, 
+                audioUrl, 
+                source: 'levante_repository',
+                details: { labelName, languageCode, cleanStringKey }
+            };
         }
 
         // Generate text-to-speech as fallback
@@ -287,11 +282,29 @@
                 audio.volume = 0.8;
                 
                 return new Promise((resolve, reject) => {
-                    audio.onloadeddata = () => {
-                        console.log('🎵 Playing audio file:', audioUrl);
+                    audio.oncanplaythrough = () => {
+                        console.log('🎵 ✅ Audio loaded successfully, playing:', audioUrl);
                         audio.play().then(resolve).catch(reject);
                     };
-                    audio.onerror = () => reject(new Error('Failed to load audio file'));
+                    
+                    audio.onerror = (error) => {
+                        console.log('🎵 ❌ Audio failed to load:', audioUrl, error);
+                        reject(new Error(`Audio file not found or failed to load: ${audioUrl}`));
+                    };
+                    
+                    audio.onloadstart = () => {
+                        console.log('🎵 📡 Started loading audio:', audioUrl);
+                    };
+                    
+                    // Set a timeout to avoid hanging indefinitely
+                    const timeout = setTimeout(() => {
+                        console.log('🎵 ⏰ Audio loading timeout:', audioUrl);
+                        reject(new Error(`Audio loading timeout: ${audioUrl}`));
+                    }, 10000); // 10 second timeout
+                    
+                    audio.addEventListener('canplaythrough', () => clearTimeout(timeout));
+                    audio.addEventListener('error', () => clearTimeout(timeout));
+                    
                     audio.load();
                 });
             }
