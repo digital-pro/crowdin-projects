@@ -503,11 +503,17 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🔑 String Key Extractor</h1>
-            <p>Extract current string keys from Crowdin Editor</p>
-        </div>
+            <div class="container">
+            <div class="header">
+                <h1>🔑 String Key Extractor</h1>
+                <p>Extract current string keys from Crowdin Editor</p>
+                <div style="margin-top: 10px;">
+                    <label style="font-size: 0.9rem; color: #666;">
+                        <input type="checkbox" id="debugMode" style="margin-right: 5px;">
+                        Enable debug mode
+                    </label>
+                </div>
+            </div>
 
         <div class="content">
             <!-- Main Extract Button -->
@@ -526,35 +532,39 @@
             </div>
 
             <!-- Methods Status -->
-            <div class="methods-status">
-                <div class="method-card">
-                    <div class="method-name">🎯 Cached String Data</div>
-                    <div id="cacheStatus" class="method-status pending">Waiting...</div>
-                </div>
-                <div class="method-card">
-                    <div class="method-name">URL Parameters</div>
-                    <div id="urlStatus" class="method-status pending">Ready</div>
-                </div>
-                <div class="method-card">
-                    <div class="method-name">PostMessage API</div>
-                    <div id="postmessageStatus" class="method-status pending">Ready</div>
-                </div>
-                <div class="method-card">
-                    <div class="method-name">Global Variables</div>
-                    <div id="globalsStatus" class="method-status pending">Ready</div>
-                </div>
-                <div class="method-card">
-                    <div class="method-name">DOM Analysis</div>
-                    <div id="domStatus" class="method-status pending">Ready</div>
-                </div>
-                <div class="method-card">
-                    <div class="method-name">Crowdin API</div>
-                    <div id="apiStatus" class="method-status pending">Ready</div>
+            <!-- Methods Status (Debug Mode) -->
+            <div id="debugSection" class="debug-section" style="display: none;">
+                <h3 style="margin-bottom: 15px; color: #666;">🔍 Detection Methods</h3>
+                <div class="methods-status">
+                    <div class="method-card">
+                        <div class="method-name">🎯 Cached String Data</div>
+                        <div id="cacheStatus" class="method-status pending">Waiting...</div>
+                    </div>
+                    <div class="method-card">
+                        <div class="method-name">URL Parameters</div>
+                        <div id="urlStatus" class="method-status pending">Ready</div>
+                    </div>
+                    <div class="method-card">
+                        <div class="method-name">PostMessage API</div>
+                        <div id="postmessageStatus" class="method-status pending">Ready</div>
+                    </div>
+                    <div class="method-card">
+                        <div class="method-name">Global Variables</div>
+                        <div id="globalsStatus" class="method-status pending">Ready</div>
+                    </div>
+                    <div class="method-card">
+                        <div class="method-name">DOM Analysis</div>
+                        <div id="domStatus" class="method-status pending">Ready</div>
+                    </div>
+                    <div class="method-card">
+                        <div class="method-name">Crowdin API</div>
+                        <div id="apiStatus" class="method-status pending">Ready</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- API Configuration Section -->
-            <div class="api-config-section">
+            <!-- API Configuration Section (Debug Mode) -->
+            <div id="apiConfigSection" class="api-config-section debug-section" style="display: none;">
                 <h3>🔐 Crowdin API Configuration</h3>
                 <p>To use the Crowdin API method, provide your API token and project details:</p>
                 
@@ -595,8 +605,8 @@
                 <div id="apiTestResult" class="api-test-result" style="display: none;"></div>
             </div>
 
-            <!-- Limitation Notice -->
-            <div class="limitation-notice">
+            <!-- Limitation Notice (Debug Mode) -->
+            <div id="limitationSection" class="limitation-notice debug-section" style="display: none;">
                 <h3>
                     ⚠️ Important Limitations
                 </h3>
@@ -610,8 +620,8 @@
                 </ul>
             </div>
 
-            <!-- Alternative Solutions -->
-            <div class="alternatives-section">
+            <!-- Alternative Solutions (Debug Mode) -->
+            <div id="alternativesSection" class="alternatives-section debug-section" style="display: none;">
                 <h3>💡 Alternative Solutions</h3>
                 <p><strong>Since direct string key extraction is limited, here are recommended approaches:</strong></p>
                 <ol>
@@ -624,8 +634,8 @@
                 </ol>
             </div>
 
-            <!-- Debug Information -->
-            <div class="debug-section">
+            <!-- Debug Information (Debug Mode) -->
+            <div id="debugInfoSection" class="debug-section" style="display: none;">
                 <h3>🔧 Debug Information</h3>
                 <div class="debug-info" id="debugInfo">Click "Extract Current String Key" to see debug information...</div>
             </div>
@@ -2315,8 +2325,11 @@ ${results.join('\n')}
             // Update language names if we have the language list
             updateLanguageNamesInCache();
             
-            console.log('📝 Updated string cache:', JSON.stringify(currentStringCache, null, 2));
-            console.log('🔍 String data properties available:', Object.keys(stringData.string || stringData));
+            // Debug logging (only in debug mode)
+            if (document.getElementById('debugMode')?.checked) {
+                console.log('📝 Updated string cache:', JSON.stringify(currentStringCache, null, 2));
+                console.log('🔍 String data properties available:', Object.keys(stringData.string || stringData));
+            }
             
             // Update the UI to show we have cached string data
             updateStringCacheStatus();
@@ -2499,14 +2512,16 @@ ${results.join('\n')}
                     additionalInfo.push(`<strong>File:</strong> ${currentStringCache.fileName}`);
                 }
                 
-                // Debug: Log what additional info we're showing
-                console.log('🔍 Additional info being displayed:', {
-                    label: currentStringCache.label,
-                    labels: currentStringCache.labels,
-                    maxLength: currentStringCache.maxLength,
-                    fileName: currentStringCache.fileName,
-                    additionalInfoCount: additionalInfo.length
-                });
+                // Debug: Log what additional info we're showing (only in debug mode)
+                if (document.getElementById('debugMode')?.checked) {
+                    console.log('🔍 Additional info being displayed:', {
+                        label: currentStringCache.label,
+                        labels: currentStringCache.labels,
+                        maxLength: currentStringCache.maxLength,
+                        fileName: currentStringCache.fileName,
+                        additionalInfoCount: additionalInfo.length
+                    });
+                }
                 
                 document.getElementById('stringCacheStatus').innerHTML = `
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
@@ -2686,6 +2701,19 @@ ${results.join('\n')}
             return result;
         }
 
+        // Debug mode toggle
+        function toggleDebugMode() {
+            const debugMode = document.getElementById('debugMode').checked;
+            const debugSections = document.querySelectorAll('.debug-section');
+            
+            debugSections.forEach(section => {
+                section.style.display = debugMode ? 'block' : 'none';
+            });
+            
+            // Store debug mode preference
+            localStorage.setItem('crowdinExtractorDebugMode', debugMode);
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🔑 String Key Extractor loaded and ready');
@@ -2708,6 +2736,17 @@ ${results.join('\n')}
             const projectId = extractProjectIdFromURL();
             if (projectId) {
                 document.getElementById('projectId').value = projectId;
+            }
+            
+            // Set up debug mode toggle
+            const debugModeCheckbox = document.getElementById('debugMode');
+            debugModeCheckbox.addEventListener('change', toggleDebugMode);
+            
+            // Restore debug mode preference
+            const savedDebugMode = localStorage.getItem('crowdinExtractorDebugMode');
+            if (savedDebugMode === 'true') {
+                debugModeCheckbox.checked = true;
+                toggleDebugMode();
             }
         });
     </script>
