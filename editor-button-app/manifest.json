@@ -1,7 +1,7 @@
 {
   "identifier": "levante-audio-previewer-v2",
   "name": "Levante Audio Previewer",
-  "description": "Play audio for the currently selected string in Crowdin using Levante repository",
+  "description": "Select a string to preview its audio",
   "logo": "/favicon.svg",
   "baseUrl": "https://editor-button-app.vercel.app",
   "authentication": {
