@@ -9,10 +9,10 @@
   },
   "scopes": ["project"],
   "modules": {
-    "editor-right-panel": [
+    "editor-translations-panel": [
       {
-        "key": "levante-audio-previewer-panel",
-        "name": "🎵 Play Audio",
+        "key": "levante-audio-previewer-translations",
+        "name": "🎵 Audio Preview",
         "modes": ["translate", "comfortable", "side-by-side", "multilingual"],
         "url": "/audio-previewer",
         "environments": ["crowdin"]

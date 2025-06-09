@@ -12,6 +12,10 @@
         <div class="header">
             <h1>🎵 Audio Preview</h1>
             <p>Play audio for the currently selected string in Crowdin</p>
+            <div style="background: #e3f2fd; padding: 8px; border-radius: 4px; margin: 10px 0; font-size: 0.9rem;">
+                <strong>📋 Module Type:</strong> Translations Panel
+                <br><small>Better access to translation context and events</small>
+            </div>
         </div>
         
         <div class="content">
@@ -407,8 +411,29 @@
                                         console.error('🎯 Error handling translation.change event:', error);
                                     }
                                 });
+                                
+                                // Translations panel specific events
+                                AP.events.on('translation.save', function(translationData) {
+                                    try {
+                                        console.log('💾 Translation saved:', translationData);
+                                        updateStringCacheFromCrowdinEvent(translationData, 'translation.save');
+                                    } catch (error) {
+                                        console.error('🎯 Error handling translation.save event:', error);
+                                    }
+                                });
+                                
+                                AP.events.on('translation.approve', function(translationData) {
+                                    try {
+                                        console.log('✅ Translation approved:', translationData);
+                                        updateStringCacheFromCrowdinEvent(translationData, 'translation.approve');
+                                    } catch (error) {
+                                        console.error('🎯 Error handling translation.approve event:', error);
+                                    }
+                                });
+                                
+                                console.log('✅ Registered for translations panel specific events');
                             } catch (error) {
-                                console.log('⚠️ translation.change event not available');
+                                console.log('⚠️ Some translation events not available');
                             }
                         }
                         
@@ -996,12 +1021,12 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🎵 Audio Previewer loaded and ready');
+            console.log('🎵 Audio Previewer loaded and ready as TRANSLATIONS PANEL module');
             
             // Prevent app disappearance
             preventAppDisappearance();
             
-            // Initialize Crowdin API
+            // Initialize Crowdin API with translations panel specific setup
             initializeCrowdinAPI();
             
             // Set up enhanced message handler with error protection
