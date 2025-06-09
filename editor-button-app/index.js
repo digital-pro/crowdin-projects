@@ -527,9 +527,43 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve the manifest file
+// Serve the manifest file dynamically
 app.get('/manifest.json', (req, res) => {
-  res.sendFile(path.join(__dirname, 'manifest.json'));
+  console.log('📋 Manifest requested');
+  
+  // Get the current deployment URL
+  const baseUrl = process.env.VERCEL_URL 
+    ? `https://${process.env.VERCEL_URL}` 
+    : `http://localhost:${PORT}`;
+  
+  const manifest = {
+    "identifier": "string-key-extractor",
+    "name": "String Key Extractor",
+    "description": "Extract current string keys and context from Crowdin editor",
+    "logo": "/favicon.svg",
+    "baseUrl": baseUrl,
+    "authentication": {
+      "type": "none"
+    },
+    "scopes": ["project"],
+    "modules": {
+      "editor-right-panel": [
+        {
+          "key": "string-key-panel",
+          "name": "String Key Extractor",
+          "modes": ["translate", "comfortable", "side-by-side", "multilingual"],
+          "url": "/string-key-extractor",
+          "environments": ["crowdin"]
+        }
+      ]
+    }
+  };
+  
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.json(manifest);
 });
 
 // New Crowdin API endpoint for string extraction
@@ -1026,6 +1060,11 @@ app.post('/extract-context', (req, res) => {
             ]
         }
     });
+});
+
+// Root route - redirect to string key extractor
+app.get('/', (req, res) => {
+  res.redirect('/string-key-extractor');
 });
 
 // Health check endpoint
