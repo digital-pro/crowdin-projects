@@ -676,6 +676,10 @@
                             text: currentStringCache.text,
                             fileId: currentStringCache.fileId,
                             context: currentStringCache.context,
+                            sourceLanguageId: currentStringCache.sourceLanguageId,
+                            targetLanguageId: currentStringCache.targetLanguageId,
+                            sourceLanguageName: currentStringCache.sourceLanguageName,
+                            targetLanguageName: currentStringCache.targetLanguageName,
                             source: currentStringCache.source,
                             lastUpdated: currentStringCache.lastUpdated
                         };
@@ -2131,6 +2135,10 @@ ${results.join('\n')}
             context: null,
             fileId: null,
             projectId: null,
+            sourceLanguageId: null,
+            targetLanguageId: null,
+            sourceLanguageName: null,
+            targetLanguageName: null,
             lastUpdated: null,
             source: null
         };
@@ -2177,6 +2185,14 @@ ${results.join('\n')}
                             if (stringData) {
                                 console.log('🎯 Current string from AP.editor.getString:', stringData);
                                 updateStringCacheFromCrowdinEvent(stringData, 'AP.editor.getString');
+                            }
+                        });
+                        
+                        // Get context information (includes language data)
+                        AP.getContext(function(contextData) {
+                            if (contextData) {
+                                console.log('🌍 Context data from AP.getContext:', JSON.stringify(contextData, null, 2));
+                                updateLanguageInfoFromContext(contextData);
                             }
                         });
                         
@@ -2242,28 +2258,141 @@ ${results.join('\n')}
         function updateStringCacheFromCrowdinEvent(stringData, eventType) {
             if (!stringData) return;
             
-            console.log('📝 Processing string data from event:', eventType, stringData);
+            console.log('📝 Processing string data from event:', eventType, JSON.stringify(stringData, null, 2));
+            
+            // Extract language information from string data
+            let sourceLanguageId = currentStringCache.sourceLanguageId;
+            let targetLanguageId = currentStringCache.targetLanguageId;
+            
+            // Look for target language in translations
+            if (stringData.translations) {
+                const targetLangs = Object.keys(stringData.translations);
+                if (targetLangs.length > 0) {
+                    targetLanguageId = targetLangs[0]; // Get the first (and usually only) target language
+                }
+                
+                // Also check target_language_id in translation objects
+                for (const lang in stringData.translations) {
+                    const translations = stringData.translations[lang];
+                    if (Array.isArray(translations) && translations.length > 0) {
+                        const firstTranslation = translations[0];
+                        if (firstTranslation.target_language_id) {
+                            targetLanguageId = firstTranslation.target_language_id;
+                        }
+                    }
+                }
+            }
             
             // Update cache with new information
             currentStringCache = {
-                stringId: stringData.id || currentStringCache.stringId,
-                stringKey: stringData.identifier || stringData.key || currentStringCache.stringKey,
-                identifier: stringData.identifier || stringData.key || currentStringCache.identifier,
-                text: stringData.text || currentStringCache.text,
-                context: stringData.context || currentStringCache.context,
-                fileId: stringData.file?.id || currentStringCache.fileId,
-                projectId: stringData.project?.id || currentStringCache.projectId,
+                stringId: stringData.string?.id || stringData.id || currentStringCache.stringId,
+                stringKey: stringData.string?.identifier || stringData.identifier || stringData.key || currentStringCache.stringKey,
+                identifier: stringData.string?.identifier || stringData.identifier || stringData.key || currentStringCache.identifier,
+                text: stringData.string?.text || stringData.text || currentStringCache.text,
+                context: stringData.string?.context || stringData.context || currentStringCache.context,
+                fileId: stringData.string?.file?.id || stringData.file?.id || currentStringCache.fileId,
+                projectId: stringData.string?.project?.id || stringData.project?.id || currentStringCache.projectId,
+                sourceLanguageId: sourceLanguageId,
+                targetLanguageId: targetLanguageId,
+                sourceLanguageName: currentStringCache.sourceLanguageName,
+                targetLanguageName: currentStringCache.targetLanguageName,
                 lastUpdated: new Date().toISOString(),
                 source: eventType
             };
             
-            console.log('📝 Updated string cache:', currentStringCache);
+            // Update language names if we have the language list
+            updateLanguageNamesInCache();
+            
+            console.log('📝 Updated string cache:', JSON.stringify(currentStringCache, null, 2));
             
             // Update the UI to show we have cached string data
             updateStringCacheStatus();
             
             // Update method status indicator
             updateMethodStatus('cacheStatus', 'success', 'Available');
+        }
+        
+        // Helper function to update language names in cache
+        function updateLanguageNamesInCache() {
+            // Try to get language names from the available languages list
+            if (typeof AP !== 'undefined' && AP.editor && AP.editor.getProjectTargetLanguages) {
+                AP.editor.getProjectTargetLanguages(function(languages) {
+                    if (languages && Array.isArray(languages)) {
+                        // Find source and target language names
+                        languages.forEach(lang => {
+                            if (lang.code === currentStringCache.sourceLanguageId || lang.internal_code === currentStringCache.sourceLanguageId) {
+                                currentStringCache.sourceLanguageName = lang.name;
+                            }
+                            if (lang.code === currentStringCache.targetLanguageId || lang.internal_code === currentStringCache.targetLanguageId) {
+                                currentStringCache.targetLanguageName = lang.name;
+                            }
+                        });
+                        
+                        // Update UI with language information
+                        updateStringCacheStatus();
+                        console.log('🌍 Updated language names in cache:', {
+                            sourceLanguageId: currentStringCache.sourceLanguageId,
+                            targetLanguageId: currentStringCache.targetLanguageId,
+                            sourceLanguageName: currentStringCache.sourceLanguageName,
+                            targetLanguageName: currentStringCache.targetLanguageName
+                        });
+                    }
+                });
+            }
+        }
+
+        // Update language information from context data
+        function updateLanguageInfoFromContext(contextData) {
+            if (!contextData) return;
+            
+            console.log('🌍 Processing context data:', JSON.stringify(contextData, null, 2));
+            
+            // Extract language information from context
+            if (contextData.editor) {
+                currentStringCache.sourceLanguageId = contextData.editor.source_language_id || currentStringCache.sourceLanguageId;
+                currentStringCache.targetLanguageId = contextData.editor.target_language_id || currentStringCache.targetLanguageId;
+            }
+            
+            // Also check if contextData has args array (from the message structure we saw)
+            if (contextData.args && Array.isArray(contextData.args) && contextData.args.length > 0) {
+                const firstArg = contextData.args[0];
+                if (firstArg.editor) {
+                    currentStringCache.sourceLanguageId = firstArg.editor.source_language_id || currentStringCache.sourceLanguageId;
+                    currentStringCache.targetLanguageId = firstArg.editor.target_language_id || currentStringCache.targetLanguageId;
+                }
+            }
+            
+            // Get language names if we have language IDs
+            if (currentStringCache.sourceLanguageId || currentStringCache.targetLanguageId) {
+                // Try to get project target languages for language names
+                if (typeof AP !== 'undefined' && AP.editor && AP.editor.getProjectTargetLanguages) {
+                    AP.editor.getProjectTargetLanguages(function(languages) {
+                        if (languages && Array.isArray(languages)) {
+                            console.log('🌍 Available languages:', JSON.stringify(languages, null, 2));
+                            
+                            // Find source and target language names
+                            languages.forEach(lang => {
+                                if (lang.id === currentStringCache.sourceLanguageId) {
+                                    currentStringCache.sourceLanguageName = lang.name;
+                                }
+                                if (lang.id === currentStringCache.targetLanguageId) {
+                                    currentStringCache.targetLanguageName = lang.name;
+                                }
+                            });
+                            
+                            // Update UI with language information
+                            updateStringCacheStatus();
+                        }
+                    });
+                }
+            }
+            
+            console.log('🌍 Updated language info in cache:', JSON.stringify({
+                sourceLanguageId: currentStringCache.sourceLanguageId,
+                targetLanguageId: currentStringCache.targetLanguageId,
+                sourceLanguageName: currentStringCache.sourceLanguageName,
+                targetLanguageName: currentStringCache.targetLanguageName
+            }, null, 2));
         }
 
         // Enhanced message handler for Crowdin API events
@@ -2332,6 +2461,16 @@ ${results.join('\n')}
             }
             
             if (currentStringCache.stringKey || currentStringCache.stringId) {
+                const languageInfo = [];
+                if (currentStringCache.sourceLanguageId) {
+                    const sourceName = currentStringCache.sourceLanguageName || currentStringCache.sourceLanguageId;
+                    languageInfo.push(`<strong>Source:</strong> ${sourceName} (${currentStringCache.sourceLanguageId})`);
+                }
+                if (currentStringCache.targetLanguageId) {
+                    const targetName = currentStringCache.targetLanguageName || currentStringCache.targetLanguageId;
+                    languageInfo.push(`<strong>Target:</strong> ${targetName} (${currentStringCache.targetLanguageId})`);
+                }
+                
                 document.getElementById('stringCacheStatus').innerHTML = `
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
                         <span style="font-size: 1.2rem;">🎯</span>
@@ -2342,6 +2481,7 @@ ${results.join('\n')}
                         <strong>Key:</strong> ${currentStringCache.stringKey || currentStringCache.identifier || 'N/A'}<br>
                         <strong>ID:</strong> ${currentStringCache.stringId || 'N/A'}<br>
                         <strong>Text:</strong> ${currentStringCache.text ? currentStringCache.text.substring(0, 100) + (currentStringCache.text.length > 100 ? '...' : '') : 'N/A'}
+                        ${languageInfo.length > 0 ? '<br>' + languageInfo.join('<br>') : ''}
                     </div>
                     <div style="font-size: 0.9rem; opacity: 0.8;">
                         Source: ${currentStringCache.source || 'Unknown'}
@@ -2364,27 +2504,40 @@ ${results.join('\n')}
             
             // Log all messages for debugging (only from Crowdin)
             if (event.origin && event.origin.includes('crowdin.com')) {
-                console.log('📨 Received message from Crowdin:', {
+                console.log('📨 Received message from Crowdin:', JSON.stringify({
                     origin: event.origin,
                     type: event.data?.type,
                     data: event.data
-                });
+                }, null, 2));
                 
                 // Try to extract any string-related data from any message
                 if (event.data && typeof event.data === 'object') {
+                    // Check if this is a context message with language information
+                    if (event.data.type === 'resp' && event.data.args && Array.isArray(event.data.args)) {
+                        const firstArg = event.data.args[0];
+                        if (firstArg && firstArg.editor && (firstArg.editor.source_language_id || firstArg.editor.target_language_id)) {
+                            console.log('🌍 Found language context in message, updating...');
+                            updateLanguageInfoFromContext(event.data);
+                        }
+                    }
+                    
                     const possibleStringData = extractStringDataFromMessage(event.data);
                     if (possibleStringData.found) {
-                        console.log('🎯 Found potential string data in message:', possibleStringData);
+                        console.log('🎯 Found potential string data in message:', JSON.stringify(possibleStringData, null, 2));
                         
-                        // Update cache with found data
+                        // Update cache with found data, preserving existing language info
                         currentStringCache = {
-                            stringId: possibleStringData.stringId,
-                            stringKey: possibleStringData.stringKey,
-                            identifier: possibleStringData.identifier,
-                            text: possibleStringData.text,
-                            context: possibleStringData.context,
-                            fileId: possibleStringData.fileId,
-                            projectId: possibleStringData.projectId,
+                            stringId: possibleStringData.stringId || currentStringCache.stringId,
+                            stringKey: possibleStringData.stringKey || currentStringCache.stringKey,
+                            identifier: possibleStringData.identifier || currentStringCache.identifier,
+                            text: possibleStringData.text || currentStringCache.text,
+                            context: possibleStringData.context || currentStringCache.context,
+                            fileId: possibleStringData.fileId || currentStringCache.fileId,
+                            projectId: possibleStringData.projectId || currentStringCache.projectId,
+                            sourceLanguageId: currentStringCache.sourceLanguageId,
+                            targetLanguageId: currentStringCache.targetLanguageId,
+                            sourceLanguageName: currentStringCache.sourceLanguageName,
+                            targetLanguageName: currentStringCache.targetLanguageName,
                             lastUpdated: new Date().toISOString(),
                             source: 'message_extraction'
                         };
