@@ -370,35 +370,73 @@
 
         // Initialize Crowdin API
         function initializeCrowdinAPI() {
-            if (typeof AP !== 'undefined') {
-                console.log('🎯 Crowdin Apps JS API available');
-                
-                // Register for string events
-                try {
-                    AP.events.on('string.change', function(stringData) {
-                        console.log('🎯 String changed:', stringData);
-                        updateStringCacheFromCrowdinEvent(stringData, 'string.change');
-                    });
+            // Add a delay to ensure the API is fully loaded
+            setTimeout(() => {
+                if (typeof AP !== 'undefined') {
+                    console.log('🎯 Crowdin Apps JS API available');
                     
-                    AP.events.on('string.selected', function(stringData) {
-                        console.log('🎯 String selected:', stringData);
-                        updateStringCacheFromCrowdinEvent(stringData, 'string.selected');
-                    });
-                    
-                    console.log('✅ Registered for Crowdin API events');
-                } catch (error) {
-                    console.log('⚠️ Failed to register for Crowdin API events:', error);
+                    // Register for string events with error handling
+                    try {
+                        // Wrap event handlers to prevent errors from breaking the app
+                        AP.events.on('string.change', function(stringData) {
+                            try {
+                                console.log('🎯 String changed:', stringData);
+                                updateStringCacheFromCrowdinEvent(stringData, 'string.change');
+                            } catch (error) {
+                                console.error('🎯 Error handling string.change event:', error);
+                            }
+                        });
+                        
+                        AP.events.on('string.selected', function(stringData) {
+                            try {
+                                console.log('🎯 String selected:', stringData);
+                                updateStringCacheFromCrowdinEvent(stringData, 'string.selected');
+                            } catch (error) {
+                                console.error('🎯 Error handling string.selected event:', error);
+                            }
+                        });
+                        
+                        // Add additional event listeners for better coverage
+                        if (AP.events.on) {
+                            try {
+                                AP.events.on('translation.change', function(translationData) {
+                                    try {
+                                        console.log('🎯 Translation changed:', translationData);
+                                        updateStringCacheFromCrowdinEvent(translationData, 'translation.change');
+                                    } catch (error) {
+                                        console.error('🎯 Error handling translation.change event:', error);
+                                    }
+                                });
+                            } catch (error) {
+                                console.log('⚠️ translation.change event not available');
+                            }
+                        }
+                        
+                        console.log('✅ Registered for Crowdin API events');
+                    } catch (error) {
+                        console.log('⚠️ Failed to register for Crowdin API events:', error);
+                    }
+                } else {
+                    console.log('⚠️ Crowdin Apps JS API not available, retrying...');
+                    // Retry after another delay
+                    setTimeout(() => {
+                        if (typeof AP !== 'undefined') {
+                            console.log('🎯 Crowdin Apps JS API available on retry');
+                            initializeCrowdinAPI();
+                        } else {
+                            console.log('⚠️ Crowdin Apps JS API still not available after retry');
+                        }
+                    }, 2000);
                 }
-            } else {
-                console.log('⚠️ Crowdin Apps JS API not available');
-            }
+            }, 1000);
         }
 
         // Update string cache from Crowdin event data
         function updateStringCacheFromCrowdinEvent(stringData, eventType) {
             if (!stringData) return;
             
-            console.log('📝 Processing string data from event:', eventType, JSON.stringify(stringData, null, 2));
+            try {
+                console.log('📝 Processing string data from event:', eventType, JSON.stringify(stringData, null, 2));
             
             // Extract language information from string data
             let sourceLanguageId = currentStringCache.sourceLanguageId;
@@ -473,6 +511,10 @@
             
             // Update the UI to show we have cached string data
             updateStringCacheStatus();
+            } catch (error) {
+                console.error('📝 Error in updateStringCacheFromCrowdinEvent:', error);
+                // Don't let errors break the app
+            }
         }
 
         // Helper function to update language names in cache
@@ -705,8 +747,24 @@
 
         // Enhanced message handler that includes API events
         function enhancedMessageHandler(event) {
-            // Log all messages for debugging (only from Crowdin)
-            if (event.origin && event.origin.includes('crowdin.com')) {
+            // Prevent any default behavior that might cause navigation
+            if (event.preventDefault) {
+                event.preventDefault();
+            }
+            
+            // Only process messages from Crowdin origins
+            if (!event.origin || !event.origin.includes('crowdin.com')) {
+                return;
+            }
+            
+            // Throttle message processing to prevent overload
+            if (window.lastMessageTime && Date.now() - window.lastMessageTime < 100) {
+                return; // Skip if less than 100ms since last message
+            }
+            window.lastMessageTime = Date.now();
+            
+            try {
+                // Log messages for debugging (only if debug mode is enabled)
                 if (document.getElementById('debugMode')?.checked) {
                     console.log('📨 Received message from Crowdin:', JSON.stringify({
                         origin: event.origin,
@@ -715,52 +773,64 @@
                     }, null, 2));
                 }
                 
-                // Try to extract any string-related data from any message
-                if (event.data && typeof event.data === 'object') {
-                    const possibleStringData = extractStringDataFromMessage(event.data);
-                    if (possibleStringData.found) {
-                        console.log('🎯 Found potential string data in message:', JSON.stringify(possibleStringData, null, 2));
-                        
-                        // Smart string ID handling for message extraction too
-                        let messageStringId = currentStringCache.stringId;
-                        if (possibleStringData.stringId && possibleStringData.stringId > 1000) {
-                            messageStringId = possibleStringData.stringId;
-                            console.log('📨 ✅ Using extracted string ID:', messageStringId);
-                        } else if (!currentStringCache.stringId && possibleStringData.stringId) {
-                            messageStringId = possibleStringData.stringId;
-                            console.log('📨 ⚠️ Using potential extracted string ID (no existing):', messageStringId);
-                        } else if (possibleStringData.stringId && possibleStringData.stringId <= 1000) {
-                            console.log('📨 ❌ Ignoring small extracted ID (likely file ID):', possibleStringData.stringId, 'keeping existing:', currentStringCache.stringId);
-                        }
-                        
-                        // Update cache with found data, preserving existing language info
-                        currentStringCache = {
-                            stringId: messageStringId,
-                            stringKey: possibleStringData.stringKey || currentStringCache.stringKey,
-                            identifier: possibleStringData.identifier || currentStringCache.identifier,
-                            text: possibleStringData.text || currentStringCache.text,
-                            context: possibleStringData.context || currentStringCache.context,
-                            fileId: possibleStringData.fileId || currentStringCache.fileId,
-                            projectId: possibleStringData.projectId || currentStringCache.projectId,
-                            sourceLanguageId: currentStringCache.sourceLanguageId,
-                            targetLanguageId: currentStringCache.targetLanguageId,
-                            sourceLanguageName: currentStringCache.sourceLanguageName,
-                            targetLanguageName: currentStringCache.targetLanguageName,
-                            lastUpdated: new Date().toISOString(),
-                            source: 'message_extraction'
-                        };
-                        
+                // Only process messages that contain actual data
+                if (!event.data || typeof event.data !== 'object') {
+                    return;
+                }
+                
+                // Try to extract string-related data from the message
+                const possibleStringData = extractStringDataFromMessage(event.data);
+                if (possibleStringData.found) {
+                    console.log('🎯 Found potential string data in message:', JSON.stringify(possibleStringData, null, 2));
+                    
+                    // Smart string ID handling for message extraction
+                    let messageStringId = currentStringCache.stringId;
+                    if (possibleStringData.stringId && possibleStringData.stringId > 1000) {
+                        messageStringId = possibleStringData.stringId;
+                        console.log('📨 ✅ Using extracted string ID:', messageStringId);
+                    } else if (!currentStringCache.stringId && possibleStringData.stringId) {
+                        messageStringId = possibleStringData.stringId;
+                        console.log('📨 ⚠️ Using potential extracted string ID (no existing):', messageStringId);
+                    } else if (possibleStringData.stringId && possibleStringData.stringId <= 1000) {
+                        console.log('📨 ❌ Ignoring small extracted ID (likely file ID):', possibleStringData.stringId, 'keeping existing:', currentStringCache.stringId);
+                    }
+                    
+                    // Update cache with found data, preserving existing language info
+                    currentStringCache = {
+                        stringId: messageStringId,
+                        stringKey: possibleStringData.stringKey || currentStringCache.stringKey,
+                        identifier: possibleStringData.identifier || currentStringCache.identifier,
+                        text: possibleStringData.text || currentStringCache.text,
+                        context: possibleStringData.context || currentStringCache.context,
+                        fileId: possibleStringData.fileId || currentStringCache.fileId,
+                        projectId: possibleStringData.projectId || currentStringCache.projectId,
+                        sourceLanguageId: currentStringCache.sourceLanguageId,
+                        targetLanguageId: currentStringCache.targetLanguageId,
+                        sourceLanguageName: currentStringCache.sourceLanguageName,
+                        targetLanguageName: currentStringCache.targetLanguageName,
+                        lastUpdated: new Date().toISOString(),
+                        source: 'message_extraction'
+                    };
+                    
+                    // Update UI in a non-blocking way
+                    setTimeout(() => {
                         updateStringCacheStatus();
-                        
-                        // Automatically fetch labels if we have a string ID (and it's not a file ID)
-                        if (possibleStringData.stringId && possibleStringData.stringId > 1000) {
-                            console.log('🏷️ Auto-fetching labels for extracted string ID:', possibleStringData.stringId);
+                    }, 0);
+                    
+                    // Automatically fetch labels if we have a string ID (and it's not a file ID)
+                    if (possibleStringData.stringId && possibleStringData.stringId > 1000) {
+                        console.log('🏷️ Auto-fetching labels for extracted string ID:', possibleStringData.stringId);
+                        // Delay label fetching to prevent blocking
+                        setTimeout(() => {
                             updateStringLabelsInCache();
-                        } else if (possibleStringData.stringId && possibleStringData.stringId <= 1000) {
-                            console.log('🏷️ Skipping auto-fetch for small extracted ID (likely file ID):', possibleStringData.stringId);
-                        }
+                        }, 100);
+                    } else if (possibleStringData.stringId && possibleStringData.stringId <= 1000) {
+                        console.log('🏷️ Skipping auto-fetch for small extracted ID (likely file ID):', possibleStringData.stringId);
                     }
                 }
+            } catch (error) {
+                console.error('📨 Error in message handler:', error);
+                // Don't let message handling errors break the app
             }
         }
         
@@ -893,31 +963,74 @@
             }
         }
 
+        // Prevent app from disappearing due to navigation events
+        function preventAppDisappearance() {
+            // Prevent any unintended navigation
+            window.addEventListener('beforeunload', function(e) {
+                console.log('🚫 Preventing unintended navigation');
+                // Don't actually prevent navigation, just log it
+            });
+            
+            // Prevent form submissions that might cause navigation
+            document.addEventListener('submit', function(e) {
+                console.log('🚫 Preventing form submission');
+                e.preventDefault();
+                return false;
+            });
+            
+            // Prevent clicks on links that might cause navigation
+            document.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A' && e.target.href && !e.target.target) {
+                    console.log('🚫 Preventing link navigation, opening in new tab instead');
+                    e.preventDefault();
+                    window.open(e.target.href, '_blank');
+                    return false;
+                }
+            });
+            
+            // Keep the app alive with periodic heartbeat
+            setInterval(() => {
+                console.log('💓 App heartbeat - still alive');
+            }, 30000); // Every 30 seconds
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🎵 Audio Previewer loaded and ready');
             
+            // Prevent app disappearance
+            preventAppDisappearance();
+            
             // Initialize Crowdin API
             initializeCrowdinAPI();
             
-            // Set up enhanced message handler
-            window.addEventListener('message', enhancedMessageHandler);
+            // Set up enhanced message handler with error protection
+            try {
+                window.addEventListener('message', enhancedMessageHandler);
+                console.log('✅ Message handler registered');
+            } catch (error) {
+                console.error('❌ Failed to register message handler:', error);
+            }
             
             // Initialize string cache status
             updateStringCacheStatus();
             
             // Set up debug mode toggle
             const debugModeCheckbox = document.getElementById('debugMode');
-            debugModeCheckbox.addEventListener('change', toggleDebugMode);
-            
-            // Restore debug mode preference
-            const savedDebugMode = localStorage.getItem('crowdinAudioPreviewerDebugMode');
-            if (savedDebugMode === 'true') {
-                debugModeCheckbox.checked = true;
-                toggleDebugMode();
+            if (debugModeCheckbox) {
+                debugModeCheckbox.addEventListener('change', toggleDebugMode);
+                
+                // Restore debug mode preference
+                const savedDebugMode = localStorage.getItem('crowdinAudioPreviewerDebugMode');
+                if (savedDebugMode === 'true') {
+                    debugModeCheckbox.checked = true;
+                    toggleDebugMode();
+                }
             }
             
             updateDebugInfo();
+            
+            console.log('🎵 Audio Previewer initialization complete');
         });
     </script>
 </body>
