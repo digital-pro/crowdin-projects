@@ -106,11 +106,12 @@
                             text: currentStringCache.text,
                             audioSource: audioResult.source,
                             audioUrl: audioResult.audioUrl,
-                            message: audioResult.message
+                            message: audioResult.message,
+                            details: audioResult.details
                         }
                     );
                 } else {
-                    showErrorResult(audioResult.message);
+                    showErrorResult(audioResult.message, audioResult.attemptedUrls);
                 }
                 
             } catch (error) {
@@ -127,13 +128,28 @@
         // Find and play audio for the current string
         async function findAndPlayAudio() {
             console.log('🎵 Looking for audio for string:', currentStringCache.stringId, currentStringCache.stringKey);
+            console.log('🎵 Current string cache:', JSON.stringify(currentStringCache, null, 2));
+            
+            const attemptedUrls = [];
             
             // Try multiple approaches to find audio
+            const stringKey = currentStringCache.stringKey || currentStringCache.identifier;
+            const labels = currentStringCache.labels || [{ title: 'general' }]; // Default to 'general' label
+            
             const audioSources = [
-                () => findAudioByStringKey(currentStringCache.stringKey || currentStringCache.identifier),
-                () => findAudioByFileName(currentStringCache.fileName, currentStringCache.stringKey || currentStringCache.identifier),
+                () => findLevanteAudio(currentStringCache.targetLanguageId, labels, stringKey),
+                () => findLevanteAudio(currentStringCache.sourceLanguageId, labels, stringKey),
+                () => findLevanteAudio('en', labels, stringKey), // Fallback to English
+                () => findLevanteAudio('fr', labels, stringKey), // Try French as shown in example
                 () => generateTextToSpeech(currentStringCache.text)
             ];
+            
+            console.log('🎵 Will try audio sources with:', {
+                targetLanguageId: currentStringCache.targetLanguageId,
+                sourceLanguageId: currentStringCache.sourceLanguageId,
+                labels: currentStringCache.labels,
+                stringKey: currentStringCache.stringKey || currentStringCache.identifier
+            });
             
             for (const audioSource of audioSources) {
                 try {
@@ -144,75 +160,78 @@
                             success: true,
                             source: result.source,
                             audioUrl: result.audioUrl,
-                            message: `Playing audio for "${currentStringCache.stringKey || currentStringCache.identifier}" from ${result.source}`
+                            message: `Playing audio for "${currentStringCache.stringKey || currentStringCache.identifier}" from ${result.source}`,
+                            details: result.details,
+                            attemptedUrls: attemptedUrls
                         };
                     }
                 } catch (error) {
                     console.log('🎵 Audio source failed:', error.message);
+                    if (error.attemptedUrl) {
+                        attemptedUrls.push(error.attemptedUrl);
+                    }
                 }
             }
             
             return {
                 success: false,
-                message: `No audio found for string "${currentStringCache.stringKey || currentStringCache.identifier}" (ID: ${currentStringCache.stringId}). Tried file system and text-to-speech.`
+                message: `No audio found for string "${currentStringCache.stringKey || currentStringCache.identifier}" (ID: ${currentStringCache.stringId}). Tried Levante audio repository and text-to-speech.`,
+                attemptedUrls: attemptedUrls
             };
         }
 
-        // Try to find audio by string key (common naming convention)
-        async function findAudioByStringKey(stringKey) {
-            if (!stringKey) throw new Error('No string key available');
+        // Find audio using Levante URL pattern
+        async function findLevanteAudio(languageCode, labels, stringKey) {
+            console.log('🎵 findLevanteAudio called with:', { languageCode, labels, stringKey });
             
-            const commonAudioExtensions = ['mp3', 'wav', 'ogg', 'm4a'];
-            const commonPaths = [
-                `audio/${stringKey}`,
-                `sounds/${stringKey}`,
-                `assets/audio/${stringKey}`,
-                `public/audio/${stringKey}`,
-                `media/${stringKey}`,
-                stringKey
-            ];
+            if (!languageCode || !stringKey) {
+                const error = new Error(`Missing required parameters - languageCode: ${languageCode}, stringKey: ${stringKey}`);
+                console.log('🎵 Levante audio failed:', error.message);
+                throw error;
+            }
             
-            for (const path of commonPaths) {
-                for (const ext of commonAudioExtensions) {
-                    const audioUrl = `${path}.${ext}`;
-                    console.log('🎵 Trying audio URL:', audioUrl);
-                    
-                    if (await checkAudioExists(audioUrl)) {
-                        return { success: true, audioUrl, source: 'file_system' };
-                    }
+            console.log('🎵 Looking for Levante audio:', { languageCode, labels, stringKey });
+            
+            // Extract label name for the URL path
+            let labelName = 'general'; // Default fallback
+            
+            if (labels && Array.isArray(labels) && labels.length > 0) {
+                // Get the first label and extract its title/name
+                const firstLabel = labels[0];
+                if (typeof firstLabel === 'object' && firstLabel.title) {
+                    labelName = firstLabel.title.toLowerCase();
+                } else if (typeof firstLabel === 'object' && firstLabel.name) {
+                    labelName = firstLabel.name.toLowerCase();
+                } else if (typeof firstLabel === 'string') {
+                    labelName = firstLabel.toLowerCase();
                 }
             }
             
-            throw new Error('No audio file found by string key');
-        }
-
-        // Try to find audio by file name pattern
-        async function findAudioByFileName(fileName, stringKey) {
-            if (!fileName || !stringKey) throw new Error('Missing file name or string key');
+            // Clean up the string key for URL (replace spaces, special chars with hyphens)
+            const cleanStringKey = stringKey
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
             
-            // Extract base name from file (remove extension)
-            const baseName = fileName.replace(/\.[^/.]+$/, "");
-            const commonExtensions = ['mp3', 'wav', 'ogg', 'm4a'];
+            // Construct the Levante audio URL
+            // Pattern: https://github.com/levante-framework/levante_translations/raw/main/audio_files/{label}/{language}/shared/{stringKey}.mp3
+            const audioUrl = `https://github.com/levante-framework/levante_translations/raw/main/audio_files/${labelName}/${languageCode}/shared/${cleanStringKey}.mp3`;
             
-            const audioPaths = [
-                `audio/${baseName}/${stringKey}`,
-                `sounds/${baseName}/${stringKey}`,
-                `assets/${baseName}/${stringKey}`,
-                `media/${baseName}/${stringKey}`
-            ];
+            console.log('🎵 Trying Levante audio URL:', audioUrl);
+            console.log('🎵 URL components:', { labelName, languageCode, cleanStringKey });
             
-            for (const path of audioPaths) {
-                for (const ext of commonExtensions) {
-                    const audioUrl = `${path}.${ext}`;
-                    console.log('🎵 Trying file-based audio URL:', audioUrl);
-                    
-                    if (await checkAudioExists(audioUrl)) {
-                        return { success: true, audioUrl, source: 'file_structure' };
-                    }
-                }
+            if (await checkAudioExists(audioUrl)) {
+                return { 
+                    success: true, 
+                    audioUrl, 
+                    source: 'levante_repository',
+                    details: { labelName, languageCode, cleanStringKey }
+                };
             }
             
-            throw new Error('No audio found by file structure');
+            const error = new Error(`No Levante audio found for ${languageCode}/${labelName}/${cleanStringKey}`);
+            error.attemptedUrl = audioUrl;
+            throw error;
         }
 
         // Generate text-to-speech as fallback
@@ -292,7 +311,13 @@
             if (data.id) content += `<strong>ID:</strong> ${data.id}<br>`;
             if (data.text) content += `<strong>Text:</strong> ${data.text.substring(0, 100)}${data.text.length > 100 ? '...' : ''}<br>`;
             if (data.audioSource) content += `<strong>Audio Source:</strong> ${data.audioSource}<br>`;
-            if (data.audioUrl) content += `<strong>Audio URL:</strong> ${data.audioUrl}<br>`;
+            if (data.audioUrl) content += `<strong>Audio URL:</strong> <a href="${data.audioUrl}" target="_blank" style="color: #155724; word-break: break-all;">${data.audioUrl}</a><br>`;
+            if (data.details) {
+                content += `<strong>URL Components:</strong><br>`;
+                content += `&nbsp;&nbsp;Language: ${data.details.languageCode}<br>`;
+                content += `&nbsp;&nbsp;Label: ${data.details.labelName}<br>`;
+                content += `&nbsp;&nbsp;String Key: ${data.details.cleanStringKey}<br>`;
+            }
             if (data.message) content += `<strong>Status:</strong> ${data.message}`;
             content += `</div>`;
             
@@ -302,7 +327,7 @@
         }
 
         // Show error result
-        function showErrorResult(message) {
+        function showErrorResult(message, attemptedUrls = []) {
             const resultSection = document.getElementById('resultSection');
             const resultTitle = document.getElementById('resultTitle');
             const resultContent = document.getElementById('resultContent');
@@ -310,7 +335,17 @@
             resultTitle.className = 'result-title error';
             resultTitle.innerHTML = `<span>❌</span> Audio Not Found`;
             
-            resultContent.innerHTML = `<div class="string-info">${message}</div>`;
+            let content = `<div class="string-info">${message}</div>`;
+            
+            if (attemptedUrls && attemptedUrls.length > 0) {
+                content += `<div class="string-info"><strong>Attempted URLs:</strong><br>`;
+                attemptedUrls.forEach(url => {
+                    content += `<a href="${url}" target="_blank" style="color: #dc3545; word-break: break-all;">${url}</a><br>`;
+                });
+                content += `</div>`;
+            }
+            
+            resultContent.innerHTML = content;
             resultSection.className = 'result-section error';
             resultSection.style.display = 'block';
         }

@@ -1,7 +1,7 @@
 {
-  "identifier": "audio-previewer",
-  "name": "Audio Previewer",
-  "description": "Play audio for the currently selected string in Crowdin",
+  "identifier": "levante-audio-previewer-v2",
+  "name": "Levante Audio Previewer",
+  "description": "Play audio for the currently selected string in Crowdin using Levante repository",
   "logo": "/favicon.svg",
   "baseUrl": "https://editor-button-app.vercel.app",
   "authentication": {
@@ -11,8 +11,8 @@
   "modules": {
     "editor-right-panel": [
       {
-        "key": "audio-previewer-panel",
-        "name": "Preview Audio",
+        "key": "levante-audio-previewer-panel",
+        "name": "🎵 Play Audio",
         "modes": ["translate", "comfortable", "side-by-side", "multilingual"],
         "url": "/audio-previewer",
         "environments": ["crowdin"]
