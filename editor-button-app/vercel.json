@@ -4,12 +4,58 @@
     {
       "src": "index.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
+      "src": "/manifest.json",
+      "dest": "/manifest.json",
+      "headers": {
+        "Cache-Control": "public, max-age=300, s-maxage=300"
+      }
+    },
+    {
+      "src": "/health",
+      "dest": "/index.js",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/index.js",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "src": "/editor-button",
+      "dest": "/public/audio-previewer.html",
+      "headers": {
+        "Cache-Control": "public, max-age=300, s-maxage=300"
+      }
+    },
+    {
+      "src": "/public/(.*)",
+      "dest": "/public/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=3600, s-maxage=3600"
+      }
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.js"
     }
-  ]
+  ],
+  "functions": {
+    "index.js": {
+      "maxDuration": 30
+    }
+  },
+  "regions": ["iad1", "sfo1"],
+  "alias": ["editor-button-app.vercel.app"]
 } 

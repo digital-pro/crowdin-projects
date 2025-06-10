@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const fetch = require('node-fetch');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,6 +11,14 @@ const PORT = process.env.PORT || 3000;
 // Crowdin API configuration
 const CROWDIN_API_BASE = 'https://api.crowdin.com/api/v2';
 const CROWDIN_ENTERPRISE_API_BASE = 'https://api.crowdin.com/api/v2'; // Can be customized for enterprise
+
+// Deployment health tracking
+let deploymentHealth = {
+  startTime: new Date(),
+  requestCount: 0,
+  errors: 0,
+  lastHealthCheck: new Date()
+};
 
 // Function to extract string information from request
 function extractStringInfo(requestBody) {
@@ -520,46 +529,58 @@ function extractAuthToken(req) {
 }
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: false
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Request tracking middleware
+app.use((req, res, next) => {
+  deploymentHealth.requestCount++;
+  deploymentHealth.lastHealthCheck = new Date();
+  
+  // Log all requests for debugging
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - ${req.get('User-Agent') || 'Unknown'}`);
+  
+  next();
+});
+
 // Serve the manifest file dynamically
 app.get('/manifest.json', (req, res) => {
-  // Get the current deployment URL
-  const baseUrl = process.env.VERCEL_URL 
-    ? `https://editor-button-app.vercel.app` 
-    : `http://localhost:${PORT}`;
-  
-  const manifest = {
-    "identifier": "string-key-extractor",
-    "name": "String Key Extractor",
-    "description": "Extract current string keys and context from Crowdin editor",
-    "logo": "/favicon.svg",
-    "baseUrl": baseUrl,
-    "authentication": {
-      "type": "none"
-    },
-    "scopes": ["project"],
-    "modules": {
-      "editor-right-panel": [
-        {
-          "key": "string-key-panel",
-          "name": "String Key Extractor",
-          "modes": ["translate", "comfortable", "side-by-side", "multilingual"],
-          "url": "/string-key-extractor",
-          "environments": ["crowdin"]
-        }
-      ]
+  try {
+    const manifestPath = path.join(__dirname, 'manifest.json');
+    
+    if (!fs.existsSync(manifestPath)) {
+      console.error('Manifest file not found at:', manifestPath);
+      deploymentHealth.errors++;
+      return res.status(404).json({ error: 'Manifest not found' });
     }
-  };
-  
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.json(manifest);
+    
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    
+    // Ensure URLs are absolute for production
+    if (process.env.VERCEL) {
+      const baseUrl = 'https://editor-button-app.vercel.app';
+      if (manifest.modules && manifest.modules[0] && manifest.modules[0].url) {
+        manifest.modules[0].url = `${baseUrl}/editor-button`;
+      }
+    }
+    
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300');
+    res.json(manifest);
+  } catch (error) {
+    console.error('Error serving manifest:', error);
+    deploymentHealth.errors++;
+    res.status(500).json({ error: 'Failed to load manifest' });
+  }
 });
 
 // New Crowdin API endpoint for string extraction
@@ -726,7 +747,23 @@ app.post('/api/crowdin/discover-projects', async (req, res) => {
 
 // Main editor button route (legacy)
 app.get('/editor-button', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'editor-button.html'));
+  try {
+    const htmlPath = path.join(__dirname, 'public', 'audio-previewer.html');
+    
+    if (!fs.existsSync(htmlPath)) {
+      console.error('Audio previewer HTML not found at:', htmlPath);
+      deploymentHealth.errors++;
+      return res.status(404).send('Audio previewer not found');
+    }
+    
+    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300');
+    res.sendFile(htmlPath);
+  } catch (error) {
+    console.error('Error serving audio previewer:', error);
+    deploymentHealth.errors++;
+    res.status(500).send('Failed to load audio previewer');
+  }
 });
 
 // New translations panel route
@@ -1229,9 +1266,57 @@ app.post('/api/get-audio-metadata', async (req, res) => {
   }
 });
 
-// Health check endpoint
+// Enhanced health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  const uptime = Date.now() - deploymentHealth.startTime.getTime();
+  const healthStatus = {
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(uptime / 1000),
+    deployment: {
+      startTime: deploymentHealth.startTime.toISOString(),
+      requestCount: deploymentHealth.requestCount,
+      errorCount: deploymentHealth.errors,
+      lastActivity: deploymentHealth.lastHealthCheck.toISOString()
+    },
+    environment: {
+      nodeVersion: process.version,
+      platform: process.platform,
+      vercel: !!process.env.VERCEL
+    }
+  };
+  
+  res.json(healthStatus);
+});
+
+// Error handling middleware
+app.use((error, req, res, next) => {
+  console.error('Unhandled error:', error);
+  deploymentHealth.errors++;
+  res.status(500).json({ 
+    error: 'Internal server error',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// 404 handler with helpful information
+app.use((req, res) => {
+  console.log(`404 - Path not found: ${req.path}`);
+  deploymentHealth.errors++;
+  res.status(404).json({ 
+    error: 'Not found',
+    path: req.path,
+    timestamp: new Date().toISOString(),
+    availableEndpoints: [
+      '/health',
+      '/manifest.json',
+      '/editor-button',
+      '/audio-previewer',
+      '/translations-panel',
+      '/api/get-audio-metadata',
+      '/api/button-action'
+    ]
+  });
 });
 
 // Start server
@@ -1239,6 +1324,23 @@ app.listen(PORT, () => {
   console.log(`Crowdin Editor Button App running on port ${PORT}`);
   console.log(`Manifest available at: http://localhost:${PORT}/manifest.json`);
   console.log(`Editor button at: http://localhost:${PORT}/editor-button`);
+  console.log(`Health check at: http://localhost:${PORT}/health`);
+  
+  if (process.env.VERCEL) {
+    console.log('🚀 Running on Vercel');
+    console.log('🌐 Production URL: https://editor-button-app.vercel.app');
+  }
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  process.exit(0);
 });
 
 module.exports = app; 
