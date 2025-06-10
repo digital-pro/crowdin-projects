@@ -13,7 +13,7 @@
   "routes": [
     {
       "src": "/manifest.json",
-      "dest": "/manifest.json",
+      "dest": "/index.js",
       "headers": {
         "Cache-Control": "public, max-age=300, s-maxage=300"
       }
@@ -51,11 +51,6 @@
       "dest": "/index.js"
     }
   ],
-  "functions": {
-    "index.js": {
-      "maxDuration": 30
-    }
-  },
-  "regions": ["iad1", "sfo1"],
+  "regions": ["iad1"],
   "alias": ["editor-button-app.vercel.app"]
 } 

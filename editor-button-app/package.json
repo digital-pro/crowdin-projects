@@ -1,12 +1,14 @@
 {
   "name": "editor-button-app",
   "version": "1.0.0",
-  "description": "A Crowdin app that adds a custom button to the editor",
+  "description": "Crowdin Editor Button App",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node index.js",
+    "deploy": "vercel --prod",
+    "deploy-clean": "npm run deploy && npm run cleanup-old-deployments",
+    "cleanup-old-deployments": "node cleanup-deployments.js"
   },
   "keywords": ["crowdin", "editor", "button", "app"],
   "author": "David Cardinal",
