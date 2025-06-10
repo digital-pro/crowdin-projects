@@ -106,7 +106,8 @@
                             audioSource: audioResult.source,
                             audioUrl: audioResult.audioUrl,
                             message: audioResult.message,
-                            details: audioResult.details
+                            details: audioResult.details,
+                            metadata: audioResult.metadata
                         }
                     );
                 } else {
@@ -121,6 +122,169 @@
                 playBtn.disabled = false;
                 playIcon.textContent = '🎵';
                 playText.textContent = 'Play Current Audio';
+            }
+        }
+
+        // Get audio file metadata via server proxy (to bypass CORS)
+        async function getAudioFileMetadataViaServer(audioUrl) {
+            try {
+                console.log('📊 Getting metadata via server proxy for:', audioUrl);
+                
+                const response = await fetch('/api/get-audio-metadata', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ audioUrl: audioUrl })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📊 Server proxy metadata:', data);
+                    return data.metadata;
+                } else {
+                    console.log('📊 Server proxy failed:', response.status);
+                    return null;
+                }
+            } catch (error) {
+                console.error('📊 Server proxy error:', error);
+                return null;
+            }
+        }
+
+        // Get audio file metadata (last modified date, size, etc.)
+        async function getAudioFileMetadata(audioUrl) {
+            try {
+                console.log('📊 Getting metadata for audio file:', audioUrl);
+                
+                // First try direct access (might be blocked by CORS)
+                const response = await fetch(audioUrl, {
+                    method: 'HEAD',
+                    cache: 'no-cache'
+                });
+                
+                if (response.ok) {
+                    // Log all available headers for debugging
+                    console.log('📊 Available headers (direct):');
+                    const headerCount = Array.from(response.headers.entries()).length;
+                    console.log(`📊 Header count: ${headerCount}`);
+                    
+                    for (const [key, value] of response.headers.entries()) {
+                        console.log(`  ${key}: ${value}`);
+                    }
+                    
+                    const metadata = {
+                        lastModified: response.headers.get('Last-Modified'),
+                        date: response.headers.get('Date'),
+                        contentLength: response.headers.get('Content-Length'),
+                        contentType: response.headers.get('Content-Type'),
+                        etag: response.headers.get('ETag'),
+                        cacheControl: response.headers.get('Cache-Control'),
+                        server: response.headers.get('Server'),
+                        expires: response.headers.get('Expires'),
+                        age: response.headers.get('Age'),
+                        url: audioUrl,
+                        status: response.status,
+                        statusText: response.statusText,
+                        method: 'direct'
+                    };
+                    
+                    // Check if we got meaningful headers (CORS might allow request but block headers)
+                    const hasUsefulHeaders = metadata.lastModified || metadata.contentLength || metadata.server;
+                    
+                    if (!hasUsefulHeaders) {
+                        console.log('📊 Direct request succeeded but no useful headers (likely CORS blocked). Trying server proxy...');
+                        const serverMetadata = await getAudioFileMetadataViaServer(audioUrl);
+                        if (serverMetadata) {
+                            return serverMetadata;
+                        }
+                    }
+                    
+                    // Try multiple date sources
+                    let dateToUse = null;
+                    let dateSource = null;
+                    
+                    if (metadata.lastModified) {
+                        dateToUse = metadata.lastModified;
+                        dateSource = 'Last-Modified header';
+                    } else if (metadata.date) {
+                        dateToUse = metadata.date;
+                        dateSource = 'Date header (server response time)';
+                    } else if (metadata.etag) {
+                        // Sometimes ETags contain timestamps
+                        const etagMatch = metadata.etag.match(/(\d{10,13})/);
+                        if (etagMatch) {
+                            const timestamp = parseInt(etagMatch[1]);
+                            if (timestamp > 1000000000) { // Valid Unix timestamp
+                                dateToUse = new Date(timestamp * (timestamp > 9999999999 ? 1 : 1000)).toUTCString();
+                                dateSource = 'ETag timestamp';
+                            }
+                        }
+                    }
+                    
+                    // Parse the date
+                    if (dateToUse) {
+                        const parsedDate = new Date(dateToUse);
+                        if (!isNaN(parsedDate.getTime())) {
+                            metadata.lastModifiedParsed = parsedDate;
+                            metadata.lastModifiedFormatted = parsedDate.toLocaleString();
+                            metadata.daysAgo = Math.floor((Date.now() - parsedDate.getTime()) / (1000 * 60 * 60 * 24));
+                            metadata.dateSource = dateSource;
+                        } else {
+                            console.log('📊 Could not parse date:', dateToUse);
+                        }
+                    } else {
+                        console.log('📊 No date information found in headers');
+                        metadata.noDateInfo = true;
+                        metadata.corsLimited = !hasUsefulHeaders;
+                    }
+                    
+                    // Format file size
+                    if (metadata.contentLength) {
+                        const bytes = parseInt(metadata.contentLength);
+                        if (bytes < 1024) {
+                            metadata.fileSizeFormatted = bytes + ' bytes';
+                        } else if (bytes < 1024 * 1024) {
+                            metadata.fileSizeFormatted = (bytes / 1024).toFixed(1) + ' KB';
+                        } else {
+                            metadata.fileSizeFormatted = (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+                        }
+                    }
+                    
+                    console.log('📊 Audio file metadata:', metadata);
+                    return metadata;
+                } else {
+                    console.log('📊 Direct request failed:', response.status, response.statusText);
+                    console.log('📊 Trying server proxy...');
+                    
+                    const serverMetadata = await getAudioFileMetadataViaServer(audioUrl);
+                    if (serverMetadata) {
+                        return serverMetadata;
+                    }
+                    
+                    return {
+                        error: true,
+                        status: response.status,
+                        statusText: response.statusText,
+                        url: audioUrl,
+                        method: 'direct'
+                    };
+                }
+            } catch (error) {
+                console.error('📊 Error getting audio metadata:', error);
+                console.log('📊 Trying server proxy as fallback...');
+                
+                const serverMetadata = await getAudioFileMetadataViaServer(audioUrl);
+                if (serverMetadata) {
+                    return serverMetadata;
+                }
+                
+                return {
+                    error: true,
+                    errorMessage: error.message,
+                    url: audioUrl,
+                    corsBlocked: error.message.includes('CORS') || error.message.includes('fetch')
+                };
             }
         }
 
@@ -154,6 +318,9 @@
                 try {
                     const result = await audioSource();
                     if (result.success) {
+                        // Get metadata for the audio file
+                        const metadata = await getAudioFileMetadata(result.audioUrl);
+                        
                         await playAudio(result.audioUrl, result.source, result.text);
                         return {
                             success: true,
@@ -161,6 +328,7 @@
                             audioUrl: result.audioUrl,
                             message: `Playing audio for "${currentStringCache.stringKey || currentStringCache.identifier}" from ${result.source}`,
                             details: result.details,
+                            metadata: metadata,
                             attemptedUrls: attemptedUrls
                         };
                     }
@@ -324,13 +492,98 @@
             if (data.text) content += `<strong>Text:</strong> ${data.text.substring(0, 100)}${data.text.length > 100 ? '...' : ''}<br>`;
             if (data.audioSource) content += `<strong>Audio Source:</strong> ${data.audioSource}<br>`;
             if (data.audioUrl) content += `<strong>Audio URL:</strong> <a href="${data.audioUrl}" target="_blank" style="color: #155724; word-break: break-all;">${data.audioUrl}</a><br>`;
+            
+            // Add metadata information if available
+            if (data.metadata) {
+                content += `<br><strong>📊 File Information:</strong><br>`;
+                
+                if (data.metadata.error) {
+                    content += `&nbsp;&nbsp;<span style="color: #dc3545;">❌ Could not get file metadata</span><br>`;
+                    if (data.metadata.errorMessage) {
+                        content += `&nbsp;&nbsp;<strong>Error:</strong> ${data.metadata.errorMessage}<br>`;
+                    }
+                    if (data.metadata.status) {
+                        content += `&nbsp;&nbsp;<strong>HTTP Status:</strong> ${data.metadata.status} ${data.metadata.statusText}<br>`;
+                    }
+                } else {
+                    // Date information with clear distinction
+                    if (data.metadata.lastModifiedFormatted) {
+                        const isActualFileDate = data.metadata.dateSource === 'Last-Modified header' || data.metadata.dateSource === 'ETag timestamp';
+                        const dateLabel = isActualFileDate ? 'File Modified' : 'Server Response';
+                        const dateColor = isActualFileDate ? '#28a745' : '#ffc107';
+                        
+                        content += `&nbsp;&nbsp;<strong>${dateLabel}:</strong> <span style="color: ${dateColor};">${data.metadata.lastModifiedFormatted}</span>`;
+                        content += ` <small>(${data.metadata.dateSource})</small>`;
+                        
+                        if (data.metadata.daysAgo !== undefined && isActualFileDate) {
+                            if (data.metadata.daysAgo === 0) {
+                                content += ` <span style="color: #28a745;">(today)</span>`;
+                            } else if (data.metadata.daysAgo === 1) {
+                                content += ` <span style="color: #ffc107;">(1 day ago)</span>`;
+                            } else if (data.metadata.daysAgo <= 7) {
+                                content += ` <span style="color: #ffc107;">(${data.metadata.daysAgo} days ago)</span>`;
+                            } else {
+                                content += ` <span style="color: #6c757d;">(${data.metadata.daysAgo} days ago)</span>`;
+                            }
+                        } else if (!isActualFileDate) {
+                            content += ` <span style="color: #dc3545;">⚠️ Not file creation date</span>`;
+                        }
+                        content += `<br>`;
+                    } else if (data.metadata.noDateInfo) {
+                        if (data.metadata.corsLimited) {
+                            content += `&nbsp;&nbsp;<strong>File Modified:</strong> <span style="color: #dc3545;">Not available (CORS restrictions block header access)</span><br>`;
+                        } else {
+                            content += `&nbsp;&nbsp;<strong>File Modified:</strong> <span style="color: #dc3545;">Not available (server doesn't provide Last-Modified header)</span><br>`;
+                        }
+                    }
+                    
+                    // File size
+                    if (data.metadata.fileSizeFormatted) {
+                        content += `&nbsp;&nbsp;<strong>File Size:</strong> ${data.metadata.fileSizeFormatted}<br>`;
+                    }
+                    
+                    // Content type
+                    if (data.metadata.contentType) {
+                        content += `&nbsp;&nbsp;<strong>Content Type:</strong> ${data.metadata.contentType}<br>`;
+                    }
+                    
+                    // Server info
+                    if (data.metadata.server) {
+                        content += `&nbsp;&nbsp;<strong>Server:</strong> ${data.metadata.server}<br>`;
+                    }
+                    
+                    // Method used to get metadata
+                    if (data.metadata.method) {
+                        const methodText = data.metadata.method === 'server-proxy' ? 
+                            'Server proxy (bypassed CORS)' : 
+                            'Direct browser request';
+                        content += `&nbsp;&nbsp;<strong>Method:</strong> <small>${methodText}</small><br>`;
+                    }
+                    
+                    // Additional debugging info
+                    if (data.metadata.etag) {
+                        content += `&nbsp;&nbsp;<strong>ETag:</strong> <small>${data.metadata.etag}</small>`;
+                        // Show if ETag was attempted for date parsing
+                        if (data.metadata.dateSource === 'ETag timestamp') {
+                            content += ` <span style="color: #28a745;">✓ Used for date</span>`;
+                        } else if (data.metadata.etag.match(/\d{10,13}/)) {
+                            content += ` <span style="color: #dc3545;">✗ Contains numbers but invalid date</span>`;
+                        }
+                        content += `<br>`;
+                    }
+                    if (data.metadata.cacheControl) {
+                        content += `&nbsp;&nbsp;<strong>Cache Control:</strong> <small>${data.metadata.cacheControl}</small><br>`;
+                    }
+                }
+            }
+            
             if (data.details) {
-                content += `<strong>URL Components:</strong><br>`;
+                content += `<br><strong>URL Components:</strong><br>`;
                 content += `&nbsp;&nbsp;Language: ${data.details.languageCode}<br>`;
                 content += `&nbsp;&nbsp;Label: ${data.details.labelName}<br>`;
                 content += `&nbsp;&nbsp;String Key: ${data.details.cleanStringKey}<br>`;
             }
-            if (data.message) content += `<strong>Status:</strong> ${data.message}`;
+            if (data.message) content += `<br><strong>Status:</strong> ${data.message}`;
             content += `</div>`;
             
             resultContent.innerHTML = content;

@@ -1073,6 +1073,162 @@ app.get('/', (req, res) => {
   res.redirect('/audio-previewer');
 });
 
+// Audio metadata endpoint (to bypass CORS)
+app.post('/api/get-audio-metadata', async (req, res) => {
+  const { audioUrl } = req.body;
+  
+  if (!audioUrl) {
+    return res.status(400).json({ error: 'audioUrl is required' });
+  }
+  
+  console.log('📊 Server: Getting metadata for audio URL:', audioUrl);
+  
+  try {
+    const response = await fetch(audioUrl, {
+      method: 'HEAD',
+      headers: {
+        'User-Agent': 'Crowdin-Audio-Previewer/1.0'
+      }
+    });
+    
+    if (response.ok) {
+      const metadata = {
+        lastModified: response.headers.get('Last-Modified'),
+        date: response.headers.get('Date'),
+        contentLength: response.headers.get('Content-Length'),
+        contentType: response.headers.get('Content-Type'),
+        etag: response.headers.get('ETag'),
+        cacheControl: response.headers.get('Cache-Control'),
+        server: response.headers.get('Server'),
+        expires: response.headers.get('Expires'),
+        age: response.headers.get('Age'),
+        url: audioUrl,
+        status: response.status,
+        statusText: response.statusText,
+        method: 'server-proxy'
+      };
+      
+      // Parse date information with priority for actual file dates
+      let dateToUse = null;
+      let dateSource = null;
+      
+      // Priority 1: Last-Modified header (actual file modification date)
+      if (metadata.lastModified) {
+        dateToUse = metadata.lastModified;
+        dateSource = 'Last-Modified header';
+      } 
+      // Priority 2: ETag timestamps (sometimes contains file date)
+      else if (metadata.etag) {
+        console.log('📊 Server: Analyzing ETag for timestamp:', metadata.etag);
+        const etagMatch = metadata.etag.match(/(\d{10,13})/);
+        if (etagMatch) {
+          const timestamp = parseInt(etagMatch[1]);
+          console.log('📊 Server: Found potential timestamp in ETag:', timestamp);
+          
+          // Validate timestamp is reasonable (between 2000 and 2030)
+          const minTimestamp = new Date('2000-01-01').getTime() / 1000; // Year 2000 in seconds
+          const maxTimestamp = new Date('2030-01-01').getTime() / 1000; // Year 2030 in seconds
+          
+          let parsedDate = null;
+          
+          // Try as seconds first
+          if (timestamp >= minTimestamp && timestamp <= maxTimestamp) {
+            parsedDate = new Date(timestamp * 1000);
+            console.log('📊 Server: Parsed as seconds:', parsedDate);
+          }
+          // Try as milliseconds
+          else if (timestamp >= minTimestamp * 1000 && timestamp <= maxTimestamp * 1000) {
+            parsedDate = new Date(timestamp);
+            console.log('📊 Server: Parsed as milliseconds:', parsedDate);
+          }
+          
+          // Validate the parsed date is reasonable
+          if (parsedDate && !isNaN(parsedDate.getTime()) && 
+              parsedDate.getFullYear() >= 2000 && parsedDate.getFullYear() <= 2030) {
+            dateToUse = parsedDate.toUTCString();
+            dateSource = 'ETag timestamp';
+            console.log('📊 Server: Valid ETag timestamp found:', dateToUse);
+          } else {
+            console.log('📊 Server: ETag timestamp invalid or unreasonable:', parsedDate);
+          }
+        } else {
+          console.log('📊 Server: No timestamp pattern found in ETag');
+        }
+      }
+      // Priority 3: Try to extract date from URL path
+      else {
+        const urlDateMatch = audioUrl.match(/(\d{4})[\/\-_](\d{1,2})[\/\-_](\d{1,2})/);
+        if (urlDateMatch) {
+          const [, year, month, day] = urlDateMatch;
+          const urlDate = new Date(year, month - 1, day);
+          if (!isNaN(urlDate.getTime()) && urlDate.getFullYear() > 2000) {
+            dateToUse = urlDate.toUTCString();
+            dateSource = 'URL path date pattern';
+          }
+        }
+      }
+      
+      // Last resort: Date header (just server response time - not file date)
+      if (!dateToUse && metadata.date) {
+        dateToUse = metadata.date;
+        dateSource = 'Date header (server response time)';
+      }
+      
+      // Parse the date
+      if (dateToUse) {
+        const parsedDate = new Date(dateToUse);
+        if (!isNaN(parsedDate.getTime())) {
+          metadata.lastModifiedParsed = parsedDate;
+          metadata.lastModifiedFormatted = parsedDate.toLocaleString();
+          metadata.daysAgo = Math.floor((Date.now() - parsedDate.getTime()) / (1000 * 60 * 60 * 24));
+          metadata.dateSource = dateSource;
+          
+          // Warn if we're using server response time instead of file date
+          if (dateSource === 'Date header (server response time)') {
+            console.log('⚠️ Server: Using server response time, not actual file modification date');
+            metadata.isServerResponseTime = true;
+          }
+        }
+      } else {
+        metadata.noDateInfo = true;
+        console.log('📊 Server: No date information available for:', audioUrl);
+      }
+      
+      // Format file size
+      if (metadata.contentLength) {
+        const bytes = parseInt(metadata.contentLength);
+        if (bytes < 1024) {
+          metadata.fileSizeFormatted = bytes + ' bytes';
+        } else if (bytes < 1024 * 1024) {
+          metadata.fileSizeFormatted = (bytes / 1024).toFixed(1) + ' KB';
+        } else {
+          metadata.fileSizeFormatted = (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+      }
+      
+      console.log('📊 Server: Successfully got metadata:', metadata);
+      
+      res.json({
+        success: true,
+        metadata: metadata
+      });
+    } else {
+      console.log('📊 Server: Failed to get metadata:', response.status, response.statusText);
+      res.status(response.status).json({
+        error: 'Failed to get metadata',
+        status: response.status,
+        statusText: response.statusText
+      });
+    }
+  } catch (error) {
+    console.error('📊 Server: Error getting metadata:', error);
+    res.status(500).json({
+      error: 'Server error getting metadata',
+      message: error.message
+    });
+  }
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
