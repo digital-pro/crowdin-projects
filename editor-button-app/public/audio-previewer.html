@@ -55,7 +55,8 @@
             stringId: null,
             stringKey: null,
             identifier: null,
-            text: null,
+            text: null, // This will store the translated text for TTS
+            sourceText: null, // This will store the original English text
             context: null,
             labels: null,
             maxLength: null,
@@ -67,7 +68,8 @@
             sourceLanguageName: null,
             targetLanguageName: null,
             lastUpdated: null,
-            source: null
+            source: null,
+            editorMode: null
         };
 
         // Main audio playing function
@@ -87,11 +89,119 @@
             try {
                 // Check if we have a cached string
                 if (!currentStringCache.stringId && !currentStringCache.stringKey) {
-                    showErrorResult('Please select a string in the Crowdin editor first.');
-                    return;
+                    // In comfortable/multilingual modes, try harder to get current string
+                    console.log('🎯 No cached string data, attempting to get current context for mode:', currentStringCache.editorMode);
+                    
+                    // Show different loading message
+                    playText.textContent = 'Getting Current String...';
+                    
+                    // Try multiple methods to get current string data
+                    await tryGetCurrentStringData();
+                    
+                    // Wait a bit for the data to be processed
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // Check again after trying to get current data
+                    if (!currentStringCache.stringId && !currentStringCache.stringKey) {
+                        // Try to extract from current page context
+                        await tryExtractFromPageContext();
+                        
+                        // Final check
+                        if (!currentStringCache.stringId && !currentStringCache.stringKey) {
+                            showErrorResult('Unable to detect current string. Please ensure a string is selected in the editor. In comfortable or multilingual mode, try clicking on a string first.');
+                            return;
+                        }
+                    }
                 }
                 
-                console.log('🎵 Playing audio for string:', currentStringCache);
+                console.log('🎵 ============ AUDIO PLAYBACK DEBUG ============');
+                console.log('🎵 Playing audio for string:', currentStringCache.stringId, currentStringCache.stringKey);
+                console.log('🎵 Editor mode:', currentStringCache.editorMode);
+                console.log('🎵 Target language ID:', currentStringCache.targetLanguageId);
+                console.log('🎵 Source language ID:', currentStringCache.sourceLanguageId);
+                console.log('🎵 Text to play:', currentStringCache.text ? currentStringCache.text.substring(0, 100) + '...' : 'N/A');
+                console.log('🎵 Labels:', currentStringCache.labels);
+                console.log('🎵 Full string cache:', JSON.stringify(currentStringCache, null, 2));
+                console.log('🎵 ===============================================');
+                
+                // CRITICAL: Check if we're in a translation context
+                if (!currentStringCache.targetLanguageId && !currentStringCache.sourceLanguageId) {
+                    console.log('🎵 ⚠️ WARNING: No language information detected!');
+                    console.log('🎵 ⚠️ This might be why we\'re getting English TTS');
+                    
+                    // Try to detect language from URL or page context
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const urlLang = urlParams.get('language') || urlParams.get('lang') || urlParams.get('target_language');
+                    if (urlLang) {
+                        console.log('🎵 ✅ Found language in URL:', urlLang);
+                        currentStringCache.targetLanguageId = urlLang;
+                    }
+                    
+                    // Try to detect from parent window location
+                    try {
+                        if (window.parent && window.parent.location) {
+                            const parentUrl = window.parent.location.href;
+                            console.log('🎵 Analyzing parent URL for language:', parentUrl);
+                            
+                            // Multiple patterns to match different Crowdin URL formats
+                            const patterns = [
+                                /\/enus-([a-z]{2})(?:[-_][A-Z]{2})?(?:\/|#|$)/,  // enus-es format
+                                /\/([a-z]{2})(?:[-_][A-Z]{2})?-enus(?:\/|#|$)/,  // es-enus format  
+                                /editor\/[^\/]+\/all\/enus-([a-z]{2})/,          // editor/project/all/enus-es
+                                /\/([a-z]{2})(?:[-_][A-Z]{2})?(?:\/|#|$)/,       // generic /es/ format
+                                /target_language=([a-z]{2})/,                    // URL parameter
+                                /lang=([a-z]{2})/                               // URL parameter
+                            ];
+                            
+                            for (const pattern of patterns) {
+                                const match = parentUrl.match(pattern);
+                                if (match && match[1] && match[1] !== 'en') {
+                                    console.log('🎵 ✅ Detected language from parent URL pattern:', match[1]);
+                                    currentStringCache.targetLanguageId = match[1];
+                                    break;
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.log('🎵 Could not access parent URL due to cross-origin restrictions');
+                    }
+                    
+                    // Fallback: Try to detect language from translated text patterns
+                    if (!currentStringCache.targetLanguageId && currentStringCache.text && currentStringCache.sourceText) {
+                        const translatedText = currentStringCache.text.toLowerCase();
+                        const sourceText = currentStringCache.sourceText.toLowerCase();
+                        
+                        // Only try detection if the texts are different (indicating translation)
+                        if (translatedText !== sourceText) {
+                            const languagePatterns = {
+                                'es': [/¡/, /ñ/, /¿/, /á|é|í|ó|ú/, /que\s/, /con\s/, /para\s/, /hola/, /estamos/, /encantados/],
+                                'fr': [/ç/, /à|è|é|ê|ë|î|ï|ô|ù|û|ü|ÿ/, /avec\s/, /pour\s/, /dans\s/, /bonjour/, /nous\s/, /sommes/],
+                                'de': [/ä|ö|ü|ß/, /und\s/, /mit\s/, /für\s/, /hallo/, /wir\s/, /sind/],
+                                'it': [/à|è|é|ì|î|ò|ù/, /con\s/, /per\s/, /nel\s/, /ciao/, /siamo/, /felici/],
+                                'pt': [/ã|õ|ç/, /com\s/, /para\s/, /olá/, /estamos/, /felizes/],
+                                'nl': [/ij/, /met\s/, /voor\s/, /hallo/, /wij\s/, /zijn/]
+                            };
+                            
+                            for (const [langCode, patterns] of Object.entries(languagePatterns)) {
+                                let matches = 0;
+                                for (const pattern of patterns) {
+                                    if (pattern.test(translatedText)) {
+                                        matches++;
+                                    }
+                                }
+                                // If we find 2 or more pattern matches, consider it a match
+                                if (matches >= 2) {
+                                    console.log('🎵 ✅ Detected language from text patterns:', langCode, `(${matches} matches)`);
+                                    currentStringCache.targetLanguageId = langCode;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Update loading message
+                playText.textContent = 'Finding Audio...';
                 
                 // Try to find and play audio for the current string
                 const audioResult = await findAndPlayAudio();
@@ -107,7 +217,9 @@
                             audioUrl: audioResult.audioUrl,
                             message: audioResult.message,
                             details: audioResult.details,
-                            metadata: audioResult.metadata
+                            metadata: audioResult.metadata,
+                            mode: currentStringCache.editorMode,
+                            detectedLanguage: currentStringCache.targetLanguageId || currentStringCache.sourceLanguageId
                         }
                     );
                 } else {
@@ -122,6 +234,94 @@
                 playBtn.disabled = false;
                 playIcon.textContent = '🎵';
                 playText.textContent = 'Play Current Audio';
+            }
+        }
+
+        // Enhanced function to try getting current string data
+        async function tryGetCurrentStringData() {
+            console.log('🎯 Trying to get current string data for mode:', currentStringCache.editorMode);
+            
+            const promises = [];
+            
+            // Try all available methods simultaneously
+            if (typeof AP !== 'undefined') {
+                // Method 1: Context API
+                if (AP.context && AP.context.getContext) {
+                    promises.push(new Promise(resolve => {
+                        AP.context.getContext(function(context) {
+                            console.log('🎯 Context API result:', context);
+                            if (context) {
+                                updateStringCacheFromCrowdinEvent(context, 'context.getContext.manual');
+                            }
+                            resolve();
+                        });
+                    }));
+                }
+                
+                // Method 2: Current String API
+                if (AP.editor && AP.editor.getCurrentString) {
+                    promises.push(new Promise(resolve => {
+                        AP.editor.getCurrentString(function(stringData) {
+                            console.log('🎯 Current string API result:', stringData);
+                            if (stringData) {
+                                updateStringCacheFromCrowdinEvent(stringData, 'editor.getCurrentString.manual');
+                            }
+                            resolve();
+                        });
+                    }));
+                }
+                
+                // Method 3: Current Translation API
+                if (AP.editor && AP.editor.getCurrentTranslation) {
+                    promises.push(new Promise(resolve => {
+                        AP.editor.getCurrentTranslation(function(translationData) {
+                            console.log('🎯 Current translation API result:', translationData);
+                            if (translationData) {
+                                updateStringCacheFromCrowdinEvent(translationData, 'editor.getCurrentTranslation.manual');
+                            }
+                            resolve();
+                        });
+                    }));
+                }
+            }
+            
+            // Wait for all methods to complete
+            await Promise.all(promises);
+        }
+
+        // Try to extract string data from page context (DOM inspection)
+        async function tryExtractFromPageContext() {
+            console.log('🎯 Trying to extract string data from page context');
+            
+            try {
+                // In comfortable/multilingual modes, try to find string data in the parent window
+                if (window.parent && window.parent !== window) {
+                    // Send a message to parent asking for current string data
+                    window.parent.postMessage({
+                        type: 'request_current_string',
+                        source: 'audio_previewer'
+                    }, '*');
+                    
+                    // Wait a bit for response
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+                
+                // Try to get data from localStorage or sessionStorage
+                const storedStringData = localStorage.getItem('crowdin_current_string') || 
+                                       sessionStorage.getItem('crowdin_current_string');
+                
+                if (storedStringData) {
+                    try {
+                        const parsedData = JSON.parse(storedStringData);
+                        console.log('🎯 Found stored string data:', parsedData);
+                        updateStringCacheFromCrowdinEvent(parsedData, 'localStorage.extraction');
+                    } catch (e) {
+                        console.log('🎯 Could not parse stored string data');
+                    }
+                }
+                
+            } catch (error) {
+                console.log('🎯 Error extracting from page context:', error);
             }
         }
 
@@ -299,11 +499,13 @@
             const stringKey = currentStringCache.stringKey || currentStringCache.identifier;
             const labels = currentStringCache.labels || [{ title: 'general' }]; // Default to 'general' label
             
+            // More comprehensive audio source attempts
             const audioSources = [
                 () => findLevanteAudio(currentStringCache.targetLanguageId, labels, stringKey),
                 () => findLevanteAudio(currentStringCache.sourceLanguageId, labels, stringKey),
                 () => findLevanteAudio('en', labels, stringKey), // Fallback to English
-                () => findLevanteAudio('fr', labels, stringKey), // Try French as shown in example
+                () => findLevanteAudio('es', labels, stringKey), // Try Spanish
+                () => findLevanteAudio('fr', labels, stringKey), // Try French
                 () => generateTextToSpeech(currentStringCache.text)
             ];
             
@@ -311,8 +513,16 @@
                 targetLanguageId: currentStringCache.targetLanguageId,
                 sourceLanguageId: currentStringCache.sourceLanguageId,
                 labels: currentStringCache.labels,
-                stringKey: currentStringCache.stringKey || currentStringCache.identifier
+                stringKey: currentStringCache.stringKey || currentStringCache.identifier,
+                text: currentStringCache.text ? currentStringCache.text.substring(0, 50) + '...' : 'N/A',
+                editorMode: currentStringCache.editorMode
             });
+            
+            // Check if we have the minimum required data
+            if (!stringKey) {
+                console.log('🎵 ❌ No string key available, will skip Levante audio and go directly to TTS');
+                return await generateTextToSpeech(currentStringCache.text);
+            }
             
             for (const audioSource of audioSources) {
                 try {
@@ -321,7 +531,11 @@
                         // Get metadata for the audio file
                         const metadata = await getAudioFileMetadata(result.audioUrl);
                         
-                        await playAudio(result.audioUrl, result.source, result.text);
+                        // Pass alternative URLs and target language if available
+                        const alternativeUrls = result.alternativeUrls || [];
+                        const targetLanguage = result.targetLanguage || currentStringCache.targetLanguageId;
+                        await playAudio(result.audioUrl, result.source, result.text, alternativeUrls, targetLanguage);
+                        
                         return {
                             success: true,
                             source: result.source,
@@ -329,7 +543,8 @@
                             message: `Playing audio for "${currentStringCache.stringKey || currentStringCache.identifier}" from ${result.source}`,
                             details: result.details,
                             metadata: metadata,
-                            attemptedUrls: attemptedUrls
+                            attemptedUrls: attemptedUrls,
+                            alternativeUrls: alternativeUrls
                         };
                     }
                 } catch (error) {
@@ -380,33 +595,59 @@
                 .replace(/[^a-z0-9]+/g, '-')
                 .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
             
-            // Construct the Levante audio URL
-            // Pattern: https://github.com/levante-framework/levante_translations/raw/main/audio_files/{label}/{language}/shared/{stringKey}.mp3
-            const audioUrl = `https://github.com/levante-framework/levante_translations/raw/main/audio_files/${labelName}/${languageCode}/shared/${cleanStringKey}.mp3`;
+            // Try multiple URL patterns for better compatibility
+            const baseUrl = 'https://raw.githubusercontent.com/levante-framework/levante_translations/main/audio_files';
+            const urlPatterns = [
+                // Primary pattern
+                `${baseUrl}/${labelName}/${languageCode}/shared/${cleanStringKey}.mp3`,
+                // Alternative patterns with different label names
+                `${baseUrl}/general/${languageCode}/shared/${cleanStringKey}.mp3`,
+                // Try without label subdirectory
+                `${baseUrl}/${languageCode}/shared/${cleanStringKey}.mp3`,
+                // Try with original string key (in case cleaning was too aggressive)
+                `${baseUrl}/${labelName}/${languageCode}/shared/${stringKey.toLowerCase().replace(/\s+/g, '-')}.mp3`,
+                // Try with underscores instead of hyphens
+                `${baseUrl}/${labelName}/${languageCode}/shared/${stringKey.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.mp3`,
+                // Try exact string key without transformation
+                `${baseUrl}/${labelName}/${languageCode}/shared/${stringKey}.mp3`
+            ];
             
-            console.log('🎵 Trying Levante audio URL:', audioUrl);
-            console.log('🎵 URL components:', { labelName, languageCode, cleanStringKey });
+            console.log('🎵 Will try Levante audio URLs:', urlPatterns);
+            console.log('🎵 URL components:', { labelName, languageCode, cleanStringKey, originalStringKey: stringKey });
             
-            // Skip CORS check and try to play directly (GitHub blocks fetch but allows audio loading)
+            // Return the first URL to try (we'll handle multiple attempts in the calling function)
             return { 
                 success: true, 
-                audioUrl, 
+                audioUrl: urlPatterns[0],
+                alternativeUrls: urlPatterns.slice(1),
                 source: 'levante_repository',
-                details: { labelName, languageCode, cleanStringKey }
+                details: { labelName, languageCode, cleanStringKey, originalStringKey: stringKey }
             };
         }
 
         // Generate text-to-speech as fallback
         async function generateTextToSpeech(text) {
-            if (!text) throw new Error('No text available for TTS');
+            // Use the translated text if available, otherwise fall back to provided text
+            const textToSpeak = currentStringCache.text || text;
+            const languageToUse = currentStringCache.targetLanguageId || currentStringCache.sourceLanguageId || 'en';
+            
+            if (!textToSpeak) throw new Error('No text available for TTS');
             
             // Use Web Speech API for text-to-speech
             if ('speechSynthesis' in window) {
+                console.log('🎵 TTS: Will use text-to-speech for:', textToSpeak.substring(0, 100) + '...');
+                console.log('🎵 TTS: Target language:', currentStringCache.targetLanguageId);
+                console.log('🎵 TTS: Source language:', currentStringCache.sourceLanguageId);
+                console.log('🎵 TTS: Using language:', languageToUse);
+                console.log('🎵 TTS: Translated text:', currentStringCache.text ? currentStringCache.text.substring(0, 50) + '...' : 'N/A');
+                console.log('🎵 TTS: Source text:', currentStringCache.sourceText ? currentStringCache.sourceText.substring(0, 50) + '...' : 'N/A');
+                
                 return { 
                     success: true, 
                     audioUrl: null, // Will use TTS directly
                     source: 'text_to_speech',
-                    text: text
+                    text: textToSpeak,
+                    targetLanguage: languageToUse
                 };
             }
             
@@ -424,57 +665,152 @@
         }
 
         // Play audio from URL or use TTS
-        async function playAudio(audioUrl, source, text) {
+        async function playAudio(audioUrl, source, text, alternativeUrls = [], targetLanguage = null) {
             if (source === 'text_to_speech') {
-                // Use Web Speech API
-                const utterance = new SpeechSynthesisUtterance(text || currentStringCache.text);
+                // Use Web Speech API with correct language
+                const textToSpeak = text || currentStringCache.text;
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
                 utterance.rate = 0.8;
                 utterance.pitch = 1;
                 utterance.volume = 1;
                 
-                // Try to use a specific voice if available
-                const voices = speechSynthesis.getVoices();
-                const preferredVoice = voices.find(voice => 
-                    voice.lang.startsWith(currentStringCache.sourceLanguageId || 'en')
-                );
-                if (preferredVoice) {
-                    utterance.voice = preferredVoice;
+                // Determine the target language for TTS
+                const languageForTTS = targetLanguage || 
+                                     currentStringCache.targetLanguageId || 
+                                     currentStringCache.sourceLanguageId || 
+                                     'en';
+                
+                console.log('🎵 TTS: Looking for voice for language:', languageForTTS);
+                
+                // Get available voices
+                let voices = speechSynthesis.getVoices();
+                
+                // If voices aren't loaded yet, wait for them
+                if (voices.length === 0) {
+                    await new Promise(resolve => {
+                        speechSynthesis.addEventListener('voiceschanged', resolve, { once: true });
+                        setTimeout(resolve, 1000); // Fallback timeout
+                    });
+                    voices = speechSynthesis.getVoices();
                 }
                 
+                console.log('🎵 TTS: Available voices:', voices.map(v => `${v.name} (${v.lang})`));
+                
+                // Language mapping for better voice selection
+                const languageMap = {
+                    'es': ['es', 'es-ES', 'es-MX', 'es-US'],
+                    'fr': ['fr', 'fr-FR', 'fr-CA'],
+                    'de': ['de', 'de-DE'],
+                    'it': ['it', 'it-IT'],
+                    'pt': ['pt', 'pt-BR', 'pt-PT'],
+                    'ru': ['ru', 'ru-RU'],
+                    'ja': ['ja', 'ja-JP'],
+                    'ko': ['ko', 'ko-KR'],
+                    'zh': ['zh', 'zh-CN', 'zh-TW'],
+                    'ar': ['ar', 'ar-SA'],
+                    'hi': ['hi', 'hi-IN'],
+                    'en': ['en', 'en-US', 'en-GB']
+                };
+                
+                // Find the best voice for the target language
+                let selectedVoice = null;
+                const targetLangCodes = languageMap[languageForTTS] || [languageForTTS];
+                
+                // Try to find a voice that matches the target language
+                for (const langCode of targetLangCodes) {
+                    selectedVoice = voices.find(voice => 
+                        voice.lang.toLowerCase().startsWith(langCode.toLowerCase())
+                    );
+                    if (selectedVoice) {
+                        console.log('🎵 TTS: Found voice for', langCode, ':', selectedVoice.name);
+                        break;
+                    }
+                }
+                
+                // If no specific voice found, try a broader search
+                if (!selectedVoice) {
+                    selectedVoice = voices.find(voice => 
+                        voice.lang.toLowerCase().startsWith(languageForTTS.toLowerCase())
+                    );
+                }
+                
+                // Set the voice if found
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                    utterance.lang = selectedVoice.lang;
+                    console.log('🎵 TTS: Using voice:', selectedVoice.name, 'for language:', selectedVoice.lang);
+                } else {
+                    // Fallback to setting just the language
+                    utterance.lang = languageForTTS;
+                    console.log('🎵 TTS: No specific voice found, using language:', languageForTTS);
+                }
+                
+                // Speak the text
+                speechSynthesis.cancel(); // Cancel any ongoing speech
                 speechSynthesis.speak(utterance);
-                console.log('🎵 Playing TTS for:', text || currentStringCache.text);
+                console.log('🎵 TTS: Playing text-to-speech for:', textToSpeak, 'in language:', utterance.lang);
+                
+                return new Promise((resolve) => {
+                    utterance.onend = resolve;
+                    utterance.onerror = resolve;
+                    setTimeout(resolve, 10000); // Timeout after 10 seconds
+                });
             } else {
-                // Play audio file
+                // Try to play audio file with fallback URLs
+                const urlsToTry = [audioUrl, ...alternativeUrls];
+                
+                for (let i = 0; i < urlsToTry.length; i++) {
+                    const currentUrl = urlsToTry[i];
+                    console.log(`🎵 Trying audio URL ${i + 1}/${urlsToTry.length}:`, currentUrl);
+                    
+                    try {
+                        await tryPlaySingleAudio(currentUrl);
+                        console.log('🎵 ✅ Successfully played audio from:', currentUrl);
+                        return; // Success, exit the function
+                    } catch (error) {
+                        console.log(`🎵 ❌ Failed to play audio from URL ${i + 1}:`, currentUrl, error.message);
+                        
+                        // If this was the last URL, throw the error
+                        if (i === urlsToTry.length - 1) {
+                            throw new Error(`All audio URLs failed. Last error: ${error.message}`);
+                        }
+                        // Otherwise, continue to the next URL
+                    }
+                }
+            }
+        }
+
+        // Helper function to try playing a single audio URL
+        async function tryPlaySingleAudio(audioUrl) {
+            return new Promise((resolve, reject) => {
                 const audio = new Audio(audioUrl);
                 audio.volume = 0.8;
                 
-                return new Promise((resolve, reject) => {
-                    audio.oncanplaythrough = () => {
-                        console.log('🎵 ✅ Audio loaded successfully, playing:', audioUrl);
-                        audio.play().then(resolve).catch(reject);
-                    };
-                    
-                    audio.onerror = (error) => {
-                        console.log('🎵 ❌ Audio failed to load:', audioUrl, error);
-                        reject(new Error(`Audio file not found or failed to load: ${audioUrl}`));
-                    };
-                    
-                    audio.onloadstart = () => {
-                        console.log('🎵 📡 Started loading audio:', audioUrl);
-                    };
-                    
-                    // Set a timeout to avoid hanging indefinitely
-                    const timeout = setTimeout(() => {
-                        console.log('🎵 ⏰ Audio loading timeout:', audioUrl);
-                        reject(new Error(`Audio loading timeout: ${audioUrl}`));
-                    }, 10000); // 10 second timeout
-                    
-                    audio.addEventListener('canplaythrough', () => clearTimeout(timeout));
-                    audio.addEventListener('error', () => clearTimeout(timeout));
-                    
-                    audio.load();
-                });
-            }
+                audio.oncanplaythrough = () => {
+                    console.log('🎵 ✅ Audio loaded successfully, playing:', audioUrl);
+                    audio.play().then(resolve).catch(reject);
+                };
+                
+                audio.onerror = (error) => {
+                    console.log('🎵 ❌ Audio failed to load:', audioUrl, error);
+                    reject(new Error(`Audio file not found or failed to load: ${audioUrl}`));
+                };
+                
+                audio.onloadstart = () => {
+                    console.log('🎵 📡 Started loading audio:', audioUrl);
+                };
+                
+                // Set a timeout to avoid hanging indefinitely
+                const timeout = setTimeout(() => {
+                    console.log('🎵 ⏰ Audio loading timeout:', audioUrl);
+                    reject(new Error(`Audio loading timeout: ${audioUrl}`));
+                }, 8000); // 8 second timeout (reduced for faster fallback)
+                
+                audio.addEventListener('canplaythrough', () => clearTimeout(timeout));
+                audio.addEventListener('error', () => clearTimeout(timeout));
+                
+                audio.load();
+            });
         }
 
         // Show success result
@@ -627,6 +963,9 @@
                 if (typeof AP !== 'undefined') {
                     console.log('🎯 Crowdin Apps JS API available');
                     
+                    // Detect current editor mode for better handling
+                    detectEditorMode();
+                    
                     // Register for string events with error handling
                     try {
                         // Wrap event handlers to prevent errors from breaking the app
@@ -648,15 +987,54 @@
                             }
                         });
                         
-                        // Add additional event listeners for better coverage
+                        // Add additional event listeners for better coverage across all modes
                         if (AP.events.on) {
                             try {
+                                // Translation events (work better in comfortable/multilingual modes)
                                 AP.events.on('translation.change', function(translationData) {
                                     try {
                                         console.log('🎯 Translation changed:', translationData);
                                         updateStringCacheFromCrowdinEvent(translationData, 'translation.change');
                                     } catch (error) {
                                         console.error('🎯 Error handling translation.change event:', error);
+                                    }
+                                });
+                                
+                                AP.events.on('translation.selected', function(translationData) {
+                                    try {
+                                        console.log('🎯 Translation selected:', translationData);
+                                        updateStringCacheFromCrowdinEvent(translationData, 'translation.selected');
+                                    } catch (error) {
+                                        console.error('🎯 Error handling translation.selected event:', error);
+                                    }
+                                });
+                                
+                                // Editor events (better for comfortable/multilingual modes)
+                                AP.events.on('editor.string.selected', function(stringData) {
+                                    try {
+                                        console.log('🎯 Editor string selected:', stringData);
+                                        updateStringCacheFromCrowdinEvent(stringData, 'editor.string.selected');
+                                    } catch (error) {
+                                        console.error('🎯 Error handling editor.string.selected event:', error);
+                                    }
+                                });
+                                
+                                AP.events.on('editor.translation.selected', function(translationData) {
+                                    try {
+                                        console.log('🎯 Editor translation selected:', translationData);
+                                        updateStringCacheFromCrowdinEvent(translationData, 'editor.translation.selected');
+                                    } catch (error) {
+                                        console.error('🎯 Error handling editor.translation.selected event:', error);
+                                    }
+                                });
+                                
+                                // Context events (work in all modes)
+                                AP.events.on('context.change', function(contextData) {
+                                    try {
+                                        console.log('🎯 Context changed:', contextData);
+                                        updateStringCacheFromCrowdinEvent(contextData, 'context.change');
+                                    } catch (error) {
+                                        console.error('🎯 Error handling context.change event:', error);
                                     }
                                 });
                                 
@@ -679,11 +1057,16 @@
                                     }
                                 });
                                 
-                                console.log('✅ Registered for translations panel specific events');
+                                console.log('✅ Registered for all available Crowdin API events');
                             } catch (error) {
-                                console.log('⚠️ Some translation events not available');
+                                console.log('⚠️ Some events not available:', error);
                             }
                         }
+                        
+                        // Try to get current context immediately for comfortable/multilingual modes
+                        setTimeout(() => {
+                            tryGetCurrentContext();
+                        }, 1000);
                         
                         console.log('✅ Registered for Crowdin API events');
                     } catch (error) {
@@ -704,6 +1087,234 @@
             }, 1000);
         }
 
+        // Detect current editor mode
+        function detectEditorMode() {
+            try {
+                // Try to detect mode from URL or API
+                const urlParams = new URLSearchParams(window.location.search);
+                const mode = urlParams.get('mode');
+                
+                if (mode) {
+                    console.log('🎯 Detected editor mode from URL:', mode);
+                    currentStringCache.editorMode = mode;
+                } else {
+                    // Try to detect from API
+                    if (typeof AP !== 'undefined' && AP.context) {
+                        AP.context.getContext(function(context) {
+                            if (context && context.mode) {
+                                console.log('🎯 Detected editor mode from API:', context.mode);
+                                currentStringCache.editorMode = context.mode;
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.log('⚠️ Could not detect editor mode:', error);
+            }
+        }
+
+        // Try to get current context (useful for comfortable/multilingual modes)
+        function tryGetCurrentContext() {
+            try {
+                if (typeof AP !== 'undefined' && AP.context) {
+                    AP.context.getContext(function(context) {
+                        console.log('🎯 Current context:', context);
+                        
+                        if (context) {
+                            // Extract useful information from context
+                            const contextData = {
+                                projectId: context.projectId,
+                                fileId: context.fileId,
+                                stringId: context.stringId,
+                                languageId: context.languageId,
+                                userId: context.userId,
+                                mode: context.mode
+                            };
+                            
+                            // Update cache with context data
+                            if (contextData.stringId || contextData.projectId) {
+                                updateStringCacheFromCrowdinEvent(contextData, 'context.getContext');
+                            }
+                        }
+                    });
+                }
+                
+                // Also try to get current string if available
+                if (typeof AP !== 'undefined' && AP.editor && AP.editor.getCurrentString) {
+                    AP.editor.getCurrentString(function(stringData) {
+                        console.log('🎯 Current string from editor:', stringData);
+                        if (stringData) {
+                            updateStringCacheFromCrowdinEvent(stringData, 'editor.getCurrentString');
+                        }
+                    });
+                }
+                
+                // Try to get current translation if available
+                if (typeof AP !== 'undefined' && AP.editor && AP.editor.getCurrentTranslation) {
+                    AP.editor.getCurrentTranslation(function(translationData) {
+                        console.log('🎯 Current translation from editor:', translationData);
+                        if (translationData) {
+                            updateStringCacheFromCrowdinEvent(translationData, 'editor.getCurrentTranslation');
+                        }
+                    });
+                }
+            } catch (error) {
+                console.log('⚠️ Error getting current context:', error);
+            }
+        }
+
+        // Enhanced message handler that includes API events and mode-specific handling
+        function enhancedMessageHandler(event) {
+            // Prevent any default behavior that might cause navigation
+            if (event.preventDefault) {
+                event.preventDefault();
+            }
+            
+            // Only process messages from Crowdin origins
+            if (!event.origin || !event.origin.includes('crowdin.com')) {
+                return;
+            }
+            
+            // Throttle message processing to prevent overload
+            if (window.lastMessageTime && Date.now() - window.lastMessageTime < 50) {
+                return; // Reduced throttling for better responsiveness
+            }
+            window.lastMessageTime = Date.now();
+            
+            try {
+                // Always log messages in comfortable/multilingual modes for debugging
+                const debugMode = document.getElementById('debugMode')?.checked;
+                const isComfortableOrMultilingual = currentStringCache.editorMode === 'comfortable' || 
+                                                   currentStringCache.editorMode === 'multilingual';
+                
+                if (debugMode || isComfortableOrMultilingual) {
+                    console.log('📨 Received message from Crowdin (mode: ' + currentStringCache.editorMode + '):', JSON.stringify({
+                        origin: event.origin,
+                        type: event.data?.type,
+                        data: event.data
+                    }, null, 2));
+                }
+                
+                // Only process messages that contain actual data
+                if (!event.data || typeof event.data !== 'object') {
+                    return;
+                }
+                
+                // Enhanced string data extraction for different modes
+                const possibleStringData = extractStringDataFromMessage(event.data);
+                if (possibleStringData.found) {
+                    console.log('🎯 Found potential string data in message (mode: ' + currentStringCache.editorMode + '):', JSON.stringify(possibleStringData, null, 2));
+                    
+                    // Smart string ID handling for message extraction
+                    let messageStringId = currentStringCache.stringId;
+                    if (possibleStringData.stringId && possibleStringData.stringId > 1000) {
+                        messageStringId = possibleStringData.stringId;
+                        console.log('📨 ✅ Using extracted string ID:', messageStringId);
+                    } else if (!currentStringCache.stringId && possibleStringData.stringId) {
+                        messageStringId = possibleStringData.stringId;
+                        console.log('📨 ⚠️ Using potential extracted string ID (no existing):', messageStringId);
+                    } else if (possibleStringData.stringId && possibleStringData.stringId <= 1000) {
+                        console.log('📨 ❌ Ignoring small extracted ID (likely file ID):', possibleStringData.stringId, 'keeping existing:', currentStringCache.stringId);
+                    }
+                    
+                    // Update cache with found data, preserving existing language info
+                    // If we have a target language, treat the text as translated text
+                    let textToUse = possibleStringData.text || currentStringCache.text;
+                    let sourceTextToUse = currentStringCache.sourceText;
+                    
+                    if (possibleStringData.targetLanguageId && possibleStringData.text) {
+                        // This is translated text
+                        textToUse = possibleStringData.text;
+                        console.log('📨 ✅ Using translated text from message:', textToUse.substring(0, 50) + '...');
+                    } else if (possibleStringData.text && !possibleStringData.targetLanguageId) {
+                        // This might be source text
+                        sourceTextToUse = possibleStringData.text;
+                        console.log('📨 ✅ Using source text from message:', sourceTextToUse.substring(0, 50) + '...');
+                    }
+                    
+                    currentStringCache = {
+                        stringId: messageStringId,
+                        stringKey: possibleStringData.stringKey || currentStringCache.stringKey,
+                        identifier: possibleStringData.identifier || currentStringCache.identifier,
+                        text: textToUse,
+                        sourceText: sourceTextToUse,
+                        context: possibleStringData.context || currentStringCache.context,
+                        fileId: possibleStringData.fileId || currentStringCache.fileId,
+                        projectId: possibleStringData.projectId || currentStringCache.projectId,
+                        sourceLanguageId: possibleStringData.sourceLanguageId || currentStringCache.sourceLanguageId,
+                        targetLanguageId: possibleStringData.targetLanguageId || currentStringCache.targetLanguageId,
+                        sourceLanguageName: currentStringCache.sourceLanguageName,
+                        targetLanguageName: currentStringCache.targetLanguageName,
+                        labels: possibleStringData.labels || currentStringCache.labels,
+                        editorMode: currentStringCache.editorMode,
+                        lastUpdated: new Date().toISOString(),
+                        source: 'message_extraction'
+                    };
+                    
+                    console.log('🎯 Updated string cache from message:', {
+                        stringId: currentStringCache.stringId,
+                        stringKey: currentStringCache.stringKey,
+                        text: currentStringCache.text ? currentStringCache.text.substring(0, 50) + '...' : 'N/A',
+                        targetLanguageId: currentStringCache.targetLanguageId,
+                        sourceLanguageId: currentStringCache.sourceLanguageId,
+                        editorMode: currentStringCache.editorMode
+                    });
+                    
+                    // Update UI in a non-blocking way
+                    setTimeout(() => {
+                        updateStringCacheStatus();
+                    }, 0);
+                    
+                    // Automatically fetch labels if we have a string ID (and it's not a file ID)
+                    if (possibleStringData.stringId && possibleStringData.stringId > 1000) {
+                        console.log('🏷️ Auto-fetching labels for extracted string ID:', possibleStringData.stringId);
+                        // Delay label fetching to prevent blocking
+                        setTimeout(() => {
+                            updateStringLabelsInCache();
+                        }, 100);
+                    } else if (possibleStringData.stringId && possibleStringData.stringId <= 1000) {
+                        console.log('🏷️ Skipping auto-fetch for small extracted ID (likely file ID):', possibleStringData.stringId);
+                    }
+                }
+                
+                // Special handling for different editor modes
+                handleModeSpecificMessages(event.data);
+                
+            } catch (error) {
+                console.error('📨 Error in message handler:', error);
+                // Don't let message handling errors break the app
+            }
+        }
+
+        // Handle mode-specific messages
+        function handleModeSpecificMessages(data) {
+            try {
+                // In comfortable/multilingual modes, look for different message patterns
+                if (data.type === 'editor.translation.selected' || 
+                    data.type === 'translation.selected' ||
+                    data.type === 'comfortable.string.selected' ||
+                    data.type === 'multilingual.string.selected') {
+                    
+                    console.log('🎯 Mode-specific message detected:', data.type);
+                    
+                    // Extract data specific to these modes
+                    if (data.payload || data.data) {
+                        const payload = data.payload || data.data;
+                        updateStringCacheFromCrowdinEvent(payload, data.type);
+                    }
+                }
+                
+                // Handle iframe communication patterns common in comfortable/multilingual modes
+                if (data.action === 'string.select' || data.action === 'translation.select') {
+                    console.log('🎯 Action-based message detected:', data.action);
+                    updateStringCacheFromCrowdinEvent(data, data.action);
+                }
+                
+            } catch (error) {
+                console.log('⚠️ Error in mode-specific message handling:', error);
+            }
+        }
+
         // Update string cache from Crowdin event data
         function updateStringCacheFromCrowdinEvent(stringData, eventType) {
             if (!stringData) return;
@@ -714,6 +1325,8 @@
             // Extract language information from string data
             let sourceLanguageId = currentStringCache.sourceLanguageId;
             let targetLanguageId = currentStringCache.targetLanguageId;
+            let translatedText = currentStringCache.text;
+            let sourceText = currentStringCache.sourceText;
             
             // Look for target language in translations
             if (stringData.translations) {
@@ -722,13 +1335,17 @@
                     targetLanguageId = targetLangs[0]; // Get the first (and usually only) target language
                 }
                 
-                // Also check target_language_id in translation objects
+                // Extract the translated text from translations
                 for (const lang in stringData.translations) {
                     const translations = stringData.translations[lang];
                     if (Array.isArray(translations) && translations.length > 0) {
                         const firstTranslation = translations[0];
                         if (firstTranslation.target_language_id) {
                             targetLanguageId = firstTranslation.target_language_id;
+                        }
+                        if (firstTranslation.text) {
+                            translatedText = firstTranslation.text;
+                            console.log('📝 ✅ Found translated text:', translatedText.substring(0, 50) + '...');
                         }
                     }
                 }
@@ -750,12 +1367,20 @@
                 console.log('📝 ❌ Ignoring small ID (likely file ID):', potentialStringId, 'keeping existing:', currentStringCache.stringId);
             }
             
+            // Store source text (English) separately from translated text
+            const currentSourceText = stringData.string?.text || stringData.text;
+            if (currentSourceText && currentSourceText !== translatedText) {
+                sourceText = currentSourceText;
+                console.log('📝 ✅ Found source text:', sourceText.substring(0, 50) + '...');
+            }
+            
             // Update cache with new information
             currentStringCache = {
                 stringId: newStringId,
                 stringKey: stringData.string?.identifier || stringData.identifier || stringData.key || currentStringCache.stringKey,
                 identifier: stringData.string?.identifier || stringData.identifier || stringData.key || currentStringCache.identifier,
-                text: stringData.string?.text || stringData.text || currentStringCache.text,
+                text: translatedText || currentStringCache.text, // Use translated text for TTS
+                sourceText: sourceText || currentStringCache.sourceText, // Keep source text separate
                 context: stringData.string?.context || stringData.context || currentStringCache.context,
                 label: stringData.string?.label || stringData.label || currentStringCache.label,
                 labels: stringData.string?.labels || stringData.labels || currentStringCache.labels,
@@ -770,6 +1395,10 @@
                 lastUpdated: new Date().toISOString(),
                 source: eventType
             };
+            
+            console.log('📝 ✅ Updated cache - translated text:', currentStringCache.text ? currentStringCache.text.substring(0, 50) + '...' : 'N/A');
+            console.log('📝 ✅ Updated cache - source text:', currentStringCache.sourceText ? currentStringCache.sourceText.substring(0, 50) + '...' : 'N/A');
+            console.log('📝 ✅ Updated cache - target language:', currentStringCache.targetLanguageId);
             
             // Update language names if we have the language list
             updateLanguageNamesInCache();
@@ -994,6 +1623,7 @@
                         <span style="font-size: 1.2rem;">🎯</span>
                         <strong>Current String Cached</strong>
                         <span style="font-size: 0.8rem; opacity: 0.7;">(${currentStringCache.lastUpdated})</span>
+                        ${currentStringCache.editorMode ? `<span style="font-size: 0.8rem; background: #e3f2fd; color: #1976d2; padding: 2px 6px; border-radius: 12px; margin-left: 5px;">${currentStringCache.editorMode}</span>` : ''}
                     </div>
                     <div style="font-family: monospace; background: white; padding: 8px; border-radius: 4px; margin: 5px 0;">
                         <strong>Key:</strong> ${currentStringCache.stringKey || currentStringCache.identifier || 'N/A'}<br>
@@ -1018,95 +1648,6 @@
             }
         }
 
-        // Enhanced message handler that includes API events
-        function enhancedMessageHandler(event) {
-            // Prevent any default behavior that might cause navigation
-            if (event.preventDefault) {
-                event.preventDefault();
-            }
-            
-            // Only process messages from Crowdin origins
-            if (!event.origin || !event.origin.includes('crowdin.com')) {
-                return;
-            }
-            
-            // Throttle message processing to prevent overload
-            if (window.lastMessageTime && Date.now() - window.lastMessageTime < 100) {
-                return; // Skip if less than 100ms since last message
-            }
-            window.lastMessageTime = Date.now();
-            
-            try {
-                // Log messages for debugging (only if debug mode is enabled)
-                if (document.getElementById('debugMode')?.checked) {
-                    console.log('📨 Received message from Crowdin:', JSON.stringify({
-                        origin: event.origin,
-                        type: event.data?.type,
-                        data: event.data
-                    }, null, 2));
-                }
-                
-                // Only process messages that contain actual data
-                if (!event.data || typeof event.data !== 'object') {
-                    return;
-                }
-                
-                // Try to extract string-related data from the message
-                const possibleStringData = extractStringDataFromMessage(event.data);
-                if (possibleStringData.found) {
-                    console.log('🎯 Found potential string data in message:', JSON.stringify(possibleStringData, null, 2));
-                    
-                    // Smart string ID handling for message extraction
-                    let messageStringId = currentStringCache.stringId;
-                    if (possibleStringData.stringId && possibleStringData.stringId > 1000) {
-                        messageStringId = possibleStringData.stringId;
-                        console.log('📨 ✅ Using extracted string ID:', messageStringId);
-                    } else if (!currentStringCache.stringId && possibleStringData.stringId) {
-                        messageStringId = possibleStringData.stringId;
-                        console.log('📨 ⚠️ Using potential extracted string ID (no existing):', messageStringId);
-                    } else if (possibleStringData.stringId && possibleStringData.stringId <= 1000) {
-                        console.log('📨 ❌ Ignoring small extracted ID (likely file ID):', possibleStringData.stringId, 'keeping existing:', currentStringCache.stringId);
-                    }
-                    
-                    // Update cache with found data, preserving existing language info
-                    currentStringCache = {
-                        stringId: messageStringId,
-                        stringKey: possibleStringData.stringKey || currentStringCache.stringKey,
-                        identifier: possibleStringData.identifier || currentStringCache.identifier,
-                        text: possibleStringData.text || currentStringCache.text,
-                        context: possibleStringData.context || currentStringCache.context,
-                        fileId: possibleStringData.fileId || currentStringCache.fileId,
-                        projectId: possibleStringData.projectId || currentStringCache.projectId,
-                        sourceLanguageId: currentStringCache.sourceLanguageId,
-                        targetLanguageId: currentStringCache.targetLanguageId,
-                        sourceLanguageName: currentStringCache.sourceLanguageName,
-                        targetLanguageName: currentStringCache.targetLanguageName,
-                        lastUpdated: new Date().toISOString(),
-                        source: 'message_extraction'
-                    };
-                    
-                    // Update UI in a non-blocking way
-                    setTimeout(() => {
-                        updateStringCacheStatus();
-                    }, 0);
-                    
-                    // Automatically fetch labels if we have a string ID (and it's not a file ID)
-                    if (possibleStringData.stringId && possibleStringData.stringId > 1000) {
-                        console.log('🏷️ Auto-fetching labels for extracted string ID:', possibleStringData.stringId);
-                        // Delay label fetching to prevent blocking
-                        setTimeout(() => {
-                            updateStringLabelsInCache();
-                        }, 100);
-                    } else if (possibleStringData.stringId && possibleStringData.stringId <= 1000) {
-                        console.log('🏷️ Skipping auto-fetch for small extracted ID (likely file ID):', possibleStringData.stringId);
-                    }
-                }
-            } catch (error) {
-                console.error('📨 Error in message handler:', error);
-                // Don't let message handling errors break the app
-            }
-        }
-        
         // Helper function to extract string data from any message
         function extractStringDataFromMessage(data) {
             const result = {
@@ -1121,7 +1662,9 @@
                 maxLength: null,
                 fileId: null,
                 fileName: null,
-                projectId: null
+                projectId: null,
+                sourceLanguageId: null,
+                targetLanguageId: null
             };
             
             // Recursively search for string-related properties
@@ -1198,6 +1741,19 @@
                         result.found = true;
                     }
                     
+                    // Check for language ID patterns (important for comfortable/multilingual modes)
+                    if ((key.toLowerCase().includes('sourcelanguageid') || key.toLowerCase().includes('source_language_id') ||
+                         (key === 'languageId' && path.toLowerCase().includes('source'))) && value) {
+                        result.sourceLanguageId = value;
+                        result.found = true;
+                    }
+                    
+                    if ((key.toLowerCase().includes('targetlanguageid') || key.toLowerCase().includes('target_language_id') ||
+                         key.toLowerCase().includes('languageid') || key.toLowerCase().includes('language_id')) && value) {
+                        result.targetLanguageId = value;
+                        result.found = true;
+                    }
+                    
                     // Recursively search nested objects
                     if (typeof value === 'object' && value !== null) {
                         searchObject(value, currentPath);
@@ -1206,6 +1762,37 @@
             }
             
             searchObject(data);
+            
+            // Additional extraction patterns for comfortable/multilingual modes
+            if (data.payload) {
+                searchObject(data.payload, 'payload');
+            }
+            
+            if (data.data) {
+                searchObject(data.data, 'data');
+            }
+            
+            // Handle translation-specific data structures
+            if (data.translation) {
+                searchObject(data.translation, 'translation');
+            }
+            
+            if (data.translations) {
+                // In multilingual mode, we might have multiple translations
+                if (typeof data.translations === 'object') {
+                    for (const [langCode, translations] of Object.entries(data.translations)) {
+                        if (Array.isArray(translations) && translations.length > 0) {
+                            // Use the target language from the first translation
+                            result.targetLanguageId = langCode;
+                            result.found = true;
+                            
+                            // Extract data from the first translation
+                            searchObject(translations[0], `translations.${langCode}.0`);
+                        }
+                    }
+                }
+            }
+            
             return result;
         }
 
@@ -1267,6 +1854,63 @@
             }, 30000); // Every 30 seconds
         }
 
+        // Periodic context polling for comfortable/multilingual modes
+        function startContextPolling() {
+            // Poll for context changes every 2 seconds in comfortable/multilingual modes
+            setInterval(() => {
+                if (currentStringCache.editorMode === 'comfortable' || 
+                    currentStringCache.editorMode === 'multilingual' ||
+                    !currentStringCache.stringId) {
+                    
+                    // Only poll if we don't have recent string data
+                    const lastUpdate = currentStringCache.lastUpdated ? new Date(currentStringCache.lastUpdated) : null;
+                    const now = new Date();
+                    const timeSinceUpdate = lastUpdate ? (now - lastUpdate) / 1000 : Infinity;
+                    
+                    if (timeSinceUpdate > 5) { // Only poll if no update in last 5 seconds
+                        console.log('🔄 Polling for current context (mode:', currentStringCache.editorMode, ')');
+                        tryGetCurrentContext();
+                    }
+                }
+            }, 2000);
+        }
+
+        // Add click handler to retry getting context when play button is clicked without string data
+        function enhancePlayButton() {
+            const originalPlayFunction = window.playCurrentAudio;
+            
+            window.playCurrentAudio = async function() {
+                // If we don't have string data, try to get current context first
+                if (!currentStringCache.stringId && !currentStringCache.stringKey) {
+                    console.log('🎯 No string data cached, trying to get current context...');
+                    
+                    // Show loading state
+                    const playBtn = document.getElementById('playBtn');
+                    const playIcon = document.getElementById('playIcon');
+                    const playText = document.getElementById('playText');
+                    
+                    playBtn.disabled = true;
+                    playIcon.innerHTML = '<div class="loading-spinner"></div>';
+                    playText.textContent = 'Getting Current String...';
+                    
+                    // Try to get current context
+                    await new Promise(resolve => {
+                        tryGetCurrentContext();
+                        // Give it a moment to process
+                        setTimeout(resolve, 1000);
+                    });
+                    
+                    // Reset button state
+                    playBtn.disabled = false;
+                    playIcon.textContent = '🎵';
+                    playText.textContent = 'Play Current Audio';
+                }
+                
+                // Call original function
+                return originalPlayFunction.call(this);
+            };
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🎵 Audio Previewer loaded and ready as TRANSLATIONS PANEL module');
@@ -1300,6 +1944,14 @@
                     toggleDebugMode();
                 }
             }
+            
+            // Start context polling for comfortable/multilingual modes
+            setTimeout(() => {
+                startContextPolling();
+            }, 3000);
+            
+            // Enhance play button with context retry
+            enhancePlayButton();
             
             updateDebugInfo();
             
