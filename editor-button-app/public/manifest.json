@@ -3,7 +3,7 @@
   "name": "Levante Audio Previewer",
   "description": "Select a string to preview its audio",
   "logo": "/favicon.svg",
-  "baseUrl": "https://editor-button-app.vercel.app",
+  "baseUrl": "https://editor-button-2urx7sqws-digitalpros-projects.vercel.app",
   "authentication": {
     "type": "none"
   },
