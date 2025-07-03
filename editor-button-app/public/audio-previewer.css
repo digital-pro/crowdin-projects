@@ -23,37 +23,37 @@ body {
 .header {
     background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     color: white;
-    padding: 30px;
+    padding: 10px;
     text-align: center;
 }
 
 .header h1 {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
+    font-size: 1rem;
+    margin-bottom: 5px;
 }
 
 .header p {
     opacity: 0.9;
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 .content {
-    padding: 30px;
+    padding: 10px;
 }
 
 .play-button {
     background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
     color: white;
     border: none;
-    padding: 20px 40px;
+    padding: 10px 20px;
     border-radius: 12px;
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 300;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
     width: 100%;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
