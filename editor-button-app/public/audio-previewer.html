@@ -15,10 +15,14 @@
         
         <div class="content">
             <!-- Play Audio Button -->
-            <button id="playBtn" class="play-button" onclick="playCurrentAudio()">
-                <span id="playIcon">🎵</span>
-                <span id="playText">Play Current Audio</span>
-            </button>
+                                <button id="playBtn" class="play-button" onclick="playCurrentAudio()">
+                        <span id="playIcon">🎵</span>
+                        <span id="playText">Play Current Audio</span>
+                    </button>
+                    <button id="refreshBtn" class="refresh-button" onclick="refreshContext()" style="margin-left: 10px; padding: 12px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <span>🔄</span>
+                        <span>Refresh Context</span>
+                    </button>
 
             <!-- String Cache Status -->
             <div id="stringCacheStatus" class="string-cache" style="display: none;">
@@ -219,16 +223,18 @@
                             details: audioResult.details,
                             metadata: audioResult.metadata,
                             mode: currentStringCache.editorMode,
-                            detectedLanguage: currentStringCache.targetLanguageId || currentStringCache.sourceLanguageId
+                            detectedLanguage: currentStringCache.targetLanguageId || currentStringCache.sourceLanguageId,
+                            allTriedUrls: audioResult.allTriedUrls
                         }
                     );
                 } else {
-                    showErrorResult(audioResult.message, audioResult.attemptedUrls);
+                    showErrorResult(audioResult.message, audioResult.attemptedUrls, audioResult.allTriedUrls);
                 }
                 
             } catch (error) {
                 console.error('Audio playback error:', error);
-                showErrorResult(`Audio playback failed: ${error.message}`);
+                const failedUrls = error.failedUrls ? error.failedUrls.map(item => item.url || item) : [];
+                showErrorResult(`Audio playback failed: ${error.message}`, [], failedUrls);
             } finally {
                 // Re-enable button
                 playBtn.disabled = false;
@@ -240,16 +246,22 @@
         // Enhanced function to try getting current string data
         async function tryGetCurrentStringData() {
             console.log('🎯 Trying to get current string data for mode:', currentStringCache.editorMode);
+            console.log('🎯 Current cache state before API calls:', JSON.stringify(currentStringCache, null, 2));
             
             const promises = [];
+            let apiResults = [];
             
             // Try all available methods simultaneously
             if (typeof AP !== 'undefined') {
+                console.log('🎯 Crowdin AP API is available');
+                
                 // Method 1: Context API
                 if (AP.context && AP.context.getContext) {
                     promises.push(new Promise(resolve => {
+                        console.log('🎯 Calling AP.context.getContext...');
                         AP.context.getContext(function(context) {
                             console.log('🎯 Context API result:', context);
+                            apiResults.push({ method: 'context.getContext', result: context });
                             if (context) {
                                 updateStringCacheFromCrowdinEvent(context, 'context.getContext.manual');
                             }
@@ -261,8 +273,10 @@
                 // Method 2: Current String API
                 if (AP.editor && AP.editor.getCurrentString) {
                     promises.push(new Promise(resolve => {
+                        console.log('🎯 Calling AP.editor.getCurrentString...');
                         AP.editor.getCurrentString(function(stringData) {
                             console.log('🎯 Current string API result:', stringData);
+                            apiResults.push({ method: 'editor.getCurrentString', result: stringData });
                             if (stringData) {
                                 updateStringCacheFromCrowdinEvent(stringData, 'editor.getCurrentString.manual');
                             }
@@ -274,8 +288,10 @@
                 // Method 3: Current Translation API
                 if (AP.editor && AP.editor.getCurrentTranslation) {
                     promises.push(new Promise(resolve => {
+                        console.log('🎯 Calling AP.editor.getCurrentTranslation...');
                         AP.editor.getCurrentTranslation(function(translationData) {
                             console.log('🎯 Current translation API result:', translationData);
+                            apiResults.push({ method: 'editor.getCurrentTranslation', result: translationData });
                             if (translationData) {
                                 updateStringCacheFromCrowdinEvent(translationData, 'editor.getCurrentTranslation.manual');
                             }
@@ -283,10 +299,112 @@
                         });
                     }));
                 }
+                
+                // Method 4: Try to get project info
+                if (AP.context && AP.context.getProject) {
+                    promises.push(new Promise(resolve => {
+                        console.log('🎯 Calling AP.context.getProject...');
+                        AP.context.getProject(function(projectData) {
+                            console.log('🎯 Project API result:', projectData);
+                            apiResults.push({ method: 'context.getProject', result: projectData });
+                            if (projectData) {
+                                // Extract project info that might be useful
+                                if (projectData.id) currentStringCache.projectId = projectData.id;
+                                if (projectData.sourceLanguageId) currentStringCache.sourceLanguageId = projectData.sourceLanguageId;
+                            }
+                            resolve();
+                        });
+                    }));
+                }
+                
+                // Method 5: Try to get current language
+                if (AP.context && AP.context.getCurrentLanguage) {
+                    promises.push(new Promise(resolve => {
+                        console.log('🎯 Calling AP.context.getCurrentLanguage...');
+                        AP.context.getCurrentLanguage(function(languageData) {
+                            console.log('🎯 Current language API result:', languageData);
+                            apiResults.push({ method: 'context.getCurrentLanguage', result: languageData });
+                            if (languageData) {
+                                if (languageData.id) currentStringCache.targetLanguageId = languageData.id;
+                                if (languageData.name) currentStringCache.targetLanguageName = languageData.name;
+                            }
+                            resolve();
+                        });
+                    }));
+                }
+            } else {
+                console.log('🎯 ❌ Crowdin AP API is not available');
             }
             
             // Wait for all methods to complete
             await Promise.all(promises);
+            
+            console.log('🎯 All API results:', apiResults);
+            console.log('🎯 Updated cache state after API calls:', JSON.stringify(currentStringCache, null, 2));
+            
+            // If we still don't have essential data, try alternative methods
+            if (!currentStringCache.stringKey && !currentStringCache.stringId) {
+                console.log('🎯 Still no string data, trying alternative methods...');
+                await tryAlternativeDataExtraction();
+            }
+        }
+        
+        // Try alternative methods to extract string data
+        async function tryAlternativeDataExtraction() {
+            console.log('🎯 Trying alternative data extraction methods...');
+            
+            // Try to extract from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlData = {};
+            
+            for (const [key, value] of urlParams.entries()) {
+                urlData[key] = value;
+                console.log(`🎯 URL param: ${key} = ${value}`);
+            }
+            
+            // Try to extract useful data from URL
+            if (urlData.stringId) currentStringCache.stringId = urlData.stringId;
+            if (urlData.stringKey) currentStringCache.stringKey = urlData.stringKey;
+            if (urlData.projectId) currentStringCache.projectId = urlData.projectId;
+            if (urlData.languageId) currentStringCache.targetLanguageId = urlData.languageId;
+            
+            // Try to get data from parent window
+            if (window.parent && window.parent !== window) {
+                console.log('🎯 Trying to communicate with parent window...');
+                try {
+                    // Send message to parent asking for current context
+                    window.parent.postMessage({
+                        type: 'request_current_context',
+                        source: 'audio_previewer',
+                        timestamp: new Date().toISOString()
+                    }, '*');
+                    
+                    // Wait a bit for potential response
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                } catch (error) {
+                    console.log('🎯 Error communicating with parent:', error);
+                }
+            }
+            
+            // Try to extract from document title or other DOM elements
+            if (document.title) {
+                console.log('🎯 Document title:', document.title);
+                // Sometimes Crowdin includes useful info in the title
+            }
+            
+            // Try to extract from referrer
+            if (document.referrer) {
+                console.log('🎯 Referrer:', document.referrer);
+                try {
+                    const referrerUrl = new URL(document.referrer);
+                    const referrerParams = new URLSearchParams(referrerUrl.search);
+                    console.log('🎯 Referrer params:', Object.fromEntries(referrerParams));
+                } catch (error) {
+                    console.log('🎯 Could not parse referrer URL');
+                }
+            }
+            
+            console.log('🎯 Final cache state after alternative extraction:', JSON.stringify(currentStringCache, null, 2));
         }
 
         // Try to extract string data from page context (DOM inspection)
@@ -494,24 +612,237 @@
             console.log('🎵 Current string cache:', JSON.stringify(currentStringCache, null, 2));
             
             const attemptedUrls = [];
+            const allTriedUrls = []; // Track all URLs attempted for debug display
             
             // Try multiple approaches to find audio
             const stringKey = currentStringCache.stringKey || currentStringCache.identifier;
-            const labels = currentStringCache.labels || [{ title: 'general' }]; // Default to 'general' label
             
-            // More comprehensive audio source attempts
-            const audioSources = [
-                () => findLevanteAudio(currentStringCache.targetLanguageId, labels, stringKey),
-                () => findLevanteAudio(currentStringCache.sourceLanguageId, labels, stringKey),
-                () => findLevanteAudio('en', labels, stringKey), // Fallback to English
-                () => findLevanteAudio('es', labels, stringKey), // Try Spanish
-                () => findLevanteAudio('fr', labels, stringKey), // Try French
-                () => generateTextToSpeech(currentStringCache.text)
-            ];
+            // Enhanced label detection - try multiple sources
+            let labels = currentStringCache.labels;
+            
+            // If no labels in cache, try to extract from other sources
+            if (!labels || !Array.isArray(labels) || labels.length === 0) {
+                console.log('🎵 No labels in cache, trying to extract from other sources...');
+                
+                // Try to extract from file path or context
+                if (currentStringCache.fileId || currentStringCache.filePath) {
+                    console.log('🎵 Trying to extract label from file info:', { fileId: currentStringCache.fileId, filePath: currentStringCache.filePath });
+                    // File path might contain the task name
+                    const filePath = currentStringCache.filePath || '';
+                    const pathSegments = filePath.split('/').filter(segment => segment.length > 0);
+                    
+                    // Look for task-related segments in the path
+                    const taskKeywords = ['egma-math', 'matrix-reasoning', 'mental-rotation', 'same-different-selection', 'theory-of-mind', 'trog', 'vocab', 'survey'];
+                    const foundTask = pathSegments.find(segment => 
+                        taskKeywords.some(keyword => segment.toLowerCase().includes(keyword.toLowerCase()))
+                    );
+                    
+                    if (foundTask) {
+                        labels = [{ title: foundTask.toLowerCase() }];
+                        console.log('🎵 Extracted label from file path:', foundTask);
+                    }
+                }
+                
+                // Try to extract from string key itself
+                if ((!labels || labels.length === 0) && stringKey) {
+                    console.log('🎵 Trying to extract label from string key:', stringKey);
+                    const taskKeywords = {
+                        'egma': 'egma-math',
+                        'math': 'egma-math',
+                        'matrix': 'matrix-reasoning',
+                        'reasoning': 'matrix-reasoning',
+                        'mental': 'mental-rotation',
+                        'rotation': 'mental-rotation',
+                        'same': 'same-different-selection',
+                        'different': 'same-different-selection',
+                        'selection': 'same-different-selection',
+                        'theory': 'theory-of-mind',
+                        'mind': 'theory-of-mind',
+                        'trog': 'trog',
+                        'vocab': 'vocab',
+                        'vocabulary': 'vocab',
+                        'survey': 'survey'
+                    };
+                    
+                    const lowerKey = stringKey.toLowerCase();
+                    for (const [keyword, taskName] of Object.entries(taskKeywords)) {
+                        if (lowerKey.includes(keyword)) {
+                            labels = [{ title: taskName }];
+                            console.log('🎵 Extracted label from string key:', taskName);
+                            break;
+                        }
+                    }
+                }
+                
+                // Try to extract from project context
+                if ((!labels || labels.length === 0) && currentStringCache.projectId) {
+                    console.log('🎵 Trying to extract label from project context...');
+                    // This could be enhanced with project-specific logic if needed
+                }
+                
+                // Final fallback to 'general'
+                if (!labels || labels.length === 0) {
+                    labels = [{ title: 'general' }];
+                    console.log('🎵 Using fallback label: general');
+                }
+            } else {
+                console.log('🎵 Using labels from cache:', labels);
+            }
+            
+            // Enhanced language detection - convert Crowdin language IDs to proper codes
+            function mapLanguageCode(languageId) {
+                if (!languageId) return null;
+                
+                // If it's already a proper language code, return it
+                if (typeof languageId === 'string' && languageId.match(/^[a-z]{2}(-[A-Z]{2})?$/)) {
+                    return languageId.toLowerCase().split('-')[0]; // Extract base language (e.g., 'es' from 'es-ES')
+                }
+                
+                // Common Crowdin language ID mappings
+                const languageMappings = {
+                    // Spanish variations
+                    '33': 'es',
+                    'es': 'es',
+                    'es-ES': 'es',
+                    'es-MX': 'es',
+                    'es-CO': 'es',
+                    'spanish': 'es',
+                    
+                    // English variations
+                    '1': 'en',
+                    'en': 'en',
+                    'en-US': 'en',
+                    'en-GB': 'en',
+                    'english': 'en',
+                    
+                    // French variations
+                    '2': 'fr',
+                    'fr': 'fr',
+                    'fr-FR': 'fr',
+                    'fr-CA': 'fr',
+                    'french': 'fr',
+                    
+                    // German variations
+                    '3': 'de',
+                    'de': 'de',
+                    'de-DE': 'de',
+                    'german': 'de',
+                    
+                    // Portuguese variations
+                    '4': 'pt',
+                    'pt': 'pt',
+                    'pt-BR': 'pt',
+                    'pt-PT': 'pt',
+                    'portuguese': 'pt',
+                    
+                    // Dutch variations
+                    '5': 'nl',
+                    '6': 'nl', // Sometimes Dutch has different IDs
+                    'nl': 'nl',
+                    'nl-NL': 'nl',
+                    'nl-BE': 'nl',
+                    'dutch': 'nl',
+                    'nederlands': 'nl'
+                };
+                
+                const langId = String(languageId).toLowerCase();
+                const mapped = languageMappings[langId];
+                
+                console.log('🎵 Language mapping:', languageId, '->', mapped || 'unknown');
+                
+                // If no mapping found, log all available mappings for debugging
+                if (!mapped) {
+                    console.log('🎵 ❌ No mapping found for:', languageId);
+                    console.log('🎵 Available mappings:', Object.keys(languageMappings));
+                    console.log('🎵 Tried to match:', langId);
+                }
+                
+                return mapped || null;
+            }
+            
+            // Map the language codes from Crowdin
+            const targetLang = mapLanguageCode(currentStringCache.targetLanguageId);
+            const sourceLang = mapLanguageCode(currentStringCache.sourceLanguageId);
+            
+            // Helper function to get language variants
+            function getLanguageVariants(lang) {
+                const variants = {
+                    'es': ['es', 'es-CO'], // Spanish: try both generic and Colombian
+                    'en': ['en', 'en-US'],
+                    'fr': ['fr', 'fr-CA'],
+                    'pt': ['pt', 'pt-BR'],
+                    'de': ['de', 'de-DE'], // German: try both generic and German-Germany
+                    'nl': ['nl', 'nl-NL', 'nl-BE'] // Dutch: try generic, Netherlands, and Belgium
+                };
+                return variants[lang] || [lang];
+            }
+            
+            console.log('🎵 Language detection results:', {
+                originalTarget: currentStringCache.targetLanguageId,
+                mappedTarget: targetLang,
+                targetVariants: targetLang ? getLanguageVariants(targetLang) : [],
+                originalSource: currentStringCache.sourceLanguageId,
+                mappedSource: sourceLang,
+                sourceVariants: sourceLang ? getLanguageVariants(sourceLang) : []
+            });
+            
+            // Debug: Check if we're getting the expected language
+            if (currentStringCache.targetLanguageId && !targetLang) {
+                console.log('🎵 ⚠️ WARNING: Target language ID provided but not mapped!');
+                console.log('🎵 Target language ID type:', typeof currentStringCache.targetLanguageId);
+                console.log('🎵 Target language ID value:', JSON.stringify(currentStringCache.targetLanguageId));
+            }
+            
+            // More comprehensive audio source attempts with proper language codes
+            const audioSources = [];
+            
+            // Try target language first if we have it (including variants)
+            if (targetLang) {
+                const targetVariants = getLanguageVariants(targetLang);
+                console.log('🎵 Will try target language variants:', targetVariants);
+                for (const variant of targetVariants) {
+                    audioSources.push(() => findLevanteAudio(variant, labels, stringKey));
+                }
+            } else {
+                console.log('🎵 ❌ No target language mapped, will skip target language attempts');
+            }
+            
+            // Try source language if different from target (including variants)
+            if (sourceLang && sourceLang !== targetLang) {
+                const sourceVariants = getLanguageVariants(sourceLang);
+                for (const variant of sourceVariants) {
+                    // Only add if not already added for target language
+                    const targetVariants = targetLang ? getLanguageVariants(targetLang) : [];
+                    if (!targetVariants.includes(variant)) {
+                        audioSources.push(() => findLevanteAudio(variant, labels, stringKey));
+                    }
+                }
+            }
+            
+            // Common fallback languages with variants
+            const fallbackLanguages = ['en', 'es', 'fr'];
+            for (const lang of fallbackLanguages) {
+                if (lang !== targetLang && lang !== sourceLang) {
+                    const variants = getLanguageVariants(lang);
+                    for (const variant of variants) {
+                        // Only add if not already added
+                        const alreadyAdded = audioSources.some(source => {
+                            // This is a rough check - we're checking if this variant might already be added
+                            return false; // For now, allow duplicates since the function calls are wrapped
+                        });
+                        audioSources.push(() => findLevanteAudio(variant, labels, stringKey));
+                    }
+                }
+            }
+            
+            // Finally, try text-to-speech
+            audioSources.push(() => generateTextToSpeech(currentStringCache.text));
             
             console.log('🎵 Will try audio sources with:', {
-                targetLanguageId: currentStringCache.targetLanguageId,
-                sourceLanguageId: currentStringCache.sourceLanguageId,
+                originalTargetLanguageId: currentStringCache.targetLanguageId,
+                mappedTargetLanguage: targetLang,
+                originalSourceLanguageId: currentStringCache.sourceLanguageId,
+                mappedSourceLanguage: sourceLang,
                 labels: currentStringCache.labels,
                 stringKey: currentStringCache.stringKey || currentStringCache.identifier,
                 text: currentStringCache.text ? currentStringCache.text.substring(0, 50) + '...' : 'N/A',
@@ -528,29 +859,50 @@
                 try {
                     const result = await audioSource();
                     if (result.success) {
+                        // Collect all URLs that will be attempted
+                        const urlsToTry = [result.audioUrl, ...(result.alternativeUrls || [])];
+                        allTriedUrls.push(...urlsToTry);
+                        
                         // Get metadata for the audio file
                         const metadata = await getAudioFileMetadata(result.audioUrl);
                         
                         // Pass alternative URLs and target language if available
                         const alternativeUrls = result.alternativeUrls || [];
                         const targetLanguage = result.targetLanguage || currentStringCache.targetLanguageId;
-                        await playAudio(result.audioUrl, result.source, result.text, alternativeUrls, targetLanguage);
                         
-                        return {
-                            success: true,
-                            source: result.source,
-                            audioUrl: result.audioUrl,
-                            message: `Playing audio for "${currentStringCache.stringKey || currentStringCache.identifier}" from ${result.source}`,
-                            details: result.details,
-                            metadata: metadata,
-                            attemptedUrls: attemptedUrls,
-                            alternativeUrls: alternativeUrls
-                        };
+                        try {
+                            await playAudio(result.audioUrl, result.source, result.text, alternativeUrls, targetLanguage);
+                            
+                            return {
+                                success: true,
+                                source: result.source,
+                                audioUrl: result.audioUrl,
+                                message: `Playing audio for "${currentStringCache.stringKey || currentStringCache.identifier}" from ${result.source}`,
+                                details: result.details,
+                                metadata: metadata,
+                                attemptedUrls: attemptedUrls,
+                                alternativeUrls: alternativeUrls,
+                                allTriedUrls: allTriedUrls,
+                                languageMapping: {
+                                    originalTarget: currentStringCache.targetLanguageId,
+                                    mappedTarget: targetLang,
+                                    targetVariants: targetLang ? getLanguageVariants(targetLang) : [],
+                                    originalSource: currentStringCache.sourceLanguageId,
+                                    mappedSource: sourceLang,
+                                    sourceVariants: sourceLang ? getLanguageVariants(sourceLang) : [],
+                                    usedLanguage: result.targetLanguage || targetLang
+                                }
+                            };
+                        } catch (playError) {
+                            console.log('🎵 ❌ All audio URLs failed for this source:', playError.message);
+                            // Continue to next audio source
+                        }
                     }
                 } catch (error) {
                     console.log('🎵 Audio source failed:', error.message);
                     if (error.attemptedUrl) {
                         attemptedUrls.push(error.attemptedUrl);
+                        allTriedUrls.push(error.attemptedUrl);
                     }
                 }
             }
@@ -558,7 +910,8 @@
             return {
                 success: false,
                 message: `No audio found for string "${currentStringCache.stringKey || currentStringCache.identifier}" (ID: ${currentStringCache.stringId}). Tried Levante audio repository and text-to-speech.`,
-                attemptedUrls: attemptedUrls
+                attemptedUrls: attemptedUrls,
+                allTriedUrls: allTriedUrls
             };
         }
 
@@ -574,20 +927,81 @@
             
             console.log('🎵 Looking for Levante audio:', { languageCode, labels, stringKey });
             
-            // Extract label name for the URL path
+            // Extract label name for the URL path with enhanced detection
             let labelName = 'general'; // Default fallback
             
+            console.log('🎵 Raw labels received:', JSON.stringify(labels, null, 2));
+            
             if (labels && Array.isArray(labels) && labels.length > 0) {
-                // Get the first label and extract its title/name
-                const firstLabel = labels[0];
-                if (typeof firstLabel === 'object' && firstLabel.title) {
-                    labelName = firstLabel.title.toLowerCase();
-                } else if (typeof firstLabel === 'object' && firstLabel.name) {
-                    labelName = firstLabel.name.toLowerCase();
-                } else if (typeof firstLabel === 'string') {
-                    labelName = firstLabel.toLowerCase();
+                // Try each label until we find a valid one
+                for (const label of labels) {
+                    let extractedName = null;
+                    
+                    if (typeof label === 'object') {
+                        // Try different property names
+                        extractedName = label.title || label.name || label.label || label.value || label.text;
+                    } else if (typeof label === 'string') {
+                        extractedName = label;
+                    }
+                    
+                    if (extractedName) {
+                        // Clean and validate the extracted name
+                        const cleanName = extractedName.toLowerCase().trim();
+                        
+                        // Map common variations to standard directory names
+                        const labelMappings = {
+                            'egma': 'egma-math',
+                            'math': 'egma-math',
+                            'egma-math': 'egma-math',
+                            'matrix': 'matrix-reasoning',
+                            'matrix-reasoning': 'matrix-reasoning',
+                            'mental': 'mental-rotation',
+                            'mental-rotation': 'mental-rotation',
+                            'same': 'same-different-selection',
+                            'same-different': 'same-different-selection',
+                            'same-different-selection': 'same-different-selection',
+                            'theory': 'theory-of-mind',
+                            'theory-of-mind': 'theory-of-mind',
+                            'tom': 'theory-of-mind',
+                            'trog': 'trog',
+                            'vocab': 'vocab',
+                            'vocabulary': 'vocab',
+                            'survey': 'survey',
+                            'general': 'general'
+                        };
+                        
+                        // Check for exact match first
+                        if (labelMappings[cleanName]) {
+                            labelName = labelMappings[cleanName];
+                            console.log('🎵 Found exact label mapping:', cleanName, '->', labelName);
+                            break;
+                        }
+                        
+                        // Check for partial matches
+                        for (const [key, value] of Object.entries(labelMappings)) {
+                            if (cleanName.includes(key) || key.includes(cleanName)) {
+                                labelName = value;
+                                console.log('🎵 Found partial label mapping:', cleanName, '->', labelName);
+                                break;
+                            }
+                        }
+                        
+                        // If we found a mapping, break from the outer loop
+                        if (labelName !== 'general') {
+                            break;
+                        }
+                        
+                        // If no mapping found but we have a clean name, use it directly
+                        if (cleanName && cleanName !== 'general') {
+                            labelName = cleanName;
+                            console.log('🎵 Using direct label name:', labelName);
+                            break;
+                        }
+                    }
                 }
             }
+            
+            console.log('🎵 Final label name selected:', labelName);
             
             // Clean up the string key for URL (replace spaces, special chars with hyphens)
             const cleanStringKey = stringKey
@@ -597,20 +1011,27 @@
             
             // Try multiple URL patterns for better compatibility
             const baseUrl = 'https://raw.githubusercontent.com/levante-framework/levante_translations/main/audio_files';
-            const urlPatterns = [
-                // Primary pattern
-                `${baseUrl}/${labelName}/${languageCode}/shared/${cleanStringKey}.mp3`,
-                // Alternative patterns with different label names
-                `${baseUrl}/general/${languageCode}/shared/${cleanStringKey}.mp3`,
-                // Try without label subdirectory
-                `${baseUrl}/${languageCode}/shared/${cleanStringKey}.mp3`,
-                // Try with original string key (in case cleaning was too aggressive)
-                `${baseUrl}/${labelName}/${languageCode}/shared/${stringKey.toLowerCase().replace(/\s+/g, '-')}.mp3`,
-                // Try with underscores instead of hyphens
-                `${baseUrl}/${labelName}/${languageCode}/shared/${stringKey.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.mp3`,
-                // Try exact string key without transformation
-                `${baseUrl}/${labelName}/${languageCode}/shared/${stringKey}.mp3`
-            ];
+            const urlPatterns = [];
+            
+            // Primary patterns with detected label (highest priority)
+            if (labelName && labelName !== 'general') {
+                urlPatterns.push(`${baseUrl}/${labelName}/${languageCode}/shared/${cleanStringKey}.mp3`);
+                urlPatterns.push(`${baseUrl}/${labelName}/${languageCode}/shared/${stringKey.toLowerCase().replace(/\s+/g, '-')}.mp3`);
+                urlPatterns.push(`${baseUrl}/${labelName}/${languageCode}/shared/${stringKey.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.mp3`);
+            }
+            
+            // Fallback patterns with 'general' (lower priority)
+            urlPatterns.push(`${baseUrl}/general/${languageCode}/shared/${cleanStringKey}.mp3`);
+            urlPatterns.push(`${baseUrl}/general/${languageCode}/shared/${stringKey.toLowerCase().replace(/\s+/g, '-')}.mp3`);
+            
+            // Try without label subdirectory (even lower priority)
+            urlPatterns.push(`${baseUrl}/${languageCode}/shared/${cleanStringKey}.mp3`);
+            
+            // Last resort patterns
+            if (labelName && labelName !== 'general') {
+                urlPatterns.push(`${baseUrl}/${labelName}/${languageCode}/shared/${stringKey}.mp3`);
+            }
+            urlPatterns.push(`${baseUrl}/general/${languageCode}/shared/${stringKey}.mp3`);
             
             console.log('🎵 Will try Levante audio URLs:', urlPatterns);
             console.log('🎵 URL components:', { labelName, languageCode, cleanStringKey, originalStringKey: stringKey });
@@ -621,7 +1042,8 @@
                 audioUrl: urlPatterns[0],
                 alternativeUrls: urlPatterns.slice(1),
                 source: 'levante_repository',
-                details: { labelName, languageCode, cleanStringKey, originalStringKey: stringKey }
+                details: { labelName, languageCode, cleanStringKey, originalStringKey: stringKey },
+                targetLanguage: languageCode
             };
         }
 
@@ -758,6 +1180,7 @@
             } else {
                 // Try to play audio file with fallback URLs
                 const urlsToTry = [audioUrl, ...alternativeUrls];
+                const failedUrls = [];
                 
                 for (let i = 0; i < urlsToTry.length; i++) {
                     const currentUrl = urlsToTry[i];
@@ -769,10 +1192,14 @@
                         return; // Success, exit the function
                     } catch (error) {
                         console.log(`🎵 ❌ Failed to play audio from URL ${i + 1}:`, currentUrl, error.message);
+                        failedUrls.push({ url: currentUrl, error: error.message });
                         
-                        // If this was the last URL, throw the error
+                        // If this was the last URL, throw the error with all failed URLs
                         if (i === urlsToTry.length - 1) {
-                            throw new Error(`All audio URLs failed. Last error: ${error.message}`);
+                            const errorMessage = `All ${urlsToTry.length} audio URLs failed. Last error: ${error.message}`;
+                            const finalError = new Error(errorMessage);
+                            finalError.failedUrls = failedUrls;
+                            throw finalError;
                         }
                         // Otherwise, continue to the next URL
                     }
@@ -919,6 +1346,34 @@
                 content += `&nbsp;&nbsp;Label: ${data.details.labelName}<br>`;
                 content += `&nbsp;&nbsp;String Key: ${data.details.cleanStringKey}<br>`;
             }
+            
+            // Show language mapping information if available
+            if (data.languageMapping) {
+                content += `<br><strong>🌐 Language Detection:</strong><br>`;
+                content += `&nbsp;&nbsp;Original Target: ${data.languageMapping.originalTarget || 'N/A'}<br>`;
+                content += `&nbsp;&nbsp;Mapped Target: ${data.languageMapping.mappedTarget || 'N/A'}<br>`;
+                if (data.languageMapping.targetVariants && data.languageMapping.targetVariants.length > 0) {
+                    content += `&nbsp;&nbsp;Target Variants: ${data.languageMapping.targetVariants.join(', ')}<br>`;
+                }
+                content += `&nbsp;&nbsp;Original Source: ${data.languageMapping.originalSource || 'N/A'}<br>`;
+                content += `&nbsp;&nbsp;Mapped Source: ${data.languageMapping.mappedSource || 'N/A'}<br>`;
+                if (data.languageMapping.sourceVariants && data.languageMapping.sourceVariants.length > 0) {
+                    content += `&nbsp;&nbsp;Source Variants: ${data.languageMapping.sourceVariants.join(', ')}<br>`;
+                }
+                content += `&nbsp;&nbsp;Used Language: ${data.languageMapping.usedLanguage || 'N/A'}<br>`;
+            }
+            
+            // Show all attempted URLs if available
+            if (data.allTriedUrls && data.allTriedUrls.length > 0) {
+                content += `<br><strong>🔗 All Attempted URLs (${data.allTriedUrls.length}):</strong><br>`;
+                data.allTriedUrls.forEach((url, index) => {
+                    const isSuccessful = url === data.audioUrl;
+                    const statusIcon = isSuccessful ? '✅' : '❌';
+                    const linkColor = isSuccessful ? '#28a745' : '#dc3545';
+                    content += `<span style="color: #6c757d; font-size: 0.9em;">${index + 1}. ${statusIcon}</span> <a href="${url}" target="_blank" style="color: ${linkColor}; word-break: break-all; font-size: 0.9em;">${url}</a><br>`;
+                });
+            }
+            
             if (data.message) content += `<br><strong>Status:</strong> ${data.message}`;
             content += `</div>`;
             
@@ -928,7 +1383,7 @@
         }
 
         // Show error result
-        function showErrorResult(message, attemptedUrls = []) {
+        function showErrorResult(message, attemptedUrls = [], allTriedUrls = []) {
             const resultSection = document.getElementById('resultSection');
             const resultTitle = document.getElementById('resultTitle');
             const resultContent = document.getElementById('resultContent');
@@ -938,11 +1393,35 @@
             
             let content = `<div class="string-info">${message}</div>`;
             
-            if (attemptedUrls && attemptedUrls.length > 0) {
-                content += `<div class="string-info"><strong>Attempted URLs:</strong><br>`;
-                attemptedUrls.forEach(url => {
-                    content += `<a href="${url}" target="_blank" style="color: #dc3545; word-break: break-all;">${url}</a><br>`;
+            // Show all URLs that were actually attempted
+            const urlsToShow = allTriedUrls.length > 0 ? allTriedUrls : attemptedUrls;
+            
+            if (urlsToShow && urlsToShow.length > 0) {
+                content += `<div class="string-info"><strong>🔗 All Attempted URLs (${urlsToShow.length}):</strong><br>`;
+                urlsToShow.forEach((urlItem, index) => {
+                    if (typeof urlItem === 'string') {
+                        content += `<span style="color: #6c757d; font-size: 0.9em;">${index + 1}.</span> <a href="${urlItem}" target="_blank" style="color: #dc3545; word-break: break-all; font-size: 0.9em;">${urlItem}</a><br>`;
+                    } else if (urlItem.url) {
+                        content += `<span style="color: #6c757d; font-size: 0.9em;">${index + 1}.</span> <a href="${urlItem.url}" target="_blank" style="color: #dc3545; word-break: break-all; font-size: 0.9em;">${urlItem.url}</a>`;
+                        if (urlItem.error) {
+                            content += ` <span style="color: #dc3545; font-size: 0.8em;">(${urlItem.error})</span>`;
+                        }
+                        content += `<br>`;
+                    }
                 });
+                content += `</div>`;
+                
+                // Add explanation of URL construction
+                content += `<div class="string-info" style="margin-top: 10px; padding: 10px; background-color: #f8f9fa; border-left: 3px solid #6c757d;">`;
+                content += `<strong>💡 URL Construction Logic:</strong><br>`;
+                content += `The audio previewer constructs GitHub URLs by:<br>`;
+                content += `1. Taking the Crowdin string key: <code>"${currentStringCache.stringKey || 'Unknown'}"</code><br>`;
+                content += `2. Converting to filename: <code>"${(currentStringCache.stringKey || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}.mp3"</code><br>`;
+                content += `3. Building URL: <code>https://raw.githubusercontent.com/levante-framework/levante_translations/main/audio_files/[label]/[language]/shared/[filename]</code><br>`;
+                content += `<br><strong>🔧 Possible Solutions:</strong><br>`;
+                content += `• Check if the audio file exists with the expected filename<br>`;
+                content += `• Verify the string key matches the actual audio filename<br>`;
+                content += `• Ensure the file is in the correct language/label directory<br>`;
                 content += `</div>`;
             }
             
@@ -1308,6 +1787,32 @@
                 if (data.action === 'string.select' || data.action === 'translation.select') {
                     console.log('🎯 Action-based message detected:', data.action);
                     updateStringCacheFromCrowdinEvent(data, data.action);
+                }
+                
+                // Handle language switching events
+                if (data.type === 'language.changed' || data.type === 'target.language.changed' || 
+                    data.action === 'language.switch' || data.action === 'target.language.switch') {
+                    console.log('🌐 Language switch detected:', data.type || data.action);
+                    
+                    // Extract new language information
+                    if (data.languageId || data.targetLanguageId) {
+                        currentStringCache.targetLanguageId = data.languageId || data.targetLanguageId;
+                        console.log('🌐 Updated target language to:', currentStringCache.targetLanguageId);
+                    }
+                    
+                    // Clear cached text when language changes to force refresh
+                    if (data.type === 'language.changed' || data.type === 'target.language.changed') {
+                        console.log('🌐 Clearing cached text due to language change');
+                        currentStringCache.text = null;
+                        currentStringCache.lastUpdated = new Date().toISOString();
+                        currentStringCache.source = 'language_switch';
+                    }
+                    
+                    // Try to get fresh context after language switch
+                    setTimeout(() => {
+                        console.log('🌐 Refreshing context after language switch...');
+                        tryGetCurrentStringData();
+                    }, 500);
                 }
                 
             } catch (error) {
@@ -1909,6 +2414,81 @@
                 // Call original function
                 return originalPlayFunction.call(this);
             };
+        }
+
+        // Function to manually refresh context
+        async function refreshContext() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            const refreshIcon = refreshBtn.querySelector('span:first-child');
+            const refreshText = refreshBtn.querySelector('span:last-child');
+            
+            try {
+                // Disable button and show loading state
+                refreshBtn.disabled = true;
+                refreshIcon.textContent = '⏳';
+                refreshText.textContent = 'Refreshing...';
+                
+                console.log('🔄 Manual context refresh requested');
+                console.log('🔄 Current cache state before refresh:', JSON.stringify(currentStringCache, null, 2));
+                
+                // Clear current cache to force fresh data
+                const editorMode = currentStringCache.editorMode; // Preserve editor mode
+                currentStringCache = {
+                    stringId: null,
+                    stringKey: null,
+                    identifier: null,
+                    text: null,
+                    sourceText: null,
+                    context: null,
+                    labels: null,
+                    maxLength: null,
+                    fileId: null,
+                    fileName: null,
+                    projectId: null,
+                    sourceLanguageId: null,
+                    targetLanguageId: null,
+                    sourceLanguageName: null,
+                    targetLanguageName: null,
+                    lastUpdated: null,
+                    source: null,
+                    editorMode: editorMode
+                };
+                
+                // Try to get fresh context
+                await tryGetCurrentStringData();
+                
+                // Update UI
+                updateStringCacheStatus();
+                updateDebugInfo();
+                
+                console.log('🔄 Context refresh completed');
+                console.log('🔄 Updated cache state:', JSON.stringify(currentStringCache, null, 2));
+                
+                // Show success message
+                refreshIcon.textContent = '✅';
+                refreshText.textContent = 'Refreshed!';
+                
+                // Reset button after a delay
+                setTimeout(() => {
+                    refreshIcon.textContent = '🔄';
+                    refreshText.textContent = 'Refresh Context';
+                    refreshBtn.disabled = false;
+                }, 2000);
+                
+            } catch (error) {
+                console.error('🔄 Error during context refresh:', error);
+                
+                // Show error state
+                refreshIcon.textContent = '❌';
+                refreshText.textContent = 'Error';
+                
+                // Reset button after a delay
+                setTimeout(() => {
+                    refreshIcon.textContent = '🔄';
+                    refreshText.textContent = 'Refresh Context';
+                    refreshBtn.disabled = false;
+                }, 2000);
+            }
         }
 
         // Initialize

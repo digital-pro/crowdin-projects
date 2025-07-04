@@ -1250,18 +1250,22 @@ app.post('/api/get-audio-metadata', async (req, res) => {
         metadata: metadata
       });
     } else {
-      console.log('📊 Server: Failed to get metadata:', response.status, response.statusText);
+      console.log('📊 Server: Failed to get metadata for URL:', audioUrl);
+      console.log('📊 Server: Response status:', response.status, response.statusText);
       res.status(response.status).json({
         error: 'Failed to get metadata',
         status: response.status,
-        statusText: response.statusText
+        statusText: response.statusText,
+        url: audioUrl
       });
     }
   } catch (error) {
-    console.error('📊 Server: Error getting metadata:', error);
+    console.error('📊 Server: Error getting metadata for URL:', audioUrl);
+    console.error('📊 Server: Error details:', error);
     res.status(500).json({
       error: 'Server error getting metadata',
-      message: error.message
+      message: error.message,
+      url: audioUrl
     });
   }
 });
