@@ -29,8 +29,8 @@ class GitHubService {
   private baseUrl = 'https://api.github.com';
   private repoOwner = 'levante-framework';
   private repoName = 'core-tasks';
-  private branch = '14337ff781dda568b50f09be5f636259bc917245';
-  private screenshotsPath = 'task-launcher/cypress/screenshots';
+  private branch = 'more-tasks-tested';
+  private screenshotsPath = 'golden-runs';
 
   private async makeRequest(endpoint: string): Promise<any> {
     const response = await fetch(`${this.baseUrl}${endpoint}`, {

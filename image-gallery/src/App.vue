@@ -175,7 +175,7 @@
         <div class="github-info">
           <h3>📸 GitHub Screenshots</h3>
           <p>Screenshots from the LEVANTE core-tasks repository Cypress tests.</p>
-          <p>Source: <a href="https://github.com/levante-framework/core-tasks/tree/14337ff781dda568b50f09be5f636259bc917245/task-launcher/cypress/screenshots" target="_blank" rel="noopener">core-tasks/cypress/screenshots</a></p>
+          <p>Source: <a href="https://github.com/levante-framework/core-tasks/tree/more-tasks-tested" target="_blank" rel="noopener">core-tasks (more-tasks-tested branch)</a></p>
         </div>
       </div>
     </div>
@@ -422,7 +422,7 @@ const currentSourceUrl = computed(() => {
     case 'assets':
       return 'https://github.com/levante-framework/core-task-assets'
     case 'github-screenshots':
-      return 'https://github.com/levante-framework/core-tasks/tree/14337ff781dda568b50f09be5f636259bc917245/task-launcher/cypress/screenshots'
+      return 'https://github.com/levante-framework/core-tasks/tree/more-tasks-tested/golden-runs'
     case 'crowdin-screenshots':
       return 'https://crowdin.com/project/levantetranslations/screenshots'
     default:
