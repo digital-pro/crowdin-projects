@@ -27,7 +27,7 @@
         :class="{ active: activeTab === 'github-screenshots' }"
         class="tab-button"
       >
-        📸 GitHub Screenshots
+        📸 Complete Runs
       </button>
       <button 
         @click="activeTab = 'crowdin-screenshots'" 
@@ -129,6 +129,16 @@
     <div v-if="activeTab === 'github-screenshots'" class="tab-content">
       <div class="controls">
         <div class="filter-controls">
+          <div class="control-group">
+            <label for="github-subdirectory-filter">Filter by Task:</label>
+            <select id="github-subdirectory-filter" v-model="githubScreenshotFilters.subdirectory" @change="applyGitHubScreenshotFilters">
+              <option value="">All Tasks</option>
+              <option v-for="subdirectory in githubSubdirectories" :key="subdirectory" :value="subdirectory">
+                {{ formatTaskName(subdirectory) }} ({{ getGitHubSubdirectoryCount(subdirectory) }})
+              </option>
+            </select>
+          </div>
+
           <div class="control-group">
             <label for="github-search">Search Screenshots:</label>
             <input
@@ -241,6 +251,7 @@ const githubScreenshots = ref<GitHubScreenshot[]>([])
 const totalGitHubScreenshots = ref(0)
 
 const githubScreenshotFilters = ref({
+  subdirectory: '',
   searchTerm: ''
 })
 
@@ -323,8 +334,33 @@ const filteredImages = computed(() => {
 })
 
 // GitHub screenshots computed properties
+const githubSubdirectories = computed(() => {
+  const subdirs = new Set<string>()
+  githubScreenshots.value.forEach(screenshot => {
+    // Extract subdirectory from relativePath (e.g., "task1/screenshot.png" -> "task1")
+    const pathParts = screenshot.relativePath.split('/')
+    if (pathParts.length > 1) {
+      subdirs.add(pathParts[0])
+    }
+  })
+  return Array.from(subdirs).sort()
+})
+
+const getGitHubSubdirectoryCount = (subdirectory: string): number => {
+  return githubScreenshots.value.filter(screenshot => 
+    screenshot.relativePath.startsWith(subdirectory + '/')
+  ).length
+}
+
 const filteredGitHubScreenshots = computed(() => {
   let result = [...githubScreenshots.value]
+
+  // Apply subdirectory filter
+  if (githubScreenshotFilters.value.subdirectory) {
+    result = result.filter(screenshot => 
+      screenshot.relativePath.startsWith(githubScreenshotFilters.value.subdirectory + '/')
+    )
+  }
 
   // Apply search filter
   if (githubScreenshotFilters.value.searchTerm) {
