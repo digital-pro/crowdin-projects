@@ -81,6 +81,20 @@
             background: rgba(0, 0, 255, 0.2); 
             border-color: rgba(0, 0, 255, 0.7);
         }
+        .grid-cell.best-match {
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.8);
+            z-index: 10;
+            position: relative;
+        }
+        .grid-cell.vocab-found {
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 10px rgba(40, 167, 69, 0.8); }
+            50% { box-shadow: 0 0 20px rgba(40, 167, 69, 1); }
+            100% { box-shadow: 0 0 10px rgba(40, 167, 69, 0.8); }
+        }
         .results { 
             margin-top: 10px; 
             max-height: 300px;
@@ -306,7 +320,7 @@
             <button id="detectGrid" onclick="detectReferenceGrid()" disabled>🔍 Re-detect Grid</button>
             <button id="analyzeAll" onclick="analyzeAllImages()" disabled>Analyze All Images</button>
             <button id="analyzeSample" onclick="analyzeSampleImages()" disabled>Analyze Sample (5 images)</button>
-            <button id="analyzeVocabMatch" onclick="analyzeVocabularyMatches()" disabled>🎯 Analyze Vocab Term Matches</button>
+            <button id="analyzeVocabMatch" onclick="analyzeVocabularyMatches()" disabled>🎯 Find Best Grid Cells</button>
             <button id="downloadResults" onclick="downloadResults()" disabled>Download Results</button>
             <button id="testButton" onclick="testFunction()">🧪 Test JS</button>
             
@@ -954,16 +968,76 @@
                     
                     const overlay = document.createElement('div');
                     overlay.className = 'grid-overlay';
-                    overlay.innerHTML = `
-                        <div class="grid-cell" data-position="top-left">TL</div>
-                        <div class="grid-cell" data-position="top-right">TR</div>
-                        <div class="grid-cell" data-position="bottom-left">BL</div>
-                        <div class="grid-cell" data-position="bottom-right">BR</div>
+                    overlay.style.cssText = `
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        pointer-events: none;
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        grid-template-rows: 1fr 1fr;
+                        gap: 2px;
                     `;
+                    
+                    // Create grid cells with proper positioning
+                    const positions = [
+                        { position: 'top-left', style: 'grid-area: 1 / 1 / 2 / 2;' },
+                        { position: 'top-right', style: 'grid-area: 1 / 2 / 2 / 3;' },
+                        { position: 'bottom-left', style: 'grid-area: 2 / 1 / 3 / 2;' },
+                        { position: 'bottom-right', style: 'grid-area: 2 / 2 / 3 / 3;' }
+                    ];
+                    
+                    positions.forEach(pos => {
+                        const cell = document.createElement('div');
+                        cell.className = 'grid-cell';
+                        cell.dataset.position = pos.position;
+                        cell.style.cssText = `
+                            ${pos.style}
+                            border: 2px solid rgba(255, 0, 0, 0.3);
+                            background: rgba(255, 255, 255, 0.1);
+                            cursor: pointer;
+                            pointer-events: all;
+                            transition: all 0.2s;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: bold;
+                            color: rgba(255, 0, 0, 0.8);
+                        `;
+                        cell.textContent = pos.position.split('-').map(w => w[0].toUpperCase()).join('');
+                        overlay.appendChild(cell);
+                    });
+                    
+                    // Extract image number and get vocabulary term
+                    const imageNumberMatch = file.name.match(/vocab-(\d+)/);
+                    let vocabTerm = '';
+                    if (imageNumberMatch) {
+                        const imageNumber = parseInt(imageNumberMatch[1]);
+                        const vocabIndex = imageNumber - 4; // Images start at 004, vocab starts at index 0
+                        if (vocabIndex >= 0 && vocabIndex < VOCAB_LIST.length) {
+                            vocabTerm = VOCAB_LIST[vocabIndex];
+                        }
+                    }
                     
                     const label = document.createElement('div');
                     label.className = 'image-label';
-                    label.textContent = file.name;
+                    label.style.cssText = `
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        right: 0;
+                        background: rgba(0, 0, 0, 0.8);
+                        color: white;
+                        padding: 8px;
+                        font-size: 12px;
+                        text-align: center;
+                    `;
+                    label.innerHTML = `
+                        <div style="font-weight: bold;">${file.name}</div>
+                        ${vocabTerm ? `<div style="color: #ffc107; font-size: 11px;">Expected: "${vocabTerm}"</div>` : ''}
+                    `;
                     
                     // Add results container for this image
                     const resultsDiv = document.createElement('div');
@@ -1745,7 +1819,7 @@
             alert(`Full analysis complete! Found ${vocabMatches} vocabulary matches out of ${totalClassifications} classifications.`);
         }
 
-        async function analyzeVocabularyMatches() {
+                async function analyzeVocabularyMatches() {
             if (!model) {
                 alert('Please load the ResNet-50 model first!');
                 return;
@@ -1766,6 +1840,32 @@
                 existingResults.remove();
             }
             
+            // Clear previous highlights
+            document.querySelectorAll('.grid-cell').forEach(cell => {
+                cell.classList.remove('best-match', 'vocab-found');
+                // Reset to original inline styles
+                const position = cell.dataset.position;
+                const positionStyles = {
+                    'top-left': 'grid-area: 1 / 1 / 2 / 2;',
+                    'top-right': 'grid-area: 1 / 2 / 2 / 3;',
+                    'bottom-left': 'grid-area: 2 / 1 / 3 / 2;',
+                    'bottom-right': 'grid-area: 2 / 2 / 3 / 3;'
+                };
+                cell.style.cssText = `
+                    ${positionStyles[position]}
+                    border: 2px solid rgba(255, 0, 0, 0.3);
+                    background: rgba(255, 255, 255, 0.1);
+                    cursor: pointer;
+                    pointer-events: all;
+                    transition: all 0.2s;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                    color: rgba(255, 0, 0, 0.8);
+                `;
+            });
+            
             // Create results container
             const resultsContainer = document.createElement('div');
             resultsContainer.id = 'vocabMatchResults';
@@ -1778,7 +1878,7 @@
                 max-height: 400px;
                 overflow-y: auto;
             `;
-            resultsContainer.innerHTML = '<h3>🎯 Vocabulary Term Match Analysis</h3>';
+            resultsContainer.innerHTML = '<h3>🎯 Grid Cell Vocabulary Analysis</h3><p>Analyzing each grid cell to find the best match for the expected vocabulary term...</p>';
             
             const vocabMatchData = [];
             
@@ -1814,86 +1914,147 @@
                         });
                     }
                     
-                    // Create canvas for the full image
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = 224;
-                    canvas.height = 224;
+                    // Ensure reference grid is detected
+                    if (!referenceGridBounds) {
+                        await detectReferenceGrid();
+                    }
                     
-                    // Draw the full image (not just a grid cell)
-                    ctx.drawImage(img, 0, 0, 224, 224);
+                    // Analyze each grid cell
+                    const positions = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+                    const cellResults = [];
                     
-                                         // Classify the full image
-                     let predictions;
-                     if (model.classify) {
-                         // Use built-in classify method (MobileNet style)
-                         predictions = await model.classify(canvas);
-                     } else {
-                         // Manual classification with ResNet-50
-                         const tensor = tf.browser.fromPixels(canvas).expandDims(0).div(255.0);
-                         const logits = model.predict(tensor);
-                         const probabilities = tf.softmax(logits).dataSync();
-                         
-                         predictions = Array.from(probabilities)
-                             .map((prob, index) => ({
-                                 className: imageNetClasses[index] || `class_${index}`,
-                                 probability: prob
-                             }))
-                             .sort((a, b) => b.probability - a.probability)
-                             .slice(0, 10); // Get top 10 predictions
-                         
-                         tensor.dispose();
-                         logits.dispose();
-                     }
-                    
-                    // Find the expected vocabulary term in predictions
-                    let vocabTermPrediction = null;
-                    let vocabTermRank = -1;
-                    
-                    for (let j = 0; j < predictions.length; j++) {
-                        const pred = predictions[j];
-                        const className = pred.className.toLowerCase();
-                        
-                        // Check if this prediction matches the expected vocabulary term
-                        if (className.includes(expectedVocabTerm.toLowerCase()) || 
-                            expectedVocabTerm.toLowerCase().includes(className) ||
-                            className === expectedVocabTerm.toLowerCase()) {
-                            vocabTermPrediction = pred;
-                            vocabTermRank = j + 1;
-                            break;
+                    for (const position of positions) {
+                        try {
+                            // Get grid bounds for this position
+                            const gridBounds = getGridBounds(position, img.naturalWidth, img.naturalHeight);
+                            
+                            // Create canvas for this grid cell
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            canvas.width = 224;
+                            canvas.height = 224;
+                            
+                            // Extract the grid cell content
+                            const { x, y, width, height } = gridBounds;
+                            ctx.drawImage(img, x, y, width, height, 0, 0, 224, 224);
+                            
+                            // Classify the grid cell
+                            let predictions;
+                            if (model.classify) {
+                                predictions = await model.classify(canvas);
+                            } else {
+                                const tensor = tf.browser.fromPixels(canvas).expandDims(0).div(255.0);
+                                const logits = model.predict(tensor);
+                                const probabilities = tf.softmax(logits).dataSync();
+                                
+                                predictions = Array.from(probabilities)
+                                    .map((prob, index) => ({
+                                        className: imageNetClasses[index] || `class_${index}`,
+                                        probability: prob
+                                    }))
+                                    .sort((a, b) => b.probability - a.probability)
+                                    .slice(0, 10);
+                                
+                                tensor.dispose();
+                                logits.dispose();
+                            }
+                            
+                            // Find the expected vocabulary term in predictions
+                            let vocabTermPrediction = null;
+                            let vocabTermRank = -1;
+                            let bestMatchScore = 0;
+                            
+                            for (let j = 0; j < predictions.length; j++) {
+                                const pred = predictions[j];
+                                const className = pred.className.toLowerCase();
+                                const expectedLower = expectedVocabTerm.toLowerCase();
+                                
+                                // Calculate match score
+                                let matchScore = 0;
+                                if (className === expectedLower) {
+                                    matchScore = pred.probability * 1.0; // Exact match
+                                } else if (className.includes(expectedLower) || expectedLower.includes(className)) {
+                                    matchScore = pred.probability * 0.8; // Partial match
+                                } else if (className.split(' ').some(word => word === expectedLower) || 
+                                          expectedLower.split(' ').some(word => className.includes(word))) {
+                                    matchScore = pred.probability * 0.6; // Word match
+                                }
+                                
+                                if (matchScore > bestMatchScore) {
+                                    bestMatchScore = matchScore;
+                                    vocabTermPrediction = pred;
+                                    vocabTermRank = j + 1;
+                                }
+                            }
+                            
+                            cellResults.push({
+                                position,
+                                predictions,
+                                vocabTermPrediction,
+                                vocabTermRank,
+                                matchScore: bestMatchScore,
+                                topPrediction: predictions[0]
+                            });
+                            
+                        } catch (cellError) {
+                            console.warn(`Error analyzing ${position} cell:`, cellError);
+                            cellResults.push({
+                                position,
+                                error: cellError.message,
+                                matchScore: 0
+                            });
                         }
                     }
                     
-                    // If not found in top predictions, check if it appears at all
-                    if (!vocabTermPrediction && predictions.length > 5) {
-                        for (let j = 0; j < Math.min(predictions.length, 100); j++) {
-                            const pred = predictions[j];
-                            const className = pred.className.toLowerCase();
-                            
-                            if (className.includes(expectedVocabTerm.toLowerCase()) || 
-                                expectedVocabTerm.toLowerCase().includes(className)) {
-                                vocabTermPrediction = pred;
-                                vocabTermRank = j + 1;
-                                break;
+                    // Find the best grid cell (highest match score)
+                    const bestCell = cellResults.reduce((best, current) => 
+                        (current.matchScore || 0) > (best.matchScore || 0) ? current : best
+                    );
+                    
+                    // Highlight the best grid cell
+                    if (bestCell && bestCell.matchScore > 0) {
+                        const gridCell = imageItem.querySelector(`[data-position="${bestCell.position}"]`);
+                        if (gridCell) {
+                            gridCell.classList.add('best-match');
+                            if (bestCell.vocabTermPrediction) {
+                                gridCell.classList.add('vocab-found');
+                                gridCell.style.cssText += `
+                                    background: rgba(40, 167, 69, 0.6) !important;
+                                    border: 4px solid #28a745 !important;
+                                    box-shadow: 0 0 15px rgba(40, 167, 69, 0.8) !important;
+                                    z-index: 100 !important;
+                                `;
+                            } else {
+                                gridCell.style.cssText += `
+                                    background: rgba(255, 193, 7, 0.6) !important;
+                                    border: 4px solid #ffc107 !important;
+                                    box-shadow: 0 0 15px rgba(255, 193, 7, 0.8) !important;
+                                    z-index: 100 !important;
+                                `;
                             }
                         }
                     }
-                    
-                    const confidence = vocabTermPrediction ? (vocabTermPrediction.probability * 100).toFixed(2) : 0;
-                    const topPrediction = predictions[0];
                     
                     // Store results
                     vocabMatchData.push({
                         imageNumber,
                         fileName,
                         expectedVocabTerm,
-                        vocabTermFound: !!vocabTermPrediction,
-                        vocabTermConfidence: confidence,
-                        vocabTermRank,
-                        topPrediction: {
-                            className: topPrediction.className,
-                            confidence: (topPrediction.probability * 100).toFixed(2)
-                        }
+                        bestCell: bestCell.position,
+                        bestMatchScore: bestCell.matchScore,
+                        vocabTermFound: !!bestCell.vocabTermPrediction,
+                        vocabTermConfidence: bestCell.vocabTermPrediction ? 
+                            (bestCell.vocabTermPrediction.probability * 100).toFixed(2) : 0,
+                        vocabTermRank: bestCell.vocabTermRank,
+                        cellResults: cellResults.map(cell => ({
+                            position: cell.position,
+                            matchScore: cell.matchScore,
+                            topPrediction: cell.topPrediction ? {
+                                className: cell.topPrediction.className,
+                                confidence: (cell.topPrediction.probability * 100).toFixed(2)
+                            } : null,
+                            vocabFound: !!cell.vocabTermPrediction
+                        }))
                     });
                     
                     // Create result display
@@ -1902,20 +2063,27 @@
                         margin: 10px 0;
                         padding: 10px;
                         border-radius: 4px;
-                        border-left: 4px solid ${vocabTermPrediction ? '#28a745' : '#dc3545'};
-                        background: ${vocabTermPrediction ? '#d4edda' : '#f8d7da'};
+                        border-left: 4px solid ${bestCell.vocabTermPrediction ? '#28a745' : '#dc3545'};
+                        background: ${bestCell.vocabTermPrediction ? '#d4edda' : '#f8d7da'};
                     `;
+                    
+                    const cellSummary = cellResults.map(cell => {
+                        const icon = cell.matchScore > 0 ? (cell.vocabTermPrediction ? '✅' : '🟡') : '❌';
+                        const score = cell.matchScore ? (cell.matchScore * 100).toFixed(1) : '0';
+                        return `${cell.position}: ${icon} ${score}%`;
+                    }).join(' | ');
                     
                     resultDiv.innerHTML = `
                         <strong>${fileName}</strong> (Expected: "${expectedVocabTerm}")
                         <br>
                         <small>
-                            ${vocabTermPrediction ? 
-                                `✅ Found "${expectedVocabTerm}" at rank ${vocabTermRank} with ${confidence}% confidence` : 
-                                `❌ "${expectedVocabTerm}" not found in top predictions`
+                            🎯 Best match: <strong>${bestCell.position}</strong> 
+                            ${bestCell.vocabTermPrediction ? 
+                                `✅ Found "${expectedVocabTerm}" with ${(bestCell.matchScore * 100).toFixed(1)}% match score` : 
+                                `❌ "${expectedVocabTerm}" not found in any cell`
                             }
                             <br>
-                            Top prediction: "${topPrediction.className}" (${(topPrediction.probability * 100).toFixed(2)}%)
+                            Grid analysis: ${cellSummary}
                         </small>
                     `;
                     
@@ -1938,7 +2106,7 @@
                 }
                 
                 // Small delay to prevent overwhelming
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 200));
             }
             
             // Add summary
@@ -1956,12 +2124,13 @@
             `;
             summaryDiv.innerHTML = `
                 📊 Summary: Found ${foundCount} out of ${totalCount} expected vocabulary terms (${matchRate}% match rate)
+                <br><small>🟢 Green highlight = Vocabulary term found | 🟡 Yellow highlight = Best match but no vocab term</small>
             `;
             resultsContainer.appendChild(summaryDiv);
             
             // Add download button for vocab match results
             const downloadBtn = document.createElement('button');
-            downloadBtn.textContent = '📥 Download Vocab Match Results';
+            downloadBtn.textContent = '📥 Download Grid Analysis Results';
             downloadBtn.style.cssText = 'margin: 10px 0; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;';
             downloadBtn.onclick = () => {
                 const data = {
@@ -1971,7 +2140,7 @@
                         foundMatches: foundCount,
                         matchRate: parseFloat(matchRate),
                         model: 'ResNet-50',
-                        analysisType: 'vocabulary_term_matching'
+                        analysisType: 'grid_cell_vocabulary_matching'
                     },
                     results: vocabMatchData
                 };
@@ -1980,7 +2149,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `resnet-vocab-match-analysis-${new Date().toISOString().split('T')[0]}.json`;
+                a.download = `resnet-grid-vocab-analysis-${new Date().toISOString().split('T')[0]}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
             };
@@ -1996,7 +2165,7 @@
             // Show success message
             const successDiv = document.createElement('div');
             successDiv.className = 'success';
-            successDiv.innerHTML = `✅ Vocabulary term analysis complete! Found ${foundCount}/${totalCount} expected terms (${matchRate}% match rate).`;
+            successDiv.innerHTML = `✅ Grid cell analysis complete! Found ${foundCount}/${totalCount} expected terms (${matchRate}% match rate). Best matching cells are highlighted.`;
             document.querySelector('.controls').appendChild(successDiv);
         }
 
