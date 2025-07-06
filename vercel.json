@@ -1,0 +1,45 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/proxy.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "real-imagenet-resnet.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "vocab/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/proxy",
+      "dest": "/api/proxy.js",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "src": "/vocab/(.*)",
+      "dest": "/vocab/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=3600, s-maxage=3600"
+      }
+    },
+    {
+      "src": "/",
+      "dest": "/real-imagenet-resnet.html",
+      "headers": {
+        "Cache-Control": "public, max-age=300, s-maxage=300"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "regions": ["iad1"]
+} 

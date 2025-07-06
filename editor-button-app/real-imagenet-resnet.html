@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResNet-50 Vocabulary Image Classifier</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.2.0/dist/tf.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .progress-container {
+            margin: 20px 0;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #28a745;
+            transition: width 0.3s ease;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-item {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .image-container {
+            position: relative;
+            display: inline-block;
+            margin: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: white;
+        }
+        .image-container img {
+            display: block;
+            max-width: 300px;
+            height: auto;
+        }
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .image-container:hover .grid-overlay {
+            opacity: 1;
+        }
+        .grid-cell {
+            position: absolute;
+            border: 2px solid #ff6b6b;
+            background-color: rgba(255, 107, 107, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #ff6b6b;
+            font-size: 14px;
+        }
+        .results {
+            margin-top: 30px;
+        }
+        .result-item {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .result-stats {
+            font-size: 14px;
+            color: #666;
+        }
+        .predictions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .prediction {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .prediction-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .prediction-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .prediction-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .prediction-item:last-child {
+            border-bottom: none;
+        }
+        .vocab-match {
+            background-color: #d4edda;
+            color: #155724;
+            font-weight: bold;
+        }
+        .confidence {
+            float: right;
+            color: #666;
+            font-size: 12px;
+        }
+        .download-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ResNet-50 Vocabulary Image Classifier</h1>
+        
+        <div class="controls">
+            <button id="loadModelBtn" onclick="loadModel()">Load ResNet-50 Model</button>
+            <button id="testBtn" onclick="testFunction()" disabled>Test Single Image</button>
+            <button id="analyzeSampleBtn" onclick="analyzeSampleImages()" disabled>Analyze Sample Images</button>
+            <button id="analyzeAllBtn" onclick="analyzeAllImages()" disabled>Analyze All Images</button>
+            <button id="downloadBtn" onclick="downloadResults()" disabled>Download Results</button>
+        </div>
+        
+        <div id="status" class="status">Ready to load model...</div>
+        
+        <div id="progressContainer" class="progress-container" style="display: none;">
+            <div class="progress-bar">
+                <div id="progressBar" class="progress-fill" style="width: 0%;"></div>
+            </div>
+            <div id="progressText">Starting analysis...</div>
+            <div id="statsContainer" class="stats"></div>
+        </div>
+        
+        <div id="results" class="results"></div>
+        
+        <div class="download-section">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Click "Load ResNet-50 Model" to initialize the classifier</li>
+                <li>Use "Test Single Image" to test with a sample vocabulary image</li>
+                <li>Use "Analyze Sample Images" to process a few test images</li>
+                <li>Use "Analyze All Images" to process all vocabulary images</li>
+                <li>Click "Download Results" to save the analysis as JSON</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        let model = null;
+        let analysisResults = [];
+        
+        // Vocabulary list (171 words)
+        const vocabularyList = [
+            'acorn', 'aloe', 'antenna', 'artichoke', 'bamboo', 'barrel', 'blender', 'bow', 'broom', 'bucket',
+            'candle', 'carrot', 'cassette', 'chandelier', 'cherry', 'chisel', 'clamp', 'clover', 'coconut', 'compass',
+            'corn', 'crab', 'cucumber', 'daffodil', 'daisy', 'dandelion', 'deer', 'dolphin', 'dragonfly', 'duck',
+            'eagle', 'elephant', 'fern', 'fish', 'flamingo', 'frog', 'giraffe', 'grape', 'grasshopper', 'hamster',
+            'harp', 'hedgehog', 'helicopter', 'heron', 'hippo', 'horse', 'hummingbird', 'iguana', 'iris', 'jellyfish',
+            'kangaroo', 'kiwi', 'ladybug', 'lamb', 'lemon', 'lettuce', 'lily', 'lion', 'lizard', 'lobster',
+            'mango', 'maple', 'marigold', 'microscope', 'moth', 'mushroom', 'octopus', 'onion', 'orchid', 'ostrich',
+            'owl', 'palm', 'panda', 'pansy', 'parrot', 'peach', 'pear', 'pelican', 'penguin', 'pepper',
+            'pine', 'pineapple', 'pliers', 'poppy', 'porcupine', 'potato', 'pumpkin', 'rabbit', 'raccoon', 'radish',
+            'rake', 'rhinoceros', 'robin', 'rose', 'saw', 'scissors', 'screwdriver', 'seahorse', 'seal', 'shark',
+            'sheep', 'snail', 'snake', 'sparrow', 'spider', 'squirrel', 'starfish', 'strawberry', 'sunflower', 'swan',
+            'telescope', 'tiger', 'tomato', 'toucan', 'tulip', 'turtle', 'umbrella', 'violin', 'walrus', 'whale',
+            'wrench', 'zebra', 'anchor', 'anvil', 'apple', 'apricot', 'asparagus', 'avocado', 'axe', 'banana',
+            'bat', 'bear', 'bee', 'beetle', 'bell', 'bicycle', 'bird', 'blackberry', 'boat', 'bone',
+            'book', 'bottle', 'butterfly', 'cactus', 'cake', 'camera', 'cat', 'caterpillar', 'chair', 'chicken',
+            'clock', 'cloud', 'clown', 'coat', 'cow', 'crocodile', 'cup', 'dog', 'donkey', 'door',
+            'drum', 'egg', 'eye', 'face', 'flower', 'fox', 'goat', 'guitar', 'hat', 'house',
+            'key', 'knife', 'leaf', 'monkey', 'moon', 'mouse', 'pencil', 'pig', 'plane', 'shoe',
+            'spoon', 'star', 'sun', 'table', 'tree', 'truck', 'watch', 'window'
+        ];
+        
+        // Grid coordinates for precise detection
+        const gridCoords = {
+            vertical: [257, 472, 500, 717],
+            horizontal: [102, 320, 330, 546]
+        };
+        
+        // Images to exclude (no standard grid)
+        const excludedImages = ['vocab-001', 'vocab-002', 'vocab-003', 'vocab-174'];
+        
+        // Synonym mapping for better vocabulary matching
+        const synonymMap = {
+            'rodent': 'hamster',
+            'terrapin': 'turtle',
+            'vessel': 'boat',
+            'feline': 'cat',
+            'canine': 'dog',
+            'bovine': 'cow',
+            'equine': 'horse',
+            'avian': 'bird',
+            'insect': 'bee',
+            'arachnid': 'spider',
+            'amphibian': 'frog',
+            'reptile': 'snake',
+            'mammal': 'elephant',
+            'primate': 'monkey',
+            'carnivore': 'lion',
+            'herbivore': 'deer',
+            'omnivore': 'bear',
+            'predator': 'shark',
+            'prey': 'rabbit',
+            'domestic': 'cat',
+            'wild': 'tiger',
+            'marine': 'whale',
+            'aquatic': 'fish',
+            'aerial': 'eagle',
+            'terrestrial': 'elephant'
+        };
+        
+        async function loadModel() {
+            const loadBtn = document.getElementById('loadModelBtn');
+            const status = document.getElementById('status');
+            
+            loadBtn.disabled = true;
+            loadBtn.textContent = 'Loading Model...';
+            status.textContent = 'Loading ResNet-50 model...';
+            
+            try {
+                // Try multiple ResNet-50 sources
+                const modelSources = [
+                    'https://storage.googleapis.com/tfjs-models/savedmodel/resnet50/model.json',
+                    'https://huggingface.co/tensorflow/resnet-50/resolve/main/tfjs_model/model.json',
+                    'https://tfhub.dev/tensorflow/resnet_50/classification/1',
+                    'https://storage.googleapis.com/tfjs-models/savedmodel/mobilenet_v2_1.0_224/model.json'
+                ];
+                
+                let modelLoaded = false;
+                
+                for (const source of modelSources) {
+                    try {
+                        status.textContent = `Trying to load model from: ${source}`;
+                        model = await tf.loadLayersModel(source);
+                        modelLoaded = true;
+                        status.innerHTML = `<div class="success">✅ Model loaded successfully from: ${source}</div>`;
+                        break;
+                    } catch (error) {
+                        console.warn(`Failed to load from ${source}:`, error);
+                        continue;
+                    }
+                }
+                
+                if (!modelLoaded) {
+                    throw new Error('Failed to load model from all sources');
+                }
+                
+                // Enable other buttons
+                document.getElementById('testBtn').disabled = false;
+                document.getElementById('analyzeSampleBtn').disabled = false;
+                document.getElementById('analyzeAllBtn').disabled = false;
+                
+                loadBtn.textContent = 'Model Loaded ✓';
+                loadBtn.style.backgroundColor = '#28a745';
+                
+            } catch (error) {
+                console.error('Error loading model:', error);
+                status.innerHTML = `<div class="error">❌ Error loading model: ${error.message}</div>`;
+                loadBtn.disabled = false;
+                loadBtn.textContent = 'Load ResNet-50 Model';
+            }
+        }
+        
+        async function testFunction() {
+            const status = document.getElementById('status');
+            status.textContent = 'Testing with sample image...';
+            
+            try {
+                const testImageUrl = 'https://raw.githubusercontent.com/levante-framework/more-tasks-tested/main/golden-runs/vocab/vocab-004.jpg';
+                const result = await analyzeImage(testImageUrl, 'vocab-004');
+                
+                displayResults([result]);
+                status.innerHTML = '<div class="success">✅ Test completed successfully!</div>';
+                
+            } catch (error) {
+                console.error('Test error:', error);
+                status.innerHTML = `<div class="error">❌ Test failed: ${error.message}</div>`;
+            }
+        }
+        
+        async function analyzeSampleImages() {
+            const sampleImages = ['vocab-004', 'vocab-005', 'vocab-006', 'vocab-007', 'vocab-008'];
+            await analyzeImageSet(sampleImages, 'Sample Analysis');
+        }
+        
+        async function analyzeAllImages() {
+            // Generate all vocab image names (vocab-001 to vocab-174, excluding specified ones)
+            const allImages = [];
+            for (let i = 1; i <= 174; i++) {
+                const imageName = `vocab-${i.toString().padStart(3, '0')}`;
+                if (!excludedImages.includes(imageName)) {
+                    allImages.push(imageName);
+                }
+            }
+            
+            await analyzeImageSet(allImages, 'Complete Analysis');
+        }
+        
+        async function analyzeImageSet(imageNames, analysisName) {
+            const status = document.getElementById('status');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const statsContainer = document.getElementById('statsContainer');
+            
+            progressContainer.style.display = 'block';
+            analysisResults = [];
+            
+            let processed = 0;
+            let vocabMatches = 0;
+            let totalPredictions = 0;
+            
+            status.textContent = `Starting ${analysisName}...`;
+            
+            for (const imageName of imageNames) {
+                try {
+                    progressText.textContent = `Processing ${imageName}... (${processed + 1}/${imageNames.length})`;
+                    
+                    const imageUrl = `https://raw.githubusercontent.com/levante-framework/more-tasks-tested/main/golden-runs/vocab/${imageName}.jpg`;
+                    const result = await analyzeImage(imageUrl, imageName);
+                    
+                    analysisResults.push(result);
+                    
+                    // Update statistics
+                    totalPredictions += result.predictions.length;
+                    vocabMatches += result.predictions.filter(p => p.vocabMatch).length;
+                    
+                    processed++;
+                    const progress = (processed / imageNames.length) * 100;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    // Update stats display
+                    updateStatsDisplay(processed, imageNames.length, vocabMatches, totalPredictions);
+                    
+                } catch (error) {
+                    console.error(`Error processing ${imageName}:`, error);
+                    analysisResults.push({
+                        imageName: imageName,
+                        error: error.message,
+                        predictions: []
+                    });
+                    processed++;
+                }
+            }
+            
+            displayResults(analysisResults);
+            status.innerHTML = `<div class="success">✅ ${analysisName} completed! Processed ${processed} images.</div>`;
+            document.getElementById('downloadBtn').disabled = false;
+            
+            // Hide progress after a delay
+            setTimeout(() => {
+                progressContainer.style.display = 'none';
+            }, 2000);
+        }
+        
+        function updateStatsDisplay(processed, total, vocabMatches, totalPredictions) {
+            const statsContainer = document.getElementById('statsContainer');
+            const matchRate = totalPredictions > 0 ? (vocabMatches / totalPredictions * 100).toFixed(1) : 0;
+            
+            statsContainer.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value">${processed}</div>
+                    <div class="stat-label">Processed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${total}</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${vocabMatches}</div>
+                    <div class="stat-label">Vocab Matches</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${matchRate}%</div>
+                    <div class="stat-label">Match Rate</div>
+                </div>
+            `;
+        }
+        
+        async function analyzeImage(imageUrl, imageName) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                
+                img.onload = async () => {
+                    try {
+                        const predictions = await classifyGridCells(img);
+                        resolve({
+                            imageName: imageName,
+                            imageUrl: imageUrl,
+                            predictions: predictions,
+                            timestamp: new Date().toISOString()
+                        });
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                
+                img.onerror = () => {
+                    reject(new Error(`Failed to load image: ${imageUrl}`));
+                };
+                
+                img.src = imageUrl;
+            });
+        }
+        
+        async function classifyGridCells(img) {
+            const predictions = [];
+            
+            // Create canvas for image processing
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size to match image
+            canvas.width = img.width;
+            canvas.height = img.height;
+            
+            // Draw image to canvas
+            ctx.drawImage(img, 0, 0);
+            
+            // Define grid cells using precise coordinates
+            const cells = [
+                { name: 'TL', x: 0, y: 0, width: gridCoords.vertical[0], height: gridCoords.horizontal[0] },
+                { name: 'TR', x: gridCoords.vertical[0], y: 0, width: gridCoords.vertical[1] - gridCoords.vertical[0], height: gridCoords.horizontal[0] },
+                { name: 'BL', x: 0, y: gridCoords.horizontal[0], width: gridCoords.vertical[0], height: gridCoords.horizontal[1] - gridCoords.horizontal[0] },
+                { name: 'BR', x: gridCoords.vertical[0], y: gridCoords.horizontal[0], width: gridCoords.vertical[1] - gridCoords.vertical[0], height: gridCoords.horizontal[1] - gridCoords.horizontal[0] }
+            ];
+            
+            for (const cell of cells) {
+                try {
+                    // Extract cell region
+                    const cellCanvas = document.createElement('canvas');
+                    const cellCtx = cellCanvas.getContext('2d');
+                    cellCanvas.width = cell.width;
+                    cellCanvas.height = cell.height;
+                    
+                    // Draw cell region
+                    cellCtx.drawImage(canvas, cell.x, cell.y, cell.width, cell.height, 0, 0, cell.width, cell.height);
+                    
+                    // Resize to model input size (224x224 for ResNet-50)
+                    const resizedCanvas = document.createElement('canvas');
+                    const resizedCtx = resizedCanvas.getContext('2d');
+                    resizedCanvas.width = 224;
+                    resizedCanvas.height = 224;
+                    resizedCtx.drawImage(cellCanvas, 0, 0, 224, 224);
+                    
+                    // Convert to tensor
+                    const tensor = tf.browser.fromPixels(resizedCanvas)
+                        .expandDims(0)
+                        .div(255.0);
+                    
+                    // Get predictions
+                    const prediction = await model.predict(tensor);
+                    const predictionData = await prediction.data();
+                    
+                    // Get top 5 predictions
+                    const topPredictions = Array.from(predictionData)
+                        .map((confidence, index) => ({ confidence, index }))
+                        .sort((a, b) => b.confidence - a.confidence)
+                        .slice(0, 5)
+                        .map(p => ({
+                            confidence: p.confidence,
+                            className: `class_${p.index}`, // Placeholder class name
+                            vocabMatch: false
+                        }));
+                    
+                    // Check for vocabulary matches
+                    topPredictions.forEach(pred => {
+                        const className = pred.className.toLowerCase();
+                        const directMatch = vocabularyList.some(word => 
+                            className.includes(word) || word.includes(className)
+                        );
+                        
+                        const synonymMatch = Object.keys(synonymMap).some(synonym => {
+                            if (className.includes(synonym)) {
+                                const mappedWord = synonymMap[synonym];
+                                return vocabularyList.includes(mappedWord);
+                            }
+                            return false;
+                        });
+                        
+                        pred.vocabMatch = directMatch || synonymMatch;
+                    });
+                    
+                    predictions.push({
+                        cell: cell.name,
+                        predictions: topPredictions
+                    });
+                    
+                    // Clean up tensors
+                    tensor.dispose();
+                    prediction.dispose();
+                    
+                } catch (error) {
+                    console.error(`Error processing cell ${cell.name}:`, error);
+                    predictions.push({
+                        cell: cell.name,
+                        error: error.message,
+                        predictions: []
+                    });
+                }
+            }
+            
+            return predictions;
+        }
+        
+        function displayResults(results) {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+            
+            results.forEach((result, index) => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result-item';
+                resultDiv.id = `results-${index}`;
+                
+                const vocabMatches = result.predictions ? 
+                    result.predictions.reduce((sum, cell) => 
+                        sum + cell.predictions.filter(p => p.vocabMatch).length, 0) : 0;
+                
+                resultDiv.innerHTML = `
+                    <div class="result-header">
+                        <div class="result-title">${result.imageName}</div>
+                        <div class="result-stats">
+                            Vocab Matches: ${vocabMatches} | 
+                            ${result.error ? 'Error' : 'Success'}
+                        </div>
+                    </div>
+                    
+                    ${result.imageUrl ? `
+                        <div class="image-container">
+                            <img src="${result.imageUrl}" alt="${result.imageName}" crossorigin="anonymous">
+                            <div class="grid-overlay">
+                                <div class="grid-cell" style="left: 0; top: 0; width: ${gridCoords.vertical[0]}px; height: ${gridCoords.horizontal[0]}px;">TL</div>
+                                <div class="grid-cell" style="left: ${gridCoords.vertical[0]}px; top: 0; width: ${gridCoords.vertical[1] - gridCoords.vertical[0]}px; height: ${gridCoords.horizontal[0]}px;">TR</div>
+                                <div class="grid-cell" style="left: 0; top: ${gridCoords.horizontal[0]}px; width: ${gridCoords.vertical[0]}px; height: ${gridCoords.horizontal[1] - gridCoords.horizontal[0]}px;">BL</div>
+                                <div class="grid-cell" style="left: ${gridCoords.vertical[0]}px; top: ${gridCoords.horizontal[0]}px; width: ${gridCoords.vertical[1] - gridCoords.vertical[0]}px; height: ${gridCoords.horizontal[1] - gridCoords.horizontal[0]}px;">BR</div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${result.error ? `
+                        <div class="error">Error: ${result.error}</div>
+                    ` : ''}
+                    
+                    ${result.predictions && result.predictions.length > 0 ? `
+                        <div class="predictions">
+                            ${result.predictions.map(cell => `
+                                <div class="prediction">
+                                    <div class="prediction-title">${cell.cell} Cell</div>
+                                    ${cell.error ? `
+                                        <div class="error">Error: ${cell.error}</div>
+                                    ` : `
+                                        <ul class="prediction-list">
+                                            ${cell.predictions.map(pred => `
+                                                <li class="prediction-item ${pred.vocabMatch ? 'vocab-match' : ''}">
+                                                    ${pred.className}
+                                                    <span class="confidence">${(pred.confidence * 100).toFixed(1)}%</span>
+                                                </li>
+                                            `).join('')}
+                                        </ul>
+                                    `}
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                `;
+                
+                resultsContainer.appendChild(resultDiv);
+            });
+        }
+        
+        function downloadResults() {
+            const dataStr = JSON.stringify(analysisResults, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `vocab-analysis-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+        }
+        
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            console.log('ResNet-50 Vocabulary Classifier loaded');
+            console.log('TensorFlow.js version:', tf.version);
+        });
+    </script>
+</body>
+</html> 

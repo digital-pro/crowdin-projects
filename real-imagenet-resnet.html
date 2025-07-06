@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real ImageNet ResNet-50 Classifier for Vocab Images</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+        }
+        .controls { 
+            background: #e8f5e8; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+        }
+        .model-info {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .image-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+            gap: 20px; 
+            margin: 20px 0; 
+        }
+        .image-item { 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            padding: 15px; 
+            background: #f9f9f9; 
+        }
+        .image-container { 
+            position: relative; 
+            margin-bottom: 15px; 
+        }
+        .vocab-image { 
+            width: 100%; 
+            height: 250px; 
+            object-fit: contain; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+        }
+        .grid-overlay { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            pointer-events: none; 
+        }
+        .grid-cell { 
+            position: absolute; 
+            border: 2px solid rgba(255, 0, 0, 0.8); 
+            background: rgba(255, 255, 255, 0.1); 
+            cursor: pointer; 
+            pointer-events: all; 
+            transition: all 0.2s;
+        }
+        .grid-cell:hover { 
+            background: rgba(255, 255, 0, 0.4); 
+            border-color: rgba(255, 165, 0, 0.9);
+        }
+        .grid-cell.analyzing { 
+            background: rgba(0, 255, 0, 0.4); 
+            border-color: rgba(0, 255, 0, 0.9);
+        }
+        .grid-cell.completed { 
+            background: rgba(0, 0, 255, 0.2); 
+            border-color: rgba(0, 0, 255, 0.7);
+        }
+        .results { 
+            margin-top: 10px; 
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .prediction { 
+            margin: 5px 0; 
+            padding: 10px; 
+            background: #f0f0f0; 
+            border-radius: 4px; 
+            font-size: 0.9em; 
+        }
+        .prediction.vocab-match { 
+            background: #d4edda; 
+            border-left: 4px solid #28a745; 
+            font-weight: bold;
+        }
+        .prediction.high-confidence {
+            background: #cce5ff;
+            border-left: 4px solid #007bff;
+        }
+        .progress { 
+            background: #e9ecef; 
+            border-radius: 4px; 
+            height: 25px; 
+            margin: 10px 0; 
+        }
+        .progress-bar { 
+            background: linear-gradient(90deg, #28a745, #20c997); 
+            height: 100%; 
+            border-radius: 4px; 
+            transition: width 0.3s; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .stats { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+            gap: 15px; 
+            margin: 20px 0; 
+        }
+        .stat-card { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 8px; 
+            text-align: center; 
+            border: 1px solid #dee2e6;
+        }
+        .stat-number { 
+            font-size: 2em; 
+            font-weight: bold; 
+            color: #007bff; 
+        }
+        .loading { 
+            text-align: center; 
+            padding: 40px; 
+            color: #666; 
+        }
+        .error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            padding: 15px; 
+            border-radius: 4px; 
+            margin: 10px 0; 
+        }
+        .success { 
+            background: #d4edda; 
+            color: #155724; 
+            padding: 15px; 
+            border-radius: 4px; 
+            margin: 10px 0; 
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+        .image-item {
+            position: relative;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+            transition: transform 0.2s;
+        }
+        .image-item:hover {
+            transform: scale(1.02);
+            border-color: #007bff;
+        }
+        .vocab-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .image-item:hover .grid-overlay {
+            opacity: 1;
+        }
+        .grid-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 123, 255, 0.1);
+            border: 2px solid rgba(0, 123, 255, 0.3);
+            color: #007bff;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .grid-cell:hover {
+            background: rgba(0, 123, 255, 0.2);
+            border-color: rgba(0, 123, 255, 0.6);
+            color: #0056b3;
+        }
+        .image-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px;
+            font-size: 12px;
+            text-align: center;
+        }
+        .classification-result {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .result-content {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        .image-preview {
+            flex-shrink: 0;
+        }
+        .image-preview canvas {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-width: 200px;
+            max-height: 200px;
+        }
+        .predictions {
+            flex: 1;
+        }
+        .prediction {
+            padding: 8px 12px;
+            margin: 4px 0;
+            border-radius: 4px;
+            background: #f8f9fa;
+            border-left: 4px solid #dee2e6;
+        }
+        .prediction.vocab-match {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+        .prediction.direct-match {
+            background: #d1ecf1;
+            border-left-color: #17a2b8;
+            color: #0c5460;
+            font-weight: bold;
+        }
+        .no-matches {
+            color: #6c757d;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ Real ImageNet Vocabulary Classifier</h1>
+        <p>Load MobileNet v2 model and classify vocab test images to find vocabulary word matches</p>
+        
+        <div class="controls">
+            <div class="status-info">
+                <div id="modelStatus">Click "Load ResNet-50 Model" to start</div>
+            </div>
+            
+            <button id="loadModel">Load ResNet-50 Model</button>
+            <button id="detectGrid" onclick="detectReferenceGrid()" disabled>🔍 Re-detect Grid</button>
+            <button id="analyzeAll" onclick="analyzeAllImages()" disabled>Analyze All Images</button>
+            <button id="analyzeSample" onclick="analyzeSampleImages()" disabled>Analyze Sample (5 images)</button>
+            <button id="downloadResults" onclick="downloadResults()" disabled>Download Results</button>
+            <button id="testButton" onclick="testFunction()">🧪 Test JS</button>
+            
+            <!-- Progress Bar -->
+            <div id="progressContainer" style="display: none; margin: 10px 0;">
+                <div style="background: #f0f0f0; border-radius: 10px; height: 20px; overflow: hidden;">
+                    <div id="progressBar" style="background: #4CAF50; height: 100%; width: 0%; transition: width 0.3s; text-align: center; line-height: 20px; color: white; font-size: 12px;">0%</div>
+                </div>
+            </div>
+            
+            <!-- Statistics Display -->
+            <div id="statsContainer" style="display: none; margin: 10px 0; padding: 10px; background: #f9f9f9; border-radius: 5px;">
+                <h4>Analysis Statistics</h4>
+                <div>Total Classifications: <span id="totalClassifications">0</span></div>
+                <div>Vocabulary Matches: <span id="vocabMatches">0</span></div>
+                <div>High Confidence (>80%): <span id="highConfidence">0</span></div>
+                <div>Average Confidence: <span id="avgConfidence">0%</span></div>
+            </div>
+        </div>
+        
+        <div id="imageGallery" class="image-gallery"></div>
+        
+        <div id="loading" class="loading">
+            <p>Ready to load ResNet-50 model...</p>
+        </div>
+    </div>
+
+    <script>
+        // Vocabulary list from vocab_list.txt
+        const VOCAB_LIST = [
+            'acorn', 'aloe', 'antenna', 'artichoke', 'bamboo', 'barrel', 'blender', 'blower', 'bouquet', 'buffet',
+            'bulldozer', 'cake', 'caramel', 'carousel', 'carrot', 'cassette', 'cheese', 'cloak', 'clothespin', 'coaster',
+            'cork', 'cornbread', 'corset', 'dumpling', 'elbow', 'fan', 'foam', 'footbath', 'fruitcake', 'gutter',
+            'hamster', 'hedgehog', 'hoe', 'hopscotch', 'kimono', 'latch', 'locker', 'lollipop', 'map', 'marshmallow',
+            'net', 'oil', 'omelet', 'pie', 'pistachio', 'pitcher', 'potato', 'prism', 'puddle', 'pump',
+            'rice', 'saddle', 'sandbag', 'scaffolding', 'scoop', 'seagull', 'ship', 'shower', 'silverware', 'sink',
+            'ski', 'sloth', 'snail', 'sorbet', 'spatula', 'sprinkler', 'squash', 'squirrel', 'stew', 'rubber band',
+            'stump', 'sunflower', 'swordfish', 'tapestry', 'teabag', 'telescope', 'thermos', 'treasure', 'trumpet', 'tulip',
+            'turbine', 'turkey', 'turtle', 'typewriter', 'watermelon', 'waterwheel', 'ant', 'ball', 'bear', 'duck',
+            'fork', 'kitten', 'knee', 'milkshake', 'skin', 'wall', 'wheel', 'farm', 'juggling', 'dressing',
+            'roof', 'peeking', 'ruler', 'tunnel', 'envelope', 'diamond', 'calendar', 'panda', 'arrow', 'picking',
+            'dripping', 'knight', 'delivering', 'dentist', 'claw', 'uniform', 'furry', 'cormorant', 'fetch', 'arcade',
+            'artifact', 'aversion', 'beret', 'applaud', 'timid', 'camp', 'tumble', 'concentric', 'confectionery', 'couturier',
+            'degression', 'divan', 'wetland', 'baywindow', 'aesthete', 'ecstatic', 'rickety', 'gourmet', 'gesticulate', 'facade',
+            'slope', 'habit', 'intersection', 'irrigation', 'kazoo', 'chat', 'colony', 'preserve', 'awning', 'mammalogy',
+            'metronome', 'paleontologist', 'percussion', 'posterior', 'precarious', 'arbor', 'resuscitation', 'rosette', 'saffron', 'mischievous',
+            'skimmer', 'sedentary', 'suede', 'turnstile', 'triad', 'dredging', 'urban', 'steam', 'vertebra', 'bandage'
+        ];
+
+        // Global variables
+        let model = null;
+        let imageFiles = [];
+        
+        // GitHub API configuration
+        const GITHUB_API_BASE = 'https://api.github.com/repos/levante-framework/core-tasks/contents/golden-runs/vocab';
+        const BRANCH = 'more-tasks-tested';
+
+        // ImageNet class names (top 1000)
+        let imageNetClasses = [];
+
+        // Global variable to store reference grid bounds
+        let referenceGridBounds = null;
+
+        // Global vocabulary list
+        let vocabularyList = [];
+        
+        // Add debugging
+        console.log('Script loaded, setting up event listeners...');
+        
+        // Test function to verify JavaScript is working
+        function testFunction() {
+            console.log('Test function called!');
+            alert('JavaScript is working! Check console for more details.');
+            document.getElementById('modelStatus').textContent = 'JavaScript test successful!';
+        }
+        
+        // Make sure the DOM is loaded before adding event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, adding click handler...');
+            const loadButton = document.getElementById('loadModel');
+            if (loadButton) {
+                console.log('Load button found, adding click handler');
+                loadButton.addEventListener('click', function() {
+                    console.log('Load button clicked!');
+                    loadModel();
+                });
+            } else {
+                console.error('Load button not found!');
+            }
+        });
+        
+        let results = [];
+        let totalClassifications = 0;
+        let vocabMatches = 0;
+        let confidenceSum = 0;
+        let highConfidenceCount = 0;
+        
+        // Load vocabulary list from embedded data instead of file
+        async function loadVocabularyList() {
+            try {
+                console.log('Loading vocabulary list...');
+                
+                // Embedded vocabulary list to avoid CORS issues
+                const embeddedVocab = [
+                    'acorn', 'aloe', 'antenna', 'artichoke', 'bamboo', 'barrel', 'blender', 'blower',
+                    'bouquet', 'buffet', 'bulldozer', 'cake', 'caramel', 'carousel', 'carrot', 'cassette',
+                    'cheese', 'cloak', 'clothespin', 'coaster', 'cork', 'cornbread', 'corset', 'dumpling',
+                    'elbow', 'fan', 'foam', 'footbath', 'fruitcake', 'gutter', 'hamster', 'hedgehog',
+                    'hoe', 'hopscotch', 'kimono', 'latch', 'locker', 'lollipop', 'map', 'marshmallow',
+                    'net', 'oil', 'omelet', 'pie', 'pistachio', 'pitcher', 'potato', 'prism',
+                    'puddle', 'pump', 'rice', 'saddle', 'sandbag', 'scaffolding', 'scoop', 'seagull',
+                    'ship', 'shower', 'silverware', 'sink', 'ski', 'sloth', 'snail', 'sorbet',
+                    'spatula', 'sprinkler', 'squash', 'squirrel', 'stew', 'rubber band', 'stump', 'sunflower',
+                    'swordfish', 'tapestry', 'teabag', 'telescope', 'thermos', 'treasure', 'trumpet', 'tulip',
+                    'turbine', 'turkey', 'turtle', 'typewriter', 'watermelon', 'waterwheel', 'ant', 'ball',
+                    'bear', 'duck', 'fork', 'kitten', 'knee', 'milkshake', 'skin', 'wall',
+                    'wheel', 'farm', 'juggling', 'dressing', 'roof', 'peeking', 'ruler', 'tunnel',
+                    'envelope', 'diamond', 'calendar', 'panda', 'arrow', 'picking', 'dripping', 'knight',
+                    'delivering', 'dentist', 'claw', 'uniform', 'furry', 'cormorant', 'fetch', 'arcade',
+                    'artifact', 'aversion', 'beret', 'applaud', 'timid', 'camp', 'tumble', 'concentric',
+                    'confectionery', 'couturier', 'degression', 'divan', 'wetland', 'baywindow', 'aesthete', 'ecstatic',
+                    'rickety', 'gourmet', 'gesticulate', 'facade', 'slope', 'habit', 'intersection', 'irrigation',
+                    'kazoo', 'chat', 'colony', 'preserve', 'awning', 'mammalogy', 'metronome', 'paleontologist',
+                    'percussion', 'posterior', 'precarious', 'arbor', 'resuscitation', 'rosette', 'saffron', 'mischievous',
+                    'skimmer', 'sedentary', 'suede', 'turnstile', 'triad', 'dredging', 'urban', 'steam',
+                    'vertebra', 'bandage'
+                ];
+                
+                // Try to load from GitHub first as fallback
+                try {
+                    const response = await fetch('https://raw.githubusercontent.com/levante-framework/crowdin-projects/main/vocab/vocab_list.txt');
+                    if (response.ok) {
+                        const text = await response.text();
+                        const githubVocab = text.split('\n')
+                            .map(word => word.trim().toLowerCase())
+                            .filter(word => word.length > 0);
+                        
+                        if (githubVocab.length > 0) {
+                            vocabularyList = githubVocab;
+                            console.log(`Loaded ${vocabularyList.length} vocabulary words from GitHub:`, vocabularyList.slice(0, 10), '...');
+                            return vocabularyList;
+                        }
+                    }
+                } catch (githubError) {
+                    console.warn('Could not load vocabulary from GitHub:', githubError.message);
+                }
+                
+                // Use embedded vocabulary as fallback
+                vocabularyList = embeddedVocab;
+                console.log(`Using embedded vocabulary list with ${vocabularyList.length} words:`, vocabularyList.slice(0, 10), '...');
+                return vocabularyList;
+                
+            } catch (error) {
+                console.error('Error loading vocabulary list:', error);
+                // Final fallback to basic vocabulary
+                vocabularyList = ['acorn', 'aloe', 'antenna', 'artichoke', 'bamboo', 'barrel', 'blender', 'bouquet', 'cake', 'carrot', 'cheese', 'duck', 'fork', 'hamster', 'hedgehog', 'map', 'net', 'pie', 'pump', 'rice', 'ship', 'snail', 'turtle', 'watermelon'];
+                console.log('Using basic fallback vocabulary');
+                return vocabularyList;
+            }
+        }
+        
+        // Find best vocabulary match for ImageNet predictions
+        function findVocabularyMatches(predictions) {
+            const matches = [];
+            
+            for (const pred of predictions) {
+                const className = pred.className.toLowerCase();
+                
+                // Direct match
+                if (vocabularyList.includes(className)) {
+                    matches.push({
+                        vocabulary: className,
+                        imagenet: pred.className,
+                        probability: pred.probability,
+                        matchType: 'direct'
+                    });
+                    continue;
+                }
+                
+                // Partial match (ImageNet class contains vocabulary word)
+                for (const vocabWord of vocabularyList) {
+                    if (className.includes(vocabWord) || vocabWord.includes(className)) {
+                        matches.push({
+                            vocabulary: vocabWord,
+                            imagenet: pred.className,
+                            probability: pred.probability,
+                            matchType: 'partial'
+                        });
+                        break;
+                    }
+                }
+                
+                // Synonym/related word matching
+                const synonymMatches = findSynonymMatches(className, vocabularyList);
+                if (synonymMatches.length > 0) {
+                    matches.push({
+                        vocabulary: synonymMatches[0],
+                        imagenet: pred.className,
+                        probability: pred.probability,
+                        matchType: 'synonym'
+                    });
+                }
+            }
+            
+            // Sort by probability (highest first)
+            matches.sort((a, b) => b.probability - a.probability);
+            return matches;
+        }
+        
+        // Find synonym matches for common vocabulary words
+        function findSynonymMatches(imagenetClass, vocabList) {
+            const synonymMap = {
+                // Animals
+                'hamster': ['rodent', 'guinea pig'],
+                'hedgehog': ['porcupine'],
+                'turtle': ['terrapin', 'tortoise'],
+                'duck': ['waterfowl', 'mallard'],
+                'bear': ['teddy bear', 'polar bear', 'brown bear'],
+                'squirrel': ['chipmunk'],
+                'snail': ['gastropod'],
+                'ant': ['insect'],
+                'turkey': ['bird', 'poultry'],
+                'seagull': ['gull', 'bird'],
+                'sloth': ['mammal'],
+                'swordfish': ['fish'],
+                'kitten': ['cat', 'feline'],
+                'panda': ['bear'],
+                
+                // Food
+                'cake': ['dessert', 'pastry'],
+                'pie': ['pastry', 'tart'],
+                'cheese': ['dairy'],
+                'watermelon': ['melon', 'fruit'],
+                'carrot': ['vegetable'],
+                'potato': ['vegetable'],
+                'rice': ['grain'],
+                'marshmallow': ['candy', 'sweet'],
+                'lollipop': ['candy', 'sweet'],
+                'caramel': ['candy', 'sweet'],
+                'pistachio': ['nut'],
+                'artichoke': ['vegetable'],
+                'acorn': ['nut'],
+                
+                // Objects
+                'fork': ['utensil', 'cutlery'],
+                'pump': ['machine'],
+                'blender': ['appliance'],
+                'telescope': ['instrument'],
+                'trumpet': ['instrument', 'horn'],
+                'typewriter': ['machine'],
+                'cassette': ['tape'],
+                'map': ['chart'],
+                'net': ['mesh'],
+                'envelope': ['mail'],
+                'ruler': ['measuring stick'],
+                'wheel': ['tire'],
+                'knee': ['joint'],
+                'elbow': ['joint']
+            };
+            
+            const matches = [];
+            for (const [vocabWord, synonyms] of Object.entries(synonymMap)) {
+                if (vocabList.includes(vocabWord)) {
+                    for (const synonym of synonyms) {
+                        if (imagenetClass.includes(synonym.toLowerCase())) {
+                            matches.push(vocabWord);
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            return matches;
+        }
+        
+        async function classifyImageRegion(canvas, region, regionName) {
+            try {
+                console.log(`Classifying ${regionName}:`, region);
+                
+                // Extract the region from the canvas
+                const regionCanvas = document.createElement('canvas');
+                regionCanvas.width = region.width;
+                regionCanvas.height = region.height;
+                const regionCtx = regionCanvas.getContext('2d');
+                
+                regionCtx.drawImage(canvas, 
+                    region.x, region.y, region.width, region.height,
+                    0, 0, region.width, region.height
+                );
+                
+                // Classify using ResNet-50 or fallback
+                let predictions;
+                try {
+                    predictions = await classifyWithResNet(regionCanvas);
+                } catch (resnetError) {
+                    console.warn('ResNet classification failed, trying generic classify:', resnetError);
+                    // Fallback for MobileNet or other models that have a classify method
+                    if (model.classify) {
+                        predictions = await model.classify(regionCanvas);
+                    } else {
+                        throw new Error('No classification method available');
+                    }
+                }
+                
+                console.log(`${regionName} raw predictions:`, predictions);
+                
+                // Filter to vocabulary matches only
+                const vocabMatches = findVocabularyMatches(predictions);
+                console.log(`${regionName} vocabulary matches:`, vocabMatches);
+                
+                return {
+                    region: regionName,
+                    allPredictions: predictions,
+                    vocabularyMatches: vocabMatches,
+                    bestMatch: vocabMatches.length > 0 ? vocabMatches[0] : null,
+                    canvas: regionCanvas
+                };
+                
+            } catch (error) {
+                console.error(`Error classifying ${regionName}:`, error);
+                return {
+                    region: regionName,
+                    error: error.message,
+                    allPredictions: [],
+                    vocabularyMatches: [],
+                    bestMatch: null
+                };
+            }
+        }
+        
+        // Custom classification function for ResNet-50
+        async function classifyWithResNet(canvas) {
+            try {
+                console.log('Starting ResNet classification...');
+                
+                if (!model) {
+                    throw new Error('Model not loaded');
+                }
+                
+                // Preprocess image for ResNet-50
+                const tensor = tf.browser.fromPixels(canvas)
+                    .resizeNearestNeighbor([224, 224])
+                    .toFloat()
+                    .expandDims();
+                
+                console.log('Image tensor shape:', tensor.shape);
+                
+                // Normalize to [0, 1] range first
+                const normalized = tensor.div(255.0);
+                
+                // Apply ImageNet normalization
+                const mean = tf.tensor([0.485, 0.456, 0.406]);
+                const std = tf.tensor([0.229, 0.224, 0.225]);
+                const preprocessed = normalized.sub(mean).div(std);
+                
+                console.log('Preprocessed tensor shape:', preprocessed.shape);
+                
+                // Run prediction - handle both GraphModel and LayersModel
+                let predictions;
+                if (model.predict) {
+                    // LayersModel
+                    console.log('Using LayersModel.predict()');
+                    predictions = model.predict(preprocessed);
+                } else if (model.execute) {
+                    // GraphModel
+                    console.log('Using GraphModel.execute()');
+                    predictions = model.execute(preprocessed);
+                } else {
+                    throw new Error('Unknown model type - no predict or execute method');
+                }
+                
+                console.log('Raw predictions shape:', predictions.shape);
+                
+                // Apply softmax if needed
+                let probabilities;
+                if (predictions.shape[1] === 1000) {
+                    // Already has 1000 classes, apply softmax
+                    probabilities = tf.softmax(predictions);
+                } else {
+                    // Use predictions as-is
+                    probabilities = predictions;
+                }
+                
+                // Get top 10 predictions
+                const topK = tf.topk(probabilities, 10);
+                const topKIndices = await topK.indices.data();
+                const topKValues = await topK.values.data();
+                
+                console.log('Top predictions indices:', topKIndices);
+                console.log('Top predictions values:', topKValues);
+                
+                // Clean up tensors
+                tensor.dispose();
+                normalized.dispose();
+                preprocessed.dispose();
+                predictions.dispose();
+                probabilities.dispose();
+                topK.indices.dispose();
+                topK.values.dispose();
+                mean.dispose();
+                std.dispose();
+                
+                // Format results
+                const results = [];
+                for (let i = 0; i < Math.min(10, topKIndices.length); i++) {
+                    const classIndex = topKIndices[i];
+                    const probability = topKValues[i];
+                    results.push({
+                        className: imageNetClasses[classIndex] || `class_${classIndex}`,
+                        probability: probability
+                    });
+                }
+                
+                console.log('Formatted results:', results);
+                return results;
+                
+            } catch (error) {
+                console.error('Error in ResNet classification:', error);
+                throw error;
+            }
+        }
+
+        async function loadImageNetClasses() {
+            // Load ImageNet class names
+            const classesUrl = 'https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt';
+            try {
+                const response = await fetch(classesUrl);
+                const text = await response.text();
+                imageNetClasses = text.trim().split('\n');
+                console.log(`Loaded ${imageNetClasses.length} ImageNet classes`);
+            } catch (error) {
+                console.error('Could not load ImageNet classes, using fallback');
+                // Fallback to basic classes if fetch fails
+                imageNetClasses = Array.from({length: 1000}, (_, i) => `class_${i}`);
+            }
+        }
+
+        async function loadModel() {
+            console.log('loadModel function called!');
+            try {
+                const statusElement = document.getElementById('modelStatus');
+                statusElement.textContent = 'Starting model load...';
+                document.getElementById('loadModel').disabled = true;
+                
+                console.log('Step 1: Loading ImageNet classes...');
+                statusElement.textContent = 'Loading ImageNet classes...';
+                await loadImageNetClasses();
+                
+                console.log('Step 2: Loading vocabulary list...');
+                statusElement.textContent = 'Loading vocabulary list...';
+                await loadVocabularyList();
+                
+                console.log('Step 3: Loading ResNet-50 model...');
+                statusElement.textContent = 'Loading ResNet-50 model... (this may take 2-3 minutes)';
+                
+                // Try multiple ResNet-50 sources (actual ResNet, not MobileNet)
+                const modelUrls = [
+                    // TensorFlow.js official ResNet-50
+                    'https://storage.googleapis.com/tfjs-models/savedmodel/resnet50/model.json',
+                    // Alternative ResNet-50 from Hugging Face
+                    'https://huggingface.co/tensorflow/resnet-50/resolve/main/tfjs_model/model.json',
+                    // TensorFlow Hub ResNet-50 (may have CORS issues)
+                    'https://tfhub.dev/google/tfjs-model/imagenet/resnet_50/classification/3/default/1',
+                    // Backup: MobileNet only as last resort
+                    'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_1.0_224/model.json'
+                ];
+                
+                let modelLoaded = false;
+                
+                for (let i = 0; i < modelUrls.length && !modelLoaded; i++) {
+                    try {
+                        const modelUrl = modelUrls[i];
+                        console.log(`Trying ResNet-50 from source ${i + 1}:`, modelUrl);
+                        statusElement.textContent = `Loading ResNet-50 (attempt ${i + 1}/4)...`;
+                        
+                        if (modelUrl.includes('tfhub.dev')) {
+                            // For TensorFlow Hub models, try loadGraphModel
+                            console.log('Using loadGraphModel for TensorFlow Hub ResNet-50...');
+                            model = await tf.loadGraphModel(modelUrl);
+                        } else if (modelUrl.includes('resnet50')) {
+                            // For ResNet-50 models, try loadLayersModel
+                            console.log('Using loadLayersModel for ResNet-50...');
+                            model = await tf.loadLayersModel(modelUrl);
+                        } else {
+                            // For MobileNet fallback
+                            console.log('Using loadLayersModel for MobileNet fallback...');
+                            model = await tf.loadLayersModel(modelUrl);
+                        }
+                        
+                        console.log('Model loaded successfully from source', i + 1);
+                        statusElement.textContent = 'ResNet-50 loaded! Loading images...';
+                        modelLoaded = true;
+                        
+                    } catch (modelError) {
+                        console.warn(`Model source ${i + 1} failed:`, modelError.message);
+                        if (i === modelUrls.length - 1) {
+                            // Last attempt failed
+                            console.error('All model sources failed');
+                            throw new Error(`All models failed. Last error: ${modelError.message}`);
+                        }
+                    }
+                }
+                
+                console.log('Step 4: Loading images...');
+                await loadImages();
+                
+                console.log('Step 5: Detecting reference grid...');
+                statusElement.textContent = 'Setting up grid detection...';
+                await detectReferenceGrid();
+                
+                statusElement.textContent = `✅ Ready! Model loaded with ${vocabularyList.length} vocab words. ${imageFiles.length} images ready.`;
+                document.getElementById('detectGrid').disabled = false;
+                document.getElementById('analyzeAll').disabled = false;
+                document.getElementById('analyzeSample').disabled = false;
+                
+                console.log('Model loading completed successfully!');
+                
+            } catch (error) {
+                console.error('Error in loadModel:', error);
+                document.getElementById('modelStatus').innerHTML = `❌ Error: ${error.message}<br><small>Check console for details</small>`;
+                document.getElementById('loadModel').disabled = false;
+            }
+        }
+
+        async function loadImages() {
+            try {
+                console.log('Loading vocab images...');
+                
+                // Get all vocab images from the GitHub repository
+                // Based on the search results, vocab images are in golden-runs/vocab/ on more-tasks-tested branch
+                const response = await fetch('https://api.github.com/repos/levante-framework/core-tasks/contents/golden-runs/vocab?ref=more-tasks-tested');
+                
+                if (!response.ok) {
+                    throw new Error(`GitHub API returned ${response.status}: ${response.statusText}`);
+                }
+                
+                const files = await response.json();
+                
+                if (!Array.isArray(files)) {
+                    console.error('GitHub API response is not an array:', files);
+                    throw new Error('Invalid GitHub API response format');
+                }
+                
+                // Filter for PNG images, excluding specific ones
+                imageFiles = files.filter(file => 
+                    file.name.endsWith('.png') && 
+                    !file.name.includes('vocab-001') &&
+                    !file.name.includes('vocab-002') &&
+                    !file.name.includes('vocab-003') &&
+                    !file.name.includes('vocab-174')
+                );
+                
+                console.log(`Found ${imageFiles.length} vocab images`);
+                
+                if (imageFiles.length === 0) {
+                    console.warn('No vocab images found, trying alternative paths...');
+                    
+                    // Try alternative paths with different branches
+                    const altPaths = [
+                        'https://api.github.com/repos/levante-framework/core-tasks/contents/golden-runs/vocab?ref=main',
+                        'https://api.github.com/repos/levante-framework/core-tasks/contents/task-screenshots/vocab?ref=more-tasks-tested',
+                        'https://api.github.com/repos/levante-framework/core-tasks/contents/task-screenshots?ref=more-tasks-tested',
+                        'https://api.github.com/repos/levante-framework/core-tasks/contents/golden-runs?ref=more-tasks-tested'
+                    ];
+                    
+                    for (const altPath of altPaths) {
+                        try {
+                            console.log(`Trying alternative path: ${altPath}`);
+                            const altResponse = await fetch(altPath);
+                            if (altResponse.ok) {
+                                const altFiles = await altResponse.json();
+                                if (Array.isArray(altFiles)) {
+                                    const vocabFiles = altFiles.filter(file => 
+                                        file.name.startsWith('vocab-') && 
+                                        file.name.endsWith('.png') && 
+                                        !file.name.includes('vocab-001') &&
+                                        !file.name.includes('vocab-002') &&
+                                        !file.name.includes('vocab-003') &&
+                                        !file.name.includes('vocab-174')
+                                    );
+                                    
+                                    if (vocabFiles.length > 0) {
+                                        imageFiles = vocabFiles;
+                                        console.log(`Found ${imageFiles.length} vocab images in ${altPath}`);
+                                        break;
+                                    }
+                                }
+                            }
+                        } catch (altError) {
+                            console.warn(`Alternative path ${altPath} failed:`, altError.message);
+                        }
+                    }
+                }
+                
+                if (imageFiles.length === 0) {
+                    throw new Error('No vocab images found in any path');
+                }
+                
+                // Create image gallery
+                const gallery = document.getElementById('imageGallery');
+                gallery.innerHTML = '';
+                
+                for (let index = 0; index < imageFiles.length; index++) {
+                    const file = imageFiles[index];
+                    const imageItem = document.createElement('div');
+                    imageItem.className = 'image-item';
+                    imageItem.dataset.fileName = file.name;
+                    
+                    const img = document.createElement('img');
+                    img.src = `/api/proxy?url=${encodeURIComponent(file.download_url)}`;
+                    img.className = 'vocab-image';
+                    img.alt = file.name;
+                    img.crossOrigin = 'anonymous'; // Enable CORS for canvas processing
+                    
+                    const overlay = document.createElement('div');
+                    overlay.className = 'grid-overlay';
+                    overlay.innerHTML = `
+                        <div class="grid-cell" data-position="top-left">TL</div>
+                        <div class="grid-cell" data-position="top-right">TR</div>
+                        <div class="grid-cell" data-position="bottom-left">BL</div>
+                        <div class="grid-cell" data-position="bottom-right">BR</div>
+                    `;
+                    
+                    const label = document.createElement('div');
+                    label.className = 'image-label';
+                    label.textContent = file.name;
+                    
+                    // Add results container for this image
+                    const resultsDiv = document.createElement('div');
+                    resultsDiv.id = `results-${index}`;
+                    resultsDiv.className = 'results';
+                    resultsDiv.style.cssText = 'margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 5px; font-size: 12px; display: none;';
+                    
+                    imageItem.appendChild(img);
+                    imageItem.appendChild(overlay);
+                    imageItem.appendChild(label);
+                    imageItem.appendChild(resultsDiv);
+                    gallery.appendChild(imageItem);
+                    
+                    // Add click handlers for grid cells
+                    overlay.querySelectorAll('.grid-cell').forEach(cell => {
+                        cell.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const position = cell.dataset.position;
+                            classifyGridCell(imageItem, position);
+                        });
+                    });
+                }
+                
+                console.log('Images loaded successfully');
+                
+            } catch (error) {
+                console.error('Error loading images:', error);
+                throw error;
+            }
+        }
+
+        function createImageItem(file, index) {
+            const div = document.createElement('div');
+            div.className = 'image-item';
+            div.innerHTML = `
+                <div class="image-container">
+                    <img src="${file.download_url}" alt="${file.name}" class="vocab-image" crossorigin="anonymous">
+                    <div class="grid-overlay">
+                        <div class="grid-cell" data-position="top-left" style="top: 0; left: 0; width: 50%; height: 50%;" onclick="classifyGridCell(${index}, 'top-left')"></div>
+                        <div class="grid-cell" data-position="top-right" style="top: 0; right: 0; width: 50%; height: 50%;" onclick="classifyGridCell(${index}, 'top-right')"></div>
+                        <div class="grid-cell" data-position="bottom-left" style="bottom: 0; left: 0; width: 50%; height: 50%;" onclick="classifyGridCell(${index}, 'bottom-left')"></div>
+                        <div class="grid-cell" data-position="bottom-right" style="bottom: 0; right: 0; width: 50%; height: 50%;" onclick="classifyGridCell(${index}, 'bottom-right')"></div>
+                    </div>
+                </div>
+                <h4>${file.name}</h4>
+                <div class="results" id="results-${index}"></div>
+            `;
+            
+            div.dataset.fileUrl = file.download_url;
+            div.dataset.fileName = file.name;
+            
+            return div;
+        }
+
+        async function detectReferenceGrid() {
+            // Find a good reference image (skip 001, 002, 003)
+            const imageItems = document.querySelectorAll('.image-item');
+            let referenceImage = null;
+            let referenceImageName = '';
+            
+            console.log(`Checking ${imageItems.length} images for reference...`);
+            
+            for (let i = 0; i < imageItems.length; i++) {
+                const fileName = imageItems[i].dataset.fileName;
+                console.log(`Checking image ${i}: ${fileName}`);
+                
+                // More specific filtering to exclude 001, 002, 003
+                if (fileName && 
+                    !fileName.includes('vocab-001') && 
+                    !fileName.includes('vocab-002') && 
+                    !fileName.includes('vocab-003')) {
+                    referenceImage = imageItems[i].querySelector('.vocab-image');
+                    referenceImageName = fileName;
+                    console.log(`Selected reference image: ${referenceImageName}`);
+                    break;
+                }
+            }
+            
+            if (!referenceImage) {
+                console.warn('No suitable reference image found, using first available image');
+                referenceImage = document.querySelector('.vocab-image');
+                referenceImageName = 'first-available';
+            }
+            
+            console.log(`Using reference image: ${referenceImageName}`);
+            
+            // Wait for image to load
+            if (!referenceImage.complete) {
+                console.log('Waiting for reference image to load...');
+                await new Promise(resolve => {
+                    referenceImage.onload = resolve;
+                    referenceImage.onerror = () => {
+                        console.error('Failed to load reference image');
+                        resolve();
+                    };
+                    setTimeout(resolve, 10000);
+                });
+            }
+            
+            console.log('Reference image loaded, creating analysis canvas...');
+            
+            // Create analysis canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = referenceImage.naturalWidth || referenceImage.width;
+            canvas.height = referenceImage.naturalHeight || referenceImage.height;
+            
+            console.log(`Canvas size: ${canvas.width}×${canvas.height}`);
+            
+            // Draw reference image
+            try {
+                ctx.drawImage(referenceImage, 0, 0);
+                console.log('Reference image drawn to canvas');
+            } catch (error) {
+                console.error('Error drawing reference image:', error);
+                return createSimpleGridBounds(canvas);
+            }
+            
+            // Use precise grid detection
+            let bounds = null;
+            
+            console.log('Creating precise grid from guide coordinates...');
+            
+            try {
+                bounds = detectGridBoundsFromReference(canvas);
+                console.log('Grid detection successful:', bounds);
+            } catch (error) {
+                console.error('Grid detection failed:', error);
+                bounds = createSimpleGridBounds(canvas);
+            }
+            
+            // Validate bounds
+            if (!bounds || !bounds.bounds || !bounds.bounds['top-left']) {
+                console.error('Invalid bounds detected, using fallback');
+                bounds = createSimpleGridBounds(canvas);
+            }
+            
+            referenceGridBounds = bounds;
+            
+            console.log('Final reference grid bounds:', bounds);
+            
+            // Create visual debug canvas
+            try {
+                createDebugVisualization(canvas, bounds, referenceImageName);
+                console.log('Debug visualization created');
+            } catch (error) {
+                console.error('Error creating debug visualization:', error);
+            }
+            
+            // Show success message
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            const cellInfo = bounds.rectangles ? 
+                `${bounds.rectangles.length} rectangles detected` : 
+                `${Math.round(bounds.cellWidth)}×${Math.round(bounds.cellHeight)} pixel cells`;
+            successDiv.innerHTML = `✅ Reference grid detected from ${referenceImageName}! ${cellInfo}. <button onclick="toggleDebugCanvas()" style="margin-left: 10px;">Show/Hide Debug</button>`;
+            document.querySelector('.controls').appendChild(successDiv);
+            
+            return bounds;
+        }
+        
+        function detectGridBoundsFromReference(canvas) {
+            const ctx = canvas.getContext('2d');
+            
+            // Use the exact guide coordinates provided by the user
+            // Vertical guides: 257, 472, 500, 717 pixels
+            // Horizontal guides: 102, 320, 330, 546 pixels
+            console.log('Using precise guide coordinates...');
+            
+            const verticalGuides = [257, 472, 500, 717];
+            const horizontalGuides = [102, 320, 330, 546];
+            
+            // Create 2x2 grid from the guides
+            // The grid cells are defined by the spaces between guides:
+            // Top-left: (257, 102) to (472, 320)
+            // Top-right: (500, 102) to (717, 320)  
+            // Bottom-left: (257, 330) to (472, 546)
+            // Bottom-right: (500, 330) to (717, 546)
+            
+            const rectangles = [
+                {
+                    x: verticalGuides[0],     // 257
+                    y: horizontalGuides[0],   // 102
+                    width: verticalGuides[1] - verticalGuides[0],   // 472 - 257 = 215
+                    height: horizontalGuides[1] - horizontalGuides[0], // 320 - 102 = 218
+                    area: (verticalGuides[1] - verticalGuides[0]) * (horizontalGuides[1] - horizontalGuides[0])
+                },
+                {
+                    x: verticalGuides[2],     // 500
+                    y: horizontalGuides[0],   // 102
+                    width: verticalGuides[3] - verticalGuides[2],   // 717 - 500 = 217
+                    height: horizontalGuides[1] - horizontalGuides[0], // 320 - 102 = 218
+                    area: (verticalGuides[3] - verticalGuides[2]) * (horizontalGuides[1] - horizontalGuides[0])
+                },
+                {
+                    x: verticalGuides[0],     // 257
+                    y: horizontalGuides[2],   // 330
+                    width: verticalGuides[1] - verticalGuides[0],   // 472 - 257 = 215
+                    height: horizontalGuides[3] - horizontalGuides[2], // 546 - 330 = 216
+                    area: (verticalGuides[1] - verticalGuides[0]) * (horizontalGuides[3] - horizontalGuides[2])
+                },
+                {
+                    x: verticalGuides[2],     // 500
+                    y: horizontalGuides[2],   // 330
+                    width: verticalGuides[3] - verticalGuides[2],   // 717 - 500 = 217
+                    height: horizontalGuides[3] - horizontalGuides[2], // 546 - 330 = 216
+                    area: (verticalGuides[3] - verticalGuides[2]) * (horizontalGuides[3] - horizontalGuides[2])
+                }
+            ];
+            
+            console.log('Precise grid rectangles created from guides:', rectangles);
+            
+            return {
+                centerX: canvas.width / 2,
+                centerY: canvas.height / 2,
+                cellWidth: rectangles[0].width,
+                cellHeight: rectangles[0].height,
+                margin: 0,
+                originalCanvas: canvas,
+                croppedCanvas: canvas,
+                rectangles: rectangles,
+                bounds: {
+                    'top-left': rectangles[0],
+                    'top-right': rectangles[1],
+                    'bottom-left': rectangles[2],
+                    'bottom-right': rectangles[3]
+                }
+            };
+        }
+        
+        function createSimpleGridBounds(canvas) {
+            console.log('Creating simple grid bounds as fallback...');
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // Calculate margins as percentage of image size
+            const marginX = Math.round(canvas.width * 0.02); // 2% margin
+            const marginY = Math.round(canvas.height * 0.02); // 2% margin
+            
+            const cellWidth = centerX - marginX;
+            const cellHeight = centerY - marginY;
+            
+            // Create rectangles for the 2x2 grid
+            const rectangles = [
+                {
+                    x: marginX,
+                    y: marginY,
+                    width: cellWidth,
+                    height: cellHeight,
+                    area: cellWidth * cellHeight
+                },
+                {
+                    x: centerX + marginX,
+                    y: marginY,
+                    width: cellWidth,
+                    height: cellHeight,
+                    area: cellWidth * cellHeight
+                },
+                {
+                    x: marginX,
+                    y: centerY + marginY,
+                    width: cellWidth,
+                    height: cellHeight,
+                    area: cellWidth * cellHeight
+                },
+                {
+                    x: centerX + marginX,
+                    y: centerY + marginY,
+                    width: cellWidth,
+                    height: cellHeight,
+                    area: cellWidth * cellHeight
+                }
+            ];
+            
+            console.log('Simple grid rectangles created:', rectangles);
+            
+            return {
+                centerX,
+                centerY,
+                cellWidth,
+                cellHeight,
+                margin: Math.min(marginX, marginY),
+                originalCanvas: canvas,
+                croppedCanvas: canvas,
+                rectangles: rectangles,
+                bounds: {
+                    'top-left': rectangles[0],
+                    'top-right': rectangles[1],
+                    'bottom-left': rectangles[2],
+                    'bottom-right': rectangles[3]
+                }
+            };
+        }
+        
+        function createDebugVisualization(sourceCanvas, bounds, imageName) {
+            // Create debug canvas for original image
+            const debugCanvas = document.createElement('canvas');
+            debugCanvas.id = 'debugCanvas';
+            debugCanvas.width = bounds.croppedCanvas.width;
+            debugCanvas.height = bounds.croppedCanvas.height;
+            debugCanvas.style.cssText = `
+                display: none;
+                max-width: 100%;
+                border: 2px solid #007bff;
+                margin: 10px 0;
+            `;
+            
+            const debugCtx = debugCanvas.getContext('2d');
+            
+            // Draw cropped image (this is what we actually analyze)
+            debugCtx.drawImage(bounds.croppedCanvas, 0, 0);
+            
+            // Draw detected rectangles
+            debugCtx.strokeStyle = '#ff0000';
+            debugCtx.lineWidth = 2;
+            
+            // Draw each detected rectangle
+            if (bounds.rectangles) {
+                bounds.rectangles.forEach((rect, index) => {
+                    debugCtx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+                    
+                    // Label the rectangle
+                    debugCtx.fillStyle = '#ff0000';
+                    debugCtx.font = '14px Arial';
+                    const positions = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+                    debugCtx.fillText(positions[index] || `rect-${index}`, rect.x + 5, rect.y + 20);
+                });
+            }
+            
+            // Draw grid bounds for comparison
+            debugCtx.strokeStyle = '#00ff00';
+            debugCtx.lineWidth = 1;
+            
+            Object.entries(bounds.bounds).forEach(([position, rect]) => {
+                debugCtx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+                
+                // Label the cell
+                debugCtx.fillStyle = '#00ff00';
+                debugCtx.font = '10px Arial';
+                debugCtx.fillText(position, rect.x + 5, rect.y + rect.height - 5);
+            });
+            
+            // Create comparison canvas showing original vs cropped
+            const comparisonCanvas = document.createElement('canvas');
+            comparisonCanvas.id = 'comparisonCanvas';
+            comparisonCanvas.width = Math.max(sourceCanvas.width, bounds.croppedCanvas.width * 2);
+            comparisonCanvas.height = sourceCanvas.height + bounds.croppedCanvas.height + 60;
+            comparisonCanvas.style.cssText = `
+                display: none;
+                max-width: 100%;
+                border: 2px solid #28a745;
+                margin: 10px 0;
+            `;
+            
+            const compCtx = comparisonCanvas.getContext('2d');
+            compCtx.fillStyle = '#f8f9fa';
+            compCtx.fillRect(0, 0, comparisonCanvas.width, comparisonCanvas.height);
+            
+            // Draw original image
+            compCtx.drawImage(sourceCanvas, 0, 0);
+            compCtx.fillStyle = '#000';
+            compCtx.font = '14px Arial';
+            compCtx.fillText('Original Image', 10, sourceCanvas.height + 20);
+            
+            // Draw cropped image
+            compCtx.drawImage(bounds.croppedCanvas, 0, sourceCanvas.height + 40);
+            compCtx.fillText('Cropped Image with Detected Blue Rectangles', 10, sourceCanvas.height + 60 + bounds.croppedCanvas.height);
+            
+            // Draw rectangles on comparison canvas
+            if (bounds.rectangles) {
+                compCtx.strokeStyle = '#ff0000';
+                compCtx.lineWidth = 2;
+                bounds.rectangles.forEach((rect, index) => {
+                    compCtx.strokeRect(rect.x, rect.y + sourceCanvas.height + 40, rect.width, rect.height);
+                });
+            }
+            
+            // Add titles
+            const debugTitle = document.createElement('h4');
+            debugTitle.textContent = `Rectangle Detection Debug - ${imageName}`;
+            debugTitle.style.margin = '10px 0 5px 0';
+            
+            const comparisonTitle = document.createElement('h4');
+            comparisonTitle.textContent = `Before/After Blue Border Removal`;
+            comparisonTitle.style.margin = '10px 0 5px 0';
+            
+            // Add rectangle info
+            const rectInfo = document.createElement('div');
+            rectInfo.style.cssText = 'background: #e9ecef; padding: 10px; border-radius: 4px; margin: 10px 0; font-size: 12px;';
+            if (bounds.rectangles) {
+                rectInfo.innerHTML = `
+                    <strong>Detected Rectangles:</strong><br>
+                    ${bounds.rectangles.map((rect, i) => {
+                        const positions = ['Top-Left', 'Top-Right', 'Bottom-Left', 'Bottom-Right'];
+                        return `${positions[i]}: ${rect.width}×${rect.height} at (${rect.x}, ${rect.y})`;
+                    }).join('<br>')}
+                `;
+            } else {
+                rectInfo.innerHTML = '<strong>No rectangles detected - using fallback grid</strong>';
+            }
+            
+            // Insert debug visualization
+            const controls = document.querySelector('.controls');
+            controls.appendChild(debugTitle);
+            controls.appendChild(rectInfo);
+            controls.appendChild(debugCanvas);
+            controls.appendChild(comparisonTitle);
+            controls.appendChild(comparisonCanvas);
+        }
+        
+        function toggleDebugCanvas() {
+            const debugCanvas = document.getElementById('debugCanvas');
+            const comparisonCanvas = document.getElementById('comparisonCanvas');
+            if (debugCanvas) {
+                const isVisible = debugCanvas.style.display !== 'none';
+                debugCanvas.style.display = isVisible ? 'none' : 'block';
+                if (comparisonCanvas) {
+                    comparisonCanvas.style.display = isVisible ? 'none' : 'block';
+                }
+            }
+        }
+        
+        function getGridBounds(position, imageWidth, imageHeight) {
+            if (!referenceGridBounds) {
+                // Fallback to quadrant division if no reference grid
+                const width = imageWidth / 2;
+                const height = imageHeight / 2;
+                let x = 0, y = 0;
+                
+                if (position.includes('right')) x = width;
+                if (position.includes('bottom')) y = height;
+                
+                return { x, y, width, height };
+            }
+            
+            // For rectangle-based detection, we need to scale the detected rectangles
+            // to match the current image dimensions
+            
+            const referenceBounds = referenceGridBounds.bounds[position];
+            if (!referenceBounds) {
+                console.warn(`No reference bounds found for position ${position}`);
+                return { x: 0, y: 0, width: imageWidth / 2, height: imageHeight / 2 };
+            }
+            
+            // Calculate scaling factors
+            const originalRef = referenceGridBounds.originalCanvas;
+            const croppedRef = referenceGridBounds.croppedCanvas;
+            
+            // First, determine how much the current image should be cropped
+            const cropScaleX = croppedRef.width / originalRef.width;
+            const cropScaleY = croppedRef.height / originalRef.height;
+            
+            // Calculate current image's cropped dimensions
+            const currentCroppedWidth = imageWidth * cropScaleX;
+            const currentCroppedHeight = imageHeight * cropScaleY;
+            
+            // Calculate crop offsets (assuming similar blue border proportions)
+            const cropOffsetX = (imageWidth - currentCroppedWidth) / 2;
+            const cropOffsetY = (imageHeight - currentCroppedHeight) / 2;
+            
+            // Scale the reference rectangle to current cropped dimensions
+            const scaleX = currentCroppedWidth / croppedRef.width;
+            const scaleY = currentCroppedHeight / croppedRef.height;
+            
+            // Calculate final bounds
+            const scaledX = referenceBounds.x * scaleX;
+            const scaledY = referenceBounds.y * scaleY;
+            const scaledWidth = referenceBounds.width * scaleX;
+            const scaledHeight = referenceBounds.height * scaleY;
+            
+            return {
+                x: scaledX + cropOffsetX,
+                y: scaledY + cropOffsetY,
+                width: scaledWidth,
+                height: scaledHeight
+            };
+        }
+
+        async function classifyGridCell(imageIndex, position) {
+            if (!model) {
+                alert('Please load the model first!');
+                return;
+            }
+
+            const imageItem = document.querySelectorAll('.image-item')[imageIndex];
+            const img = imageItem.querySelector('.vocab-image');
+            const gridCell = imageItem.querySelector(`[data-position="${position}"]`);
+            
+            // Skip problematic images
+            const fileName = imageItem.dataset.fileName;
+            if (fileName && (fileName.includes('001') || fileName.includes('002') || fileName.includes('003') || fileName.includes('174'))) {
+                gridCell.classList.add('completed');
+                const resultsDiv = document.getElementById(`results-${imageIndex}`);
+                if (resultsDiv) {
+                    resultsDiv.style.display = 'block';
+                    resultsDiv.innerHTML += `<div class="prediction" style="background: #fff3cd; border-left: 4px solid #ffc107;">
+                        <strong>${position}:</strong> Skipped (${fileName} - no standard grid)
+                    </div>`;
+                }
+                return;
+            }
+            
+            gridCell.classList.add('analyzing');
+            
+            try {
+                // Ensure reference grid is detected
+                if (!referenceGridBounds) {
+                    await detectReferenceGrid();
+                }
+                
+                // Get grid bounds for this position
+                const gridBounds = getGridBounds(position, img.naturalWidth, img.naturalHeight);
+                
+                // Create canvas for classification
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 224;
+                canvas.height = 224;
+                
+                // Wait for image to load if needed
+                if (!img.complete) {
+                    await new Promise((resolve, reject) => {
+                        img.onload = resolve;
+                        img.onerror = reject;
+                        setTimeout(reject, 10000); // 10 second timeout
+                    });
+                }
+                
+                // Extract the grid cell content
+                const { x, y, width, height } = gridBounds;
+                
+                try {
+                    // Draw the cropped grid cell content
+                    ctx.drawImage(img, x, y, width, height, 0, 0, 224, 224);
+                } catch (drawError) {
+                    console.warn('Direct canvas draw failed, trying alternative approach:', drawError);
+                    
+                    // Alternative approach: create a clean intermediate canvas
+                    const tempCanvas = document.createElement('canvas');
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCanvas.width = img.naturalWidth;
+                    tempCanvas.height = img.naturalHeight;
+                    
+                    // Draw full image to temp canvas first
+                    tempCtx.drawImage(img, 0, 0);
+                    
+                    // Then extract the region
+                    const imageData = tempCtx.getImageData(x, y, width, height);
+                    
+                    // Create final canvas
+                    const finalCanvas = document.createElement('canvas');
+                    const finalCtx = finalCanvas.getContext('2d');
+                    finalCanvas.width = width;
+                    finalCanvas.height = height;
+                    finalCtx.putImageData(imageData, 0, 0);
+                    
+                    // Scale to 224x224
+                    ctx.drawImage(finalCanvas, 0, 0, 224, 224);
+                }
+                
+                // Classify the grid cell
+                let predictions;
+                if (model.classify) {
+                    // MobileNet style
+                    predictions = await model.classify(canvas);
+                } else {
+                    // TensorFlow style
+                    const tensor = tf.browser.fromPixels(canvas)
+                        .resizeNearestNeighbor([224, 224])
+                        .toFloat()
+                        .div(255.0)
+                        .expandDims();
+                    
+                    const logits = model.predict(tensor);
+                    const probabilities = tf.softmax(logits);
+                    const topK = tf.topk(probabilities, 5);
+                    
+                    const indices = await topK.indices.data();
+                    const values = await topK.values.data();
+                    
+                    predictions = Array.from(indices).map((index, i) => ({
+                        className: imageNetClasses[index] || `class_${index}`,
+                        probability: values[i]
+                    }));
+                    
+                    tensor.dispose();
+                    logits.dispose();
+                    probabilities.dispose();
+                    topK.indices.dispose();
+                    topK.values.dispose();
+                }
+                
+                // Check for vocabulary matches
+                const vocabPredictions = findVocabularyMatches(predictions);
+
+                // Update statistics
+                totalClassifications++;
+                if (vocabPredictions.some(p => p.vocabulary)) {
+                    vocabMatches++;
+                }
+                if (predictions[0].probability > 0.8) {
+                    highConfidenceCount++;
+                }
+                confidenceSum += predictions[0].probability;
+                
+                updateStats();
+                displayResults(imageIndex, position, vocabPredictions, gridBounds);
+                
+                gridCell.classList.add('completed');
+                
+            } catch (error) {
+                console.error('Classification error:', error);
+                const resultsDiv = document.getElementById(`results-${imageIndex}`);
+                resultsDiv.innerHTML += `<div class="error">Error classifying ${position}: ${error.message}</div>`;
+            } finally {
+                gridCell.classList.remove('analyzing');
+            }
+        }
+
+        function detectGridBounds(canvas, position) {
+            // This function is now deprecated in favor of the reference-based approach
+            // Keeping it for backward compatibility
+            return getGridBounds(position, canvas.width, canvas.height);
+        }
+
+        function findVocabMatch(className) {
+            const lowerClassName = className.toLowerCase().replace(/[_\-]/g, ' ');
+            
+            // Direct match
+            const directMatch = VOCAB_LIST.find(vocab => {
+                const lowerVocab = vocab.toLowerCase();
+                return lowerVocab === lowerClassName ||
+                       lowerClassName.includes(lowerVocab) ||
+                       lowerVocab.includes(lowerClassName);
+            });
+            
+            if (directMatch) return directMatch;
+            
+            // Word-by-word matching
+            const classWords = lowerClassName.split(/[\s,_-]+/);
+            const vocabWords = VOCAB_LIST.map(v => v.toLowerCase());
+            
+            for (const classWord of classWords) {
+                for (const vocabWord of vocabWords) {
+                    if (classWord === vocabWord || 
+                        (classWord.length > 3 && vocabWord.includes(classWord)) ||
+                        (vocabWord.length > 3 && classWord.includes(vocabWord))) {
+                        return VOCAB_LIST[vocabWords.indexOf(vocabWord)];
+                    }
+                }
+            }
+            
+            return null;
+        }
+
+        function displayResults(imageIndex, position, predictions, gridBounds) {
+            const resultsDiv = document.getElementById(`results-${imageIndex}`);
+            if (!resultsDiv) {
+                console.error(`Results div not found for image ${imageIndex}`);
+                return;
+            }
+            
+            // Show the results div
+            resultsDiv.style.display = 'block';
+            
+            const positionDiv = document.createElement('div');
+            positionDiv.innerHTML = `
+                <strong>${position}:</strong>
+                <small style="color: #666;">[Grid: ${gridBounds.x},${gridBounds.y} ${gridBounds.width}×${gridBounds.height}]</small>
+                ${predictions.map((pred, i) => `
+                    <div class="prediction ${pred.vocabulary ? 'vocab-match' : ''} ${pred.probability > 0.8 ? 'high-confidence' : ''}">
+                        ${i + 1}. ${pred.imagenet} (${(pred.probability * 100).toFixed(1)}%)
+                        ${pred.vocabulary ? `<strong> → VOCAB: ${pred.vocabulary}</strong>` : ''}
+                        ${pred.probability > 0.8 ? ' 🎯' : ''}
+                    </div>
+                `).join('')}
+            `;
+            
+            resultsDiv.appendChild(positionDiv);
+            
+            // Store results for download
+            results.push({
+                imageIndex,
+                fileName: document.querySelectorAll('.image-item')[imageIndex].dataset.fileName,
+                position,
+                gridBounds,
+                predictions: predictions.map(p => ({
+                    className: p.imagenet,
+                    probability: p.probability,
+                    vocabulary: p.vocabulary,
+                    isVocabMatch: !!p.vocabulary,
+                    isHighConfidence: p.probability > 0.8
+                }))
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('totalClassifications').textContent = totalClassifications;
+            document.getElementById('vocabMatches').textContent = vocabMatches;
+            document.getElementById('highConfidence').textContent = highConfidenceCount;
+            document.getElementById('avgConfidence').textContent = 
+                totalClassifications > 0 ? `${((confidenceSum / totalClassifications) * 100).toFixed(1)}%` : '0%';
+            
+            if (totalClassifications > 0) {
+                document.getElementById('downloadResults').disabled = false;
+            }
+        }
+
+        async function analyzeSampleImages() {
+            const imageItems = document.querySelectorAll('.image-item');
+            const sampleSize = Math.min(5, imageItems.length);
+            const totalCells = sampleSize * 4;
+            let currentCell = 0;
+            
+            // Show progress and stats
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('statsContainer').style.display = 'block';
+            document.getElementById('analyzeSample').disabled = true;
+            
+            for (let i = 0; i < sampleSize; i++) {
+                const positions = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+                
+                for (const position of positions) {
+                    await classifyGridCell(i, position);
+                    currentCell++;
+                    
+                    const progress = (currentCell / totalCells) * 100;
+                    const progressBar = document.getElementById('progressBar');
+                    if (progressBar) {
+                        progressBar.style.width = `${progress}%`;
+                        progressBar.textContent = `${Math.round(progress)}%`;
+                    }
+                    
+                    // Small delay to prevent overwhelming
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+            }
+            
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('analyzeSample').disabled = false;
+            
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            successDiv.innerHTML = `✅ Sample analysis complete! Found ${vocabMatches} vocabulary matches out of ${totalClassifications} classifications (${((vocabMatches/totalClassifications)*100).toFixed(1)}% match rate).`;
+            document.querySelector('.controls').appendChild(successDiv);
+        }
+
+        async function analyzeAllImages() {
+            const imageItems = document.querySelectorAll('.image-item');
+            const totalCells = imageItems.length * 4;
+            let currentCell = 0;
+            
+            // Show progress and stats
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('statsContainer').style.display = 'block';
+            document.getElementById('analyzeAll').disabled = true;
+            
+            for (let i = 0; i < imageItems.length; i++) {
+                const positions = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+                
+                for (const position of positions) {
+                    await classifyGridCell(i, position);
+                    currentCell++;
+                    
+                    const progress = (currentCell / totalCells) * 100;
+                    const progressBar = document.getElementById('progressBar');
+                    if (progressBar) {
+                        progressBar.style.width = `${progress}%`;
+                        progressBar.textContent = `${Math.round(progress)}%`;
+                    }
+                    
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+            }
+            
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('analyzeAll').disabled = false;
+            alert(`Full analysis complete! Found ${vocabMatches} vocabulary matches out of ${totalClassifications} classifications.`);
+        }
+
+        function downloadResults() {
+            const data = {
+                metadata: {
+                    timestamp: new Date().toISOString(),
+                    totalImages: document.querySelectorAll('.image-item').length,
+                    totalClassifications: totalClassifications,
+                    vocabMatches: vocabMatches,
+                    highConfidenceCount: highConfidenceCount,
+                    matchRate: totalClassifications > 0 ? (vocabMatches / totalClassifications) * 100 : 0,
+                    avgConfidence: totalClassifications > 0 ? (confidenceSum / totalClassifications) * 100 : 0,
+                    model: 'MobileNet v2',
+                    vocabularyList: vocabularyList
+                },
+                results: results
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `mobilenet-vocab-analysis-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html> 

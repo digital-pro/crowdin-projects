@@ -1,0 +1,25 @@
+{
+  "name": "resnet-vocab-classifier",
+  "version": "1.0.0",
+  "description": "ResNet-50 classifier for vocabulary images with grid detection",
+  "main": "api/proxy.js",
+  "scripts": {
+    "dev": "node serve-resnet.js",
+    "start": "node serve-resnet.js",
+    "build": "echo 'Static build - no build step required'"
+  },
+  "keywords": [
+    "tensorflow",
+    "resnet",
+    "image-classification",
+    "vocabulary",
+    "machine-learning"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+} 

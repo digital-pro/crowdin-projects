@@ -1,0 +1,29 @@
+# Development files
+serve-resnet.js
+node_modules/
+.git/
+.vscode/
+
+# Analysis files
+analyze-*.js
+*-analysis.html
+*-analysis.json
+*-classifier.js
+
+# Task screenshots
+task-screenshots/
+
+# Other project directories
+editor-button-app/
+image-gallery/
+corpora/
+
+# Generated files
+imagenet-*.html
+imagenet-*.json
+vocab-*.html
+vocab-*.json
+
+# Config files
+config.js
+GITHUB_SETUP.md 

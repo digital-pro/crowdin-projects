@@ -15,10 +15,10 @@
         
         <div class="content">
             <!-- Play Audio Button -->
-                                <button id="playBtn" class="play-button" onclick="playCurrentAudio()">
-                        <span id="playIcon">🎵</span>
-                        <span id="playText">Play Current Audio</span>
-                    </button>
+            <button id="playBtn" class="play-button" onclick="playCurrentAudio()">
+                <span id="playIcon">🎵</span>
+                <span id="playText">Play Current Audio</span>
+            </button>
                     <button id="refreshBtn" class="refresh-button" onclick="refreshContext()" style="margin-left: 10px; padding: 12px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
                         <span>🔄</span>
                         <span>Refresh Context</span>
@@ -871,16 +871,16 @@
                         const targetLanguage = result.targetLanguage || currentStringCache.targetLanguageId;
                         
                         try {
-                            await playAudio(result.audioUrl, result.source, result.text, alternativeUrls, targetLanguage);
-                            
-                            return {
-                                success: true,
-                                source: result.source,
-                                audioUrl: result.audioUrl,
-                                message: `Playing audio for "${currentStringCache.stringKey || currentStringCache.identifier}" from ${result.source}`,
-                                details: result.details,
-                                metadata: metadata,
-                                attemptedUrls: attemptedUrls,
+                        await playAudio(result.audioUrl, result.source, result.text, alternativeUrls, targetLanguage);
+                        
+                        return {
+                            success: true,
+                            source: result.source,
+                            audioUrl: result.audioUrl,
+                            message: `Playing audio for "${currentStringCache.stringKey || currentStringCache.identifier}" from ${result.source}`,
+                            details: result.details,
+                            metadata: metadata,
+                            attemptedUrls: attemptedUrls,
                                 alternativeUrls: alternativeUrls,
                                 allTriedUrls: allTriedUrls,
                                 languageMapping: {
