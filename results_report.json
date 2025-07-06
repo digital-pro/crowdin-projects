@@ -1,0 +1,26 @@
+{
+  "model_info": {
+    "model_name": "google/efficientnet-b7",
+    "model_type": "1k",
+    "vocab_size": 170
+  },
+  "overall_stats": {
+    "total_images": 0,
+    "successful_classifications": 0,
+    "failed_classifications": 0,
+    "images_with_expected_vocab": 0,
+    "exact_matches": 0,
+    "partial_matches": 0,
+    "similarity_matches": 0,
+    "no_matches": 0
+  },
+  "accuracy_metrics": {
+    "overall_accuracy": 0.0,
+    "exact_match_rate": 0.0,
+    "partial_match_rate": 0.0,
+    "any_match_rate": 0.0
+  },
+  "vocab_performance": {},
+  "best_matches": [],
+  "worst_matches": []
+}

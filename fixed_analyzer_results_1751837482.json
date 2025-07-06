@@ -1,0 +1,14 @@
+{
+  "analysis_results": [
+    {
+      "screenshot_id": "004",
+      "expected_vocab": "acorn",
+      "grid_results": {
+        "top_left": {
+          "position": "top_left",
+          "predictions": [
+            {
+              "rank": 1,
+              "class_idx": "13207",
+              "class_name": "class_13207",
+              "confidence": 

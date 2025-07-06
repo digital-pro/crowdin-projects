@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "model_name": "tf_efficientnetv2_l.in21k",
+    "total_images": 0,
+    "total_time": 2.384185791015625e-06,
+    "vocab_size": 170,
+    "imagenet_classes": 21000,
+    "timestamp": 1751824681.5687647
+  },
+  "summary": {
+    "total_images": 0,
+    "successful_analyses": 0,
+    "failed_analyses": 0,
+    "images_with_expected_vocab": 0,
+    "expected_vocab_found": 0,
+    "expected_vocab_accuracy": 0.0,
+    "total_vocab_matches": 0,
+    "avg_matches_per_image": 0.0,
+    "match_type_distribution": {
+      "exact": 0,
+      "partial": 0,
+      "word_match": 0,
+      "similarity": 0
+    },
+    "source_distribution": {
+      "full_image": 0,
+      "grid_cell_top-left": 0,
+      "grid_cell_top-right": 0,
+      "grid_cell_bottom-left": 0,
+      "grid_cell_bottom-right": 0
+    },
+    "performance": {
+      "total_time": 2.384185791015625e-06,
+      "avg_time_per_image": 2.384185791015625e-06,
+      "images_per_second": 0.0
+    }
+  },
+  "detailed_results": []
+}
