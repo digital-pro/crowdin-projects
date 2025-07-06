@@ -295,7 +295,7 @@
 <body>
     <div class="container">
         <h1>🖼️ Real ImageNet Vocabulary Classifier</h1>
-        <p>Load MobileNet v2 model and classify vocab test images to find vocabulary word matches</p>
+                        <p>Load ResNet-50 model and classify vocab test images to find vocabulary word matches</p>
         
         <div class="controls">
             <div class="status-info">
@@ -602,7 +602,7 @@
                     predictions = await classifyWithResNet(regionCanvas);
                 } catch (resnetError) {
                     console.warn('ResNet classification failed, trying generic classify:', resnetError);
-                    // Fallback for MobileNet or other models that have a classify method
+                    // Fallback for ResNet or other models that have a classify method
                     if (model.classify) {
                         predictions = await model.classify(regionCanvas);
                     } else {
@@ -790,8 +790,8 @@
                             console.log('Using loadLayersModel for ResNet-50...');
                             model = await tf.loadLayersModel(modelUrl);
                         } else {
-                            // For MobileNet fallback
-                            console.log('Using loadLayersModel for MobileNet fallback...');
+                                            // For ResNet fallback
+                console.log('Using loadLayersModel for ResNet fallback...');
                             model = await tf.loadLayersModel(modelUrl);
                         }
                         
@@ -1496,7 +1496,7 @@
                 // Classify the grid cell
                 let predictions;
                 if (model.classify) {
-                    // MobileNet style
+                    // ResNet style
                     predictions = await model.classify(canvas);
                 } else {
                     // TensorFlow style
@@ -1723,7 +1723,7 @@
                     highConfidenceCount: highConfidenceCount,
                     matchRate: totalClassifications > 0 ? (vocabMatches / totalClassifications) * 100 : 0,
                     avgConfidence: totalClassifications > 0 ? (confidenceSum / totalClassifications) * 100 : 0,
-                    model: 'MobileNet v2',
+                    model: 'ResNet-50',
                     vocabularyList: vocabularyList
                 },
                 results: results
@@ -1733,7 +1733,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `mobilenet-vocab-analysis-${new Date().toISOString().split('T')[0]}.json`;
+                            a.download = `resnet-vocab-analysis-${new Date().toISOString().split('T')[0]}.json`;
             a.click();
             URL.revokeObjectURL(url);
         }

@@ -4,11 +4,11 @@ node_modules/
 .git/
 .vscode/
 
-# Analysis files
-analyze-*.js
-*-analysis.html
-*-analysis.json
-*-classifier.js
+# Analysis files (now in task-screenshots)
+task-screenshots/analyze-*.js
+task-screenshots/*-analysis.html
+task-screenshots/*-analysis.json
+task-screenshots/*-classifier.js
 
 # Task screenshots
 task-screenshots/
