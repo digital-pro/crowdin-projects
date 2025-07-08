@@ -128,17 +128,17 @@
             background: rgba(0, 0, 0, 0.2);
         }
         .clip-selected {
-            background: rgba(40, 167, 69, 0.3) !important;
+            background: rgba(40, 167, 69, 0.1) !important;
             border-color: #28a745 !important;
             border-width: 3px !important;
         }
         .efficient-selected {
-            background: rgba(255, 193, 7, 0.3) !important;
+            background: rgba(255, 193, 7, 0.1) !important;
             border-color: #ffc107 !important;
             border-width: 3px !important;
         }
         .both-selected {
-            background: linear-gradient(45deg, rgba(40, 167, 69, 0.3) 50%, rgba(255, 193, 7, 0.3) 50%) !important;
+            background: linear-gradient(45deg, rgba(40, 167, 69, 0.1) 50%, rgba(255, 193, 7, 0.1) 50%) !important;
             border: 3px solid #17a2b8 !important;
         }
         .model-results {
@@ -254,15 +254,15 @@
 
         <div class="legend">
             <div class="legend-item">
-                <div class="legend-color" style="background: rgba(40, 167, 69, 0.6); border: 2px solid #28a745;"></div>
+                <div class="legend-color" style="background: rgba(40, 167, 69, 0.1); border: 2px solid #28a745;"></div>
                 <span>CLIP Selection</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: rgba(255, 193, 7, 0.6); border: 2px solid #ffc107;"></div>
+                <div class="legend-color" style="background: rgba(255, 193, 7, 0.1); border: 2px solid #ffc107;"></div>
                 <span>EfficientNet-21k Selection</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(45deg, rgba(40, 167, 69, 0.6) 50%, rgba(255, 193, 7, 0.6) 50%); border: 2px solid #17a2b8;"></div>
+                <div class="legend-color" style="background: linear-gradient(45deg, rgba(40, 167, 69, 0.1) 50%, rgba(255, 193, 7, 0.1) 50%); border: 2px solid #17a2b8;"></div>
                 <span>Both Models Agree</span>
             </div>
         </div>
@@ -281,7 +281,7 @@
         async function loadData() {
             try {
                 // Load CLIP results
-                const clipResponse = await fetch('./clip_vocab_analysis_1752007567.json');
+                const clipResponse = await fetch('./clip_vocab_analysis_full_1752012318.json');
                 const clipData = await clipResponse.json();
                 clipResults = clipData.results || [];
                 

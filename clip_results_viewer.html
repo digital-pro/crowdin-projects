@@ -189,17 +189,17 @@
             background: rgba(0, 0, 0, 0.2);
         }
         .clip-selected {
-            background: rgba(40, 167, 69, 0.8) !important;
+            background: rgba(40, 167, 69, 0.1) !important;
             border-color: #28a745 !important;
             border-width: 3px !important;
         }
         .efficientnet-selected {
-            background: rgba(255, 193, 7, 0.8) !important;
+            background: rgba(255, 193, 7, 0.1) !important;
             border-color: #ffc107 !important;
             border-width: 3px !important;
         }
         .both-selected {
-            background: linear-gradient(45deg, rgba(40, 167, 69, 0.8) 50%, rgba(255, 193, 7, 0.8) 50%) !important;
+            background: linear-gradient(45deg, rgba(40, 167, 69, 0.1) 50%, rgba(255, 193, 7, 0.1) 50%) !important;
             border: 3px solid #17a2b8 !important;
         }
         .legend {
@@ -292,15 +292,15 @@
 
         <div class="legend">
             <div class="legend-item">
-                <div class="legend-color" style="background: rgba(40, 167, 69, 0.8);"></div>
+                <div class="legend-color" style="background: rgba(40, 167, 69, 0.1); border: 2px solid #28a745;"></div>
                 <span>CLIP Selection</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: rgba(255, 193, 7, 0.8);"></div>
+                <div class="legend-color" style="background: rgba(255, 193, 7, 0.1); border: 2px solid #ffc107;"></div>
                 <span>EfficientNet-21k Selection</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(45deg, rgba(40, 167, 69, 0.8) 50%, rgba(255, 193, 7, 0.8) 50%);"></div>
+                <div class="legend-color" style="background: linear-gradient(45deg, rgba(40, 167, 69, 0.1) 50%, rgba(255, 193, 7, 0.1) 50%); border: 2px solid #17a2b8;"></div>
                 <span>Both Models Agree</span>
             </div>
         </div>
@@ -318,18 +318,22 @@
 
         async function loadCLIPResults() {
             try {
-                const response = await fetch('./clip_vocab_analysis_1752007567.json');
+                document.getElementById('results').innerHTML = '<div class="loading">Loading CLIP results...</div>';
+                const response = await fetch('./clip_vocab_analysis_full_1752012318.json');
                 const data = await response.json();
                 clipResults = data.results || [];
                 console.log(`Loaded ${clipResults.length} CLIP results`);
                 updateStats();
+                document.getElementById('results').innerHTML = '<div class="loading">CLIP results loaded successfully. Click "Show Side-by-Side Comparison" to view.</div>';
             } catch (error) {
                 console.error('Error loading CLIP results:', error);
+                document.getElementById('results').innerHTML = `<div class="loading" style="color: #dc3545;">Error loading CLIP results: ${error.message}</div>`;
             }
         }
 
         async function loadEfficientNetResults() {
             try {
+                document.getElementById('results').innerHTML = '<div class="loading">Loading EfficientNet results...</div>';
                 let response = await fetch('./simple_grid_selection_fixed_1751995650.json');
                 if (!response.ok) {
                     response = await fetch('./simple_grid_selection_1751993817.json');
@@ -338,8 +342,10 @@
                 efficientNetResults = data.results || [];
                 console.log(`Loaded ${efficientNetResults.length} EfficientNet results`);
                 updateStats();
+                document.getElementById('results').innerHTML = '<div class="loading">EfficientNet results loaded successfully. Click "Show Side-by-Side Comparison" to view.</div>';
             } catch (error) {
                 console.error('Error loading EfficientNet results:', error);
+                document.getElementById('results').innerHTML = `<div class="loading" style="color: #dc3545;">Error loading EfficientNet results: ${error.message}</div>`;
             }
         }
 
@@ -358,15 +364,19 @@
         }
 
         async function showComparison() {
+            document.getElementById('results').innerHTML = '<div class="loading">Preparing comparison...</div>';
+            
             await loadCLIPResults();
             await loadEfficientNetResults();
             
             const resultsDiv = document.getElementById('results');
             
             if (clipResults.length === 0 || efficientNetResults.length === 0) {
-                resultsDiv.innerHTML = '<div class="loading">Please load both CLIP and EfficientNet results first</div>';
+                resultsDiv.innerHTML = '<div class="loading" style="color: #dc3545;">Please load both CLIP and EfficientNet results first</div>';
                 return;
             }
+
+            resultsDiv.innerHTML = '<div class="loading">Creating comparison cards...</div>';
 
             const gridContainer = document.createElement('div');
             gridContainer.className = 'grid-container';
@@ -382,6 +392,8 @@
                     });
                 }
             });
+
+            console.log(`Creating ${matchedResults.length} comparison cards`);
 
             matchedResults.forEach(({ clip, efficient }) => {
                 const card = document.createElement('div');
@@ -417,7 +429,7 @@
                             <div class="prediction ${clipCorrect ? 'correct-prediction' : 'wrong-prediction'}">
                                 ${clipCorrect ? `✅ Found in ${clipPosition}` : '❌ Not found'}
                                 <span class="accuracy-indicator ${clipCorrect ? 'correct' : 'incorrect'}">
-                                    ${clipCorrect ? 'CORRECT' : 'INCORRECT'}
+                                    ${clipCorrect ? 'FOUND MATCH' : 'NO MATCH'}
                                 </span>
                             </div>
                             ${clip.best_match_confidence ? `<div class="confidence">Confidence: ${clip.best_match_confidence.toFixed(1)}%</div>` : ''}
@@ -428,7 +440,7 @@
                             <div class="prediction ${efficientCorrect ? 'correct-prediction' : 'wrong-prediction'}">
                                 ${efficientCorrect ? `✅ Found in ${efficientPosition}` : '❌ Not found'}
                                 <span class="accuracy-indicator ${efficientCorrect ? 'correct' : 'incorrect'}">
-                                    ${efficientCorrect ? 'CORRECT' : 'INCORRECT'}
+                                    ${efficientCorrect ? 'FOUND MATCH' : 'NO MATCH'}
                                 </span>
                             </div>
                             ${efficient.selection_confidence ? `<div class="confidence">Confidence: ${efficient.selection_confidence.toFixed(1)}%</div>` : ''}
@@ -441,6 +453,8 @@
 
             resultsDiv.innerHTML = '';
             resultsDiv.appendChild(gridContainer);
+            
+            console.log(`Comparison complete: ${matchedResults.length} cards displayed`);
         }
 
         function createComparisonGridCells(clipPosition, efficientPosition) {
@@ -468,20 +482,38 @@
         async function showOnlyDifferences() {
             await showComparison();
             
-            // Hide cards where both models agree
-            const cards = document.querySelectorAll('.comparison-card');
-            cards.forEach(card => {
-                const clipResult = card.querySelector('.clip-result .prediction');
-                const efficientResult = card.querySelector('.efficientnet-result .prediction');
+            document.getElementById('results').innerHTML = '<div class="loading">Filtering to show only differences...</div>';
+            
+            setTimeout(() => {
+                // Hide cards where both models agree
+                const cards = document.querySelectorAll('.comparison-card');
+                let hiddenCount = 0;
                 
-                const clipCorrect = clipResult.classList.contains('correct-prediction');
-                const efficientCorrect = efficientResult.classList.contains('correct-prediction');
+                cards.forEach(card => {
+                    const clipResult = card.querySelector('.clip-result .prediction');
+                    const efficientResult = card.querySelector('.efficientnet-result .prediction');
+                    
+                    const clipCorrect = clipResult.classList.contains('correct-prediction');
+                    const efficientCorrect = efficientResult.classList.contains('correct-prediction');
+                    
+                    // Hide if both models have the same result (both correct or both incorrect)
+                    if (clipCorrect === efficientCorrect) {
+                        card.style.display = 'none';
+                        hiddenCount++;
+                    }
+                });
                 
-                // Hide if both models have the same result (both correct or both incorrect)
-                if (clipCorrect === efficientCorrect) {
-                    card.style.display = 'none';
-                }
-            });
+                const visibleCount = cards.length - hiddenCount;
+                console.log(`Showing ${visibleCount} differences out of ${cards.length} total comparisons`);
+                
+                // Add a header to show the filter status
+                const resultsDiv = document.getElementById('results');
+                const header = document.createElement('div');
+                header.style.cssText = 'text-align: center; margin-bottom: 20px; padding: 15px; background: #e8f5e8; border-radius: 6px; font-weight: bold;';
+                header.innerHTML = `🔍 Showing ${visibleCount} cases where models disagree (${hiddenCount} agreements hidden)`;
+                resultsDiv.insertBefore(header, resultsDiv.firstChild);
+                
+            }, 500);
         }
 
         // Auto-load results on page load

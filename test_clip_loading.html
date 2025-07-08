@@ -76,7 +76,7 @@
             
             try {
                 console.log('Attempting to load CLIP results...');
-                const response = await fetch('./clip_vocab_analysis_1752007567.json');
+                const response = await fetch('./clip_vocab_analysis_full_1752012318.json');
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -151,7 +151,7 @@ ${error.stack}`;
             
             try {
                 // Load CLIP results
-                const clipResponse = await fetch('./clip_vocab_analysis_1752007567.json');
+                const clipResponse = await fetch('./clip_vocab_analysis_full_1752012318.json');
                 const clipData = await clipResponse.json();
                 const clipResults = clipData.results || [];
                 
