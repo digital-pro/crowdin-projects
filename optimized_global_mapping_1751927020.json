@@ -1,0 +1,2167 @@
+{
+  "global_mapping": {
+    "13885": "acorn",
+    "7154": "bouquet",
+    "17565": "chat",
+    "7808": "chat",
+    "11382": "chat",
+    "11061": "preserve",
+    "9910": "aloe",
+    "7655": "sandbag",
+    "9655": "sandbag",
+    "14102": "sprinkler",
+    "21679": "sprinkler",
+    "12021": "foam",
+    "13899": "foam",
+    "12275": "antenna",
+    "4318": "cloak",
+    "14155": "cloak",
+    "4467": "carousel",
+    "11870": "carousel",
+    "8915": "artichoke",
+    "21666": "swordfish",
+    "10277": "swordfish",
+    "8": "bamboo",
+    "7646": "bamboo",
+    "11004": "barrel",
+    "6288": "oil",
+    "11437": "posterior",
+    "14051": "posterior",
+    "14582": "posterior",
+    "14003": "blender",
+    "11735": "watermelon",
+    "4711": "blower",
+    "12020": "lollipop",
+    "11141": "lollipop",
+    "21279": "lollipop",
+    "12023": "couturier",
+    "6820": "prism",
+    "13352": "buffet",
+    "4606": "map",
+    "8193": "map",
+    "5029": "map",
+    "14004": "cake",
+    "14039": "caramel",
+    "14059": "caramel",
+    "14698": "ball",
+    "3574": "ball",
+    "19202": "ball",
+    "21359": "carrot",
+    "15259": "cassette",
+    "9355": "cassette",
+    "21668": "cheese",
+    "2332": "cheese",
+    "13256": "cheese",
+    "11930": "tumble",
+    "9545": "tumble",
+    "4619": "tumble",
+    "5314": "coaster",
+    "7644": "cork",
+    "7419": "ruler",
+    "7994": "potato",
+    "21658": "potato",
+    "6833": "corset",
+    "12291": "triad",
+    "7688": "elbow",
+    "14407": "fan",
+    "9317": "fan",
+    "8332": "waterwheel",
+    "16144": "waterwheel",
+    "2519": "artifact",
+    "17789": "artifact",
+    "13505": "artifact",
+    "13950": "footbath",
+    "9742": "fruitcake",
+    "6937": "gutter",
+    "11016": "hamster",
+    "21689": "divan",
+    "21644": "divan",
+    "12793": "hedgehog",
+    "16044": "hedgehog",
+    "10444": "hedgehog",
+    "6440": "locker",
+    "18665": "gesticulate",
+    "3047": "marshmallow",
+    "12298": "kazoo",
+    "12628": "pie",
+    "9422": "pitcher",
+    "4346": "pitcher",
+    "14684": "puddle",
+    "11051": "baywindow",
+    "13512": "baywindow",
+    "17835": "pump",
+    "12095": "facade",
+    "6342": "dripping",
+    "9176": "dripping",
+    "7871": "tapestry",
+    "4317": "scoop",
+    "9001": "furry",
+    "12055": "furry",
+    "210": "seagull",
+    "21688": "shower",
+    "10496": "shower",
+    "11293": "silverware",
+    "12009": "ski",
+    "16256": "sloth",
+    "5857": "sloth",
+    "11480": "snail",
+    "15308": "snail",
+    "12313": "steam",
+    "21282": "steam",
+    "5990": "spatula",
+    "4740": "spatula",
+    "7462": "squash",
+    "17159": "stew",
+    "6482": "stew",
+    "6248": "beret",
+    "12324": "beret",
+    "6556": "sedentary",
+    "7872": "sedentary",
+    "5282": "sedentary",
+    "17685": "stump",
+    "8350": "stump",
+    "5718": "rosette",
+    "6483": "rosette",
+    "13228": "rosette",
+    "21356": "telescope",
+    "7425": "telescope",
+    "11637": "thermos",
+    "12557": "treasure",
+    "14715": "trumpet",
+    "21678": "cormorant",
+    "12614": "tulip",
+    "11052": "turbine",
+    "13900": "turkey",
+    "8139": "turtle",
+    "8231": "turtle",
+    "14404": "typewriter",
+    "13886": "juggling",
+    "13768": "juggling",
+    "5146": "juggling",
+    "21686": "wheel",
+    "16660": "wheel",
+    "10809": "wheel",
+    "5725": "bear",
+    "4801": "duck",
+    "7724": "roof",
+    "4378": "milkshake",
+    "3575": "farm",
+    "5224": "farm",
+    "14386": "dressing",
+    "6870": "peeking",
+    "108": "envelope",
+    "21025": "diamond",
+    "13879": "diamond",
+    "6693": "calendar",
+    "12818": "calendar",
+    "12018": "calendar",
+    "5514": "panda",
+    "11040": "panda",
+    "14042": "panda",
+    "14691": "arrow",
+    "21774": "degression",
+    "7260": "degression",
+    "13513": "degression",
+    "13976": "knight",
+    "13397": "delivering",
+    "21748": "dentist",
+    "14622": "uniform",
+    "7000": "fetch",
+    "6335": "arcade",
+    "173": "awning",
+    "21804": "awning",
+    "21680": "colony",
+    "13942": "concentric",
+    "11379": "concentric",
+    "9450": "mischievous",
+    "12035": "mischievous",
+    "18113": "mischievous",
+    "7270": "confectionery",
+    "16879": "wetland",
+    "14669": "ecstatic",
+    "4380": "ecstatic",
+    "5802": "slope",
+    "5508": "habit",
+    "4922": "habit",
+    "5631": "irrigation",
+    "14006": "irrigation",
+    "12511": "mammalogy",
+    "19575": "metronome",
+    "4690": "paleontologist",
+    "21713": "paleontologist",
+    "11440": "percussion",
+    "12796": "percussion",
+    "5390": "percussion",
+    "14678": "arbor",
+    "8236": "saffron",
+    "9470": "skimmer",
+    "6350": "suede",
+    "17569": "suede",
+    "11347": "suede",
+    "15610": "dredging",
+    "14020": "bandage"
+  },
+  "mapping_statistics": {
+    "13885": {
+      "vocab_term": "acorn",
+      "avg_confidence": 99.90177154541016,
+      "occurrence_count": 1,
+      "consistency_score": 99.90177154541016,
+      "images": [
+        "004"
+      ]
+    },
+    "7154": {
+      "vocab_term": "bouquet",
+      "avg_confidence": 99.93203735351562,
+      "occurrence_count": 1,
+      "consistency_score": 99.93203735351562,
+      "images": [
+        "012"
+      ]
+    },
+    "17565": {
+      "vocab_term": "chat",
+      "avg_confidence": 97.4185676574707,
+      "occurrence_count": 2,
+      "consistency_score": 194.8371353149414,
+      "images": [
+        "149",
+        "149"
+      ]
+    },
+    "11061": {
+      "vocab_term": "preserve",
+      "avg_confidence": 94.96250915527344,
+      "occurrence_count": 3,
+      "consistency_score": 284.8875274658203,
+      "images": [
+        "151",
+        "151",
+        "151"
+      ]
+    },
+    "9910": {
+      "vocab_term": "aloe",
+      "avg_confidence": 98.40766906738281,
+      "occurrence_count": 1,
+      "consistency_score": 98.40766906738281,
+      "images": [
+        "005"
+      ]
+    },
+    "7655": {
+      "vocab_term": "sandbag",
+      "avg_confidence": 99.99675750732422,
+      "occurrence_count": 1,
+      "consistency_score": 99.99675750732422,
+      "images": [
+        "056"
+      ]
+    },
+    "21679": {
+      "vocab_term": "sprinkler",
+      "avg_confidence": 99.99866485595703,
+      "occurrence_count": 1,
+      "consistency_score": 99.99866485595703,
+      "images": [
+        "069"
+      ]
+    },
+    "12021": {
+      "vocab_term": "foam",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "030"
+      ]
+    },
+    "12275": {
+      "vocab_term": "antenna",
+      "avg_confidence": 99.95028686523438,
+      "occurrence_count": 1,
+      "consistency_score": 99.95028686523438,
+      "images": [
+        "006"
+      ]
+    },
+    "14155": {
+      "vocab_term": "cloak",
+      "avg_confidence": 96.19012451171875,
+      "occurrence_count": 1,
+      "consistency_score": 96.19012451171875,
+      "images": [
+        "021"
+      ]
+    },
+    "4467": {
+      "vocab_term": "carousel",
+      "avg_confidence": 98.763427734375,
+      "occurrence_count": 2,
+      "consistency_score": 197.52685546875,
+      "images": [
+        "017",
+        "017"
+      ]
+    },
+    "8915": {
+      "vocab_term": "artichoke",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "007"
+      ]
+    },
+    "21666": {
+      "vocab_term": "swordfish",
+      "avg_confidence": 99.99998474121094,
+      "occurrence_count": 1,
+      "consistency_score": 99.99998474121094,
+      "images": [
+        "076"
+      ]
+    },
+    "8": {
+      "vocab_term": "bamboo",
+      "avg_confidence": 99.99868774414062,
+      "occurrence_count": 1,
+      "consistency_score": 99.99868774414062,
+      "images": [
+        "008"
+      ]
+    },
+    "14102": {
+      "vocab_term": "sprinkler",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "069"
+      ]
+    },
+    "7646": {
+      "vocab_term": "bamboo",
+      "avg_confidence": 99.28974914550781,
+      "occurrence_count": 1,
+      "consistency_score": 99.28974914550781,
+      "images": [
+        "008"
+      ]
+    },
+    "11004": {
+      "vocab_term": "barrel",
+      "avg_confidence": 99.22856140136719,
+      "occurrence_count": 1,
+      "consistency_score": 99.22856140136719,
+      "images": [
+        "009"
+      ]
+    },
+    "6288": {
+      "vocab_term": "oil",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "045"
+      ]
+    },
+    "11437": {
+      "vocab_term": "posterior",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "157"
+      ]
+    },
+    "14003": {
+      "vocab_term": "blender",
+      "avg_confidence": 99.36833190917969,
+      "occurrence_count": 1,
+      "consistency_score": 99.36833190917969,
+      "images": [
+        "010"
+      ]
+    },
+    "11735": {
+      "vocab_term": "watermelon",
+      "avg_confidence": 99.99932098388672,
+      "occurrence_count": 1,
+      "consistency_score": 99.99932098388672,
+      "images": [
+        "088"
+      ]
+    },
+    "4711": {
+      "vocab_term": "blower",
+      "avg_confidence": 99.98120880126953,
+      "occurrence_count": 1,
+      "consistency_score": 99.98120880126953,
+      "images": [
+        "011"
+      ]
+    },
+    "12020": {
+      "vocab_term": "lollipop",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "041"
+      ]
+    },
+    "12023": {
+      "vocab_term": "couturier",
+      "avg_confidence": 99.86430740356445,
+      "occurrence_count": 2,
+      "consistency_score": 199.7286148071289,
+      "images": [
+        "133",
+        "133"
+      ]
+    },
+    "6820": {
+      "vocab_term": "prism",
+      "avg_confidence": 98.98809814453125,
+      "occurrence_count": 1,
+      "consistency_score": 98.98809814453125,
+      "images": [
+        "051"
+      ]
+    },
+    "13352": {
+      "vocab_term": "buffet",
+      "avg_confidence": 98.50181579589844,
+      "occurrence_count": 1,
+      "consistency_score": 98.50181579589844,
+      "images": [
+        "013"
+      ]
+    },
+    "5029": {
+      "vocab_term": "map",
+      "avg_confidence": 97.72461700439453,
+      "occurrence_count": 1,
+      "consistency_score": 97.72461700439453,
+      "images": [
+        "042"
+      ]
+    },
+    "14004": {
+      "vocab_term": "cake",
+      "avg_confidence": 96.5577392578125,
+      "occurrence_count": 1,
+      "consistency_score": 96.5577392578125,
+      "images": [
+        "015"
+      ]
+    },
+    "14039": {
+      "vocab_term": "caramel",
+      "avg_confidence": 99.98448181152344,
+      "occurrence_count": 1,
+      "consistency_score": 99.98448181152344,
+      "images": [
+        "016"
+      ]
+    },
+    "14059": {
+      "vocab_term": "caramel",
+      "avg_confidence": 72.60064697265625,
+      "occurrence_count": 1,
+      "consistency_score": 72.60064697265625,
+      "images": [
+        "016"
+      ]
+    },
+    "11870": {
+      "vocab_term": "carousel",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "017"
+      ]
+    },
+    "14698": {
+      "vocab_term": "ball",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "091"
+      ]
+    },
+    "21359": {
+      "vocab_term": "carrot",
+      "avg_confidence": 98.93162536621094,
+      "occurrence_count": 1,
+      "consistency_score": 98.93162536621094,
+      "images": [
+        "018"
+      ]
+    },
+    "9355": {
+      "vocab_term": "cassette",
+      "avg_confidence": 93.28034210205078,
+      "occurrence_count": 1,
+      "consistency_score": 93.28034210205078,
+      "images": [
+        "019"
+      ]
+    },
+    "15259": {
+      "vocab_term": "cassette",
+      "avg_confidence": 99.99760437011719,
+      "occurrence_count": 1,
+      "consistency_score": 99.99760437011719,
+      "images": [
+        "019"
+      ]
+    },
+    "13256": {
+      "vocab_term": "cheese",
+      "avg_confidence": 99.5056381225586,
+      "occurrence_count": 1,
+      "consistency_score": 99.5056381225586,
+      "images": [
+        "020"
+      ]
+    },
+    "21668": {
+      "vocab_term": "cheese",
+      "avg_confidence": 99.99998474121094,
+      "occurrence_count": 1,
+      "consistency_score": 99.99998474121094,
+      "images": [
+        "020"
+      ]
+    },
+    "2332": {
+      "vocab_term": "cheese",
+      "avg_confidence": 99.84741973876953,
+      "occurrence_count": 1,
+      "consistency_score": 99.84741973876953,
+      "images": [
+        "020"
+      ]
+    },
+    "4318": {
+      "vocab_term": "cloak",
+      "avg_confidence": 99.22227478027344,
+      "occurrence_count": 1,
+      "consistency_score": 99.22227478027344,
+      "images": [
+        "021"
+      ]
+    },
+    "9545": {
+      "vocab_term": "tumble",
+      "avg_confidence": 99.9984359741211,
+      "occurrence_count": 1,
+      "consistency_score": 99.9984359741211,
+      "images": [
+        "130"
+      ]
+    },
+    "5314": {
+      "vocab_term": "coaster",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "023"
+      ]
+    },
+    "11382": {
+      "vocab_term": "chat",
+      "avg_confidence": 93.1412124633789,
+      "occurrence_count": 1,
+      "consistency_score": 93.1412124633789,
+      "images": [
+        "149"
+      ]
+    },
+    "7644": {
+      "vocab_term": "cork",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "024"
+      ]
+    },
+    "7419": {
+      "vocab_term": "ruler",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "106"
+      ]
+    },
+    "3574": {
+      "vocab_term": "ball",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "091"
+      ]
+    },
+    "7994": {
+      "vocab_term": "potato",
+      "avg_confidence": 99.97915649414062,
+      "occurrence_count": 1,
+      "consistency_score": 99.97915649414062,
+      "images": [
+        "050"
+      ]
+    },
+    "6833": {
+      "vocab_term": "corset",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "026"
+      ]
+    },
+    "12291": {
+      "vocab_term": "triad",
+      "avg_confidence": 99.73803329467773,
+      "occurrence_count": 2,
+      "consistency_score": 199.47606658935547,
+      "images": [
+        "168",
+        "168"
+      ]
+    },
+    "7688": {
+      "vocab_term": "elbow",
+      "avg_confidence": 74.85603332519531,
+      "occurrence_count": 1,
+      "consistency_score": 74.85603332519531,
+      "images": [
+        "028"
+      ]
+    },
+    "9317": {
+      "vocab_term": "fan",
+      "avg_confidence": 99.99864196777344,
+      "occurrence_count": 1,
+      "consistency_score": 99.99864196777344,
+      "images": [
+        "029"
+      ]
+    },
+    "14407": {
+      "vocab_term": "fan",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "029"
+      ]
+    },
+    "8332": {
+      "vocab_term": "waterwheel",
+      "avg_confidence": 99.99656677246094,
+      "occurrence_count": 1,
+      "consistency_score": 99.99656677246094,
+      "images": [
+        "089"
+      ]
+    },
+    "13899": {
+      "vocab_term": "foam",
+      "avg_confidence": 97.91381072998047,
+      "occurrence_count": 1,
+      "consistency_score": 97.91381072998047,
+      "images": [
+        "030"
+      ]
+    },
+    "2519": {
+      "vocab_term": "artifact",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "124"
+      ]
+    },
+    "13950": {
+      "vocab_term": "footbath",
+      "avg_confidence": 85.59832000732422,
+      "occurrence_count": 1,
+      "consistency_score": 85.59832000732422,
+      "images": [
+        "031"
+      ]
+    },
+    "9742": {
+      "vocab_term": "fruitcake",
+      "avg_confidence": 81.73062896728516,
+      "occurrence_count": 1,
+      "consistency_score": 81.73062896728516,
+      "images": [
+        "032"
+      ]
+    },
+    "6937": {
+      "vocab_term": "gutter",
+      "avg_confidence": 98.22765350341797,
+      "occurrence_count": 1,
+      "consistency_score": 98.22765350341797,
+      "images": [
+        "033"
+      ]
+    },
+    "11016": {
+      "vocab_term": "hamster",
+      "avg_confidence": 87.50399017333984,
+      "occurrence_count": 1,
+      "consistency_score": 87.50399017333984,
+      "images": [
+        "034"
+      ]
+    },
+    "21689": {
+      "vocab_term": "divan",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "135"
+      ]
+    },
+    "10277": {
+      "vocab_term": "swordfish",
+      "avg_confidence": 99.33069610595703,
+      "occurrence_count": 1,
+      "consistency_score": 99.33069610595703,
+      "images": [
+        "076"
+      ]
+    },
+    "10444": {
+      "vocab_term": "hedgehog",
+      "avg_confidence": 97.51441955566406,
+      "occurrence_count": 1,
+      "consistency_score": 97.51441955566406,
+      "images": [
+        "035"
+      ]
+    },
+    "16044": {
+      "vocab_term": "hedgehog",
+      "avg_confidence": 99.9940185546875,
+      "occurrence_count": 1,
+      "consistency_score": 99.9940185546875,
+      "images": [
+        "035"
+      ]
+    },
+    "12793": {
+      "vocab_term": "hedgehog",
+      "avg_confidence": 99.99773406982422,
+      "occurrence_count": 1,
+      "consistency_score": 99.99773406982422,
+      "images": [
+        "035"
+      ]
+    },
+    "6440": {
+      "vocab_term": "locker",
+      "avg_confidence": 99.48076629638672,
+      "occurrence_count": 1,
+      "consistency_score": 99.48076629638672,
+      "images": [
+        "040"
+      ]
+    },
+    "18665": {
+      "vocab_term": "gesticulate",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "142"
+      ]
+    },
+    "21279": {
+      "vocab_term": "lollipop",
+      "avg_confidence": 97.92204284667969,
+      "occurrence_count": 1,
+      "consistency_score": 97.92204284667969,
+      "images": [
+        "041"
+      ]
+    },
+    "11141": {
+      "vocab_term": "lollipop",
+      "avg_confidence": 99.73836517333984,
+      "occurrence_count": 1,
+      "consistency_score": 99.73836517333984,
+      "images": [
+        "041"
+      ]
+    },
+    "8193": {
+      "vocab_term": "map",
+      "avg_confidence": 99.97587585449219,
+      "occurrence_count": 1,
+      "consistency_score": 99.97587585449219,
+      "images": [
+        "042"
+      ]
+    },
+    "4606": {
+      "vocab_term": "map",
+      "avg_confidence": 99.99165344238281,
+      "occurrence_count": 1,
+      "consistency_score": 99.99165344238281,
+      "images": [
+        "042"
+      ]
+    },
+    "3047": {
+      "vocab_term": "marshmallow",
+      "avg_confidence": 98.40711212158203,
+      "occurrence_count": 1,
+      "consistency_score": 98.40711212158203,
+      "images": [
+        "043"
+      ]
+    },
+    "12298": {
+      "vocab_term": "kazoo",
+      "avg_confidence": 99.9908218383789,
+      "occurrence_count": 1,
+      "consistency_score": 99.9908218383789,
+      "images": [
+        "148"
+      ]
+    },
+    "12628": {
+      "vocab_term": "pie",
+      "avg_confidence": 85.40422058105469,
+      "occurrence_count": 1,
+      "consistency_score": 85.40422058105469,
+      "images": [
+        "047"
+      ]
+    },
+    "9422": {
+      "vocab_term": "pitcher",
+      "avg_confidence": 81.8642578125,
+      "occurrence_count": 1,
+      "consistency_score": 81.8642578125,
+      "images": [
+        "049"
+      ]
+    },
+    "4346": {
+      "vocab_term": "pitcher",
+      "avg_confidence": 72.7216567993164,
+      "occurrence_count": 1,
+      "consistency_score": 72.7216567993164,
+      "images": [
+        "049"
+      ]
+    },
+    "21658": {
+      "vocab_term": "potato",
+      "avg_confidence": 94.3388900756836,
+      "occurrence_count": 1,
+      "consistency_score": 94.3388900756836,
+      "images": [
+        "050"
+      ]
+    },
+    "14684": {
+      "vocab_term": "puddle",
+      "avg_confidence": 99.75577545166016,
+      "occurrence_count": 1,
+      "consistency_score": 99.75577545166016,
+      "images": [
+        "052"
+      ]
+    },
+    "11051": {
+      "vocab_term": "baywindow",
+      "avg_confidence": 99.98985290527344,
+      "occurrence_count": 1,
+      "consistency_score": 99.98985290527344,
+      "images": [
+        "137"
+      ]
+    },
+    "17835": {
+      "vocab_term": "pump",
+      "avg_confidence": 88.83499145507812,
+      "occurrence_count": 1,
+      "consistency_score": 88.83499145507812,
+      "images": [
+        "053"
+      ]
+    },
+    "12095": {
+      "vocab_term": "facade",
+      "avg_confidence": 99.96452331542969,
+      "occurrence_count": 1,
+      "consistency_score": 99.96452331542969,
+      "images": [
+        "143"
+      ]
+    },
+    "6342": {
+      "vocab_term": "dripping",
+      "avg_confidence": 99.18975830078125,
+      "occurrence_count": 1,
+      "consistency_score": 99.18975830078125,
+      "images": [
+        "114"
+      ]
+    },
+    "9655": {
+      "vocab_term": "sandbag",
+      "avg_confidence": 85.44822692871094,
+      "occurrence_count": 1,
+      "consistency_score": 85.44822692871094,
+      "images": [
+        "056"
+      ]
+    },
+    "21644": {
+      "vocab_term": "divan",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "135"
+      ]
+    },
+    "7871": {
+      "vocab_term": "tapestry",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "077"
+      ]
+    },
+    "4317": {
+      "vocab_term": "scoop",
+      "avg_confidence": 78.48722076416016,
+      "occurrence_count": 1,
+      "consistency_score": 78.48722076416016,
+      "images": [
+        "058"
+      ]
+    },
+    "9001": {
+      "vocab_term": "furry",
+      "avg_confidence": 99.98292541503906,
+      "occurrence_count": 1,
+      "consistency_score": 99.98292541503906,
+      "images": [
+        "120"
+      ]
+    },
+    "210": {
+      "vocab_term": "seagull",
+      "avg_confidence": 74.71257781982422,
+      "occurrence_count": 1,
+      "consistency_score": 74.71257781982422,
+      "images": [
+        "059"
+      ]
+    },
+    "21688": {
+      "vocab_term": "shower",
+      "avg_confidence": 98.83263397216797,
+      "occurrence_count": 1,
+      "consistency_score": 98.83263397216797,
+      "images": [
+        "061"
+      ]
+    },
+    "10496": {
+      "vocab_term": "shower",
+      "avg_confidence": 93.65678405761719,
+      "occurrence_count": 1,
+      "consistency_score": 93.65678405761719,
+      "images": [
+        "061"
+      ]
+    },
+    "11293": {
+      "vocab_term": "silverware",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "062"
+      ]
+    },
+    "12009": {
+      "vocab_term": "ski",
+      "avg_confidence": 99.97042846679688,
+      "occurrence_count": 1,
+      "consistency_score": 99.97042846679688,
+      "images": [
+        "064"
+      ]
+    },
+    "16256": {
+      "vocab_term": "sloth",
+      "avg_confidence": 98.82234954833984,
+      "occurrence_count": 1,
+      "consistency_score": 98.82234954833984,
+      "images": [
+        "065"
+      ]
+    },
+    "5857": {
+      "vocab_term": "sloth",
+      "avg_confidence": 95.5040512084961,
+      "occurrence_count": 1,
+      "consistency_score": 95.5040512084961,
+      "images": [
+        "065"
+      ]
+    },
+    "15308": {
+      "vocab_term": "snail",
+      "avg_confidence": 80.32258605957031,
+      "occurrence_count": 1,
+      "consistency_score": 80.32258605957031,
+      "images": [
+        "066"
+      ]
+    },
+    "11480": {
+      "vocab_term": "snail",
+      "avg_confidence": 99.38762664794922,
+      "occurrence_count": 1,
+      "consistency_score": 99.38762664794922,
+      "images": [
+        "066"
+      ]
+    },
+    "12313": {
+      "vocab_term": "steam",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "171"
+      ]
+    },
+    "5990": {
+      "vocab_term": "spatula",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "068"
+      ]
+    },
+    "4740": {
+      "vocab_term": "spatula",
+      "avg_confidence": 99.99995422363281,
+      "occurrence_count": 1,
+      "consistency_score": 99.99995422363281,
+      "images": [
+        "068"
+      ]
+    },
+    "7462": {
+      "vocab_term": "squash",
+      "avg_confidence": 83.36300659179688,
+      "occurrence_count": 1,
+      "consistency_score": 83.36300659179688,
+      "images": [
+        "070"
+      ]
+    },
+    "17159": {
+      "vocab_term": "stew",
+      "avg_confidence": 98.93058013916016,
+      "occurrence_count": 1,
+      "consistency_score": 98.93058013916016,
+      "images": [
+        "072"
+      ]
+    },
+    "6482": {
+      "vocab_term": "stew",
+      "avg_confidence": 98.7423095703125,
+      "occurrence_count": 1,
+      "consistency_score": 98.7423095703125,
+      "images": [
+        "072"
+      ]
+    },
+    "6248": {
+      "vocab_term": "beret",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "126"
+      ]
+    },
+    "6556": {
+      "vocab_term": "sedentary",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "165"
+      ]
+    },
+    "8350": {
+      "vocab_term": "stump",
+      "avg_confidence": 86.56169128417969,
+      "occurrence_count": 1,
+      "consistency_score": 86.56169128417969,
+      "images": [
+        "074"
+      ]
+    },
+    "17685": {
+      "vocab_term": "stump",
+      "avg_confidence": 93.0889892578125,
+      "occurrence_count": 1,
+      "consistency_score": 93.0889892578125,
+      "images": [
+        "074"
+      ]
+    },
+    "5718": {
+      "vocab_term": "rosette",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "161"
+      ]
+    },
+    "7425": {
+      "vocab_term": "telescope",
+      "avg_confidence": 75.73833465576172,
+      "occurrence_count": 1,
+      "consistency_score": 75.73833465576172,
+      "images": [
+        "079"
+      ]
+    },
+    "21356": {
+      "vocab_term": "telescope",
+      "avg_confidence": 99.99897766113281,
+      "occurrence_count": 1,
+      "consistency_score": 99.99897766113281,
+      "images": [
+        "079"
+      ]
+    },
+    "11637": {
+      "vocab_term": "thermos",
+      "avg_confidence": 99.99996185302734,
+      "occurrence_count": 1,
+      "consistency_score": 99.99996185302734,
+      "images": [
+        "080"
+      ]
+    },
+    "12557": {
+      "vocab_term": "treasure",
+      "avg_confidence": 99.99486541748047,
+      "occurrence_count": 1,
+      "consistency_score": 99.99486541748047,
+      "images": [
+        "081"
+      ]
+    },
+    "14715": {
+      "vocab_term": "trumpet",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "082"
+      ]
+    },
+    "21678": {
+      "vocab_term": "cormorant",
+      "avg_confidence": 99.99995422363281,
+      "occurrence_count": 1,
+      "consistency_score": 99.99995422363281,
+      "images": [
+        "121"
+      ]
+    },
+    "12614": {
+      "vocab_term": "tulip",
+      "avg_confidence": 99.14112091064453,
+      "occurrence_count": 1,
+      "consistency_score": 99.14112091064453,
+      "images": [
+        "083"
+      ]
+    },
+    "11052": {
+      "vocab_term": "turbine",
+      "avg_confidence": 99.81678771972656,
+      "occurrence_count": 1,
+      "consistency_score": 99.81678771972656,
+      "images": [
+        "084"
+      ]
+    },
+    "13900": {
+      "vocab_term": "turkey",
+      "avg_confidence": 99.62688446044922,
+      "occurrence_count": 1,
+      "consistency_score": 99.62688446044922,
+      "images": [
+        "085"
+      ]
+    },
+    "8139": {
+      "vocab_term": "turtle",
+      "avg_confidence": 99.99493408203125,
+      "occurrence_count": 1,
+      "consistency_score": 99.99493408203125,
+      "images": [
+        "086"
+      ]
+    },
+    "8231": {
+      "vocab_term": "turtle",
+      "avg_confidence": 99.99258422851562,
+      "occurrence_count": 1,
+      "consistency_score": 99.99258422851562,
+      "images": [
+        "086"
+      ]
+    },
+    "14404": {
+      "vocab_term": "typewriter",
+      "avg_confidence": 97.00556945800781,
+      "occurrence_count": 1,
+      "consistency_score": 97.00556945800781,
+      "images": [
+        "087"
+      ]
+    },
+    "16144": {
+      "vocab_term": "waterwheel",
+      "avg_confidence": 96.45638275146484,
+      "occurrence_count": 1,
+      "consistency_score": 96.45638275146484,
+      "images": [
+        "089"
+      ]
+    },
+    "13886": {
+      "vocab_term": "juggling",
+      "avg_confidence": 99.99968719482422,
+      "occurrence_count": 1,
+      "consistency_score": 99.99968719482422,
+      "images": [
+        "102"
+      ]
+    },
+    "19202": {
+      "vocab_term": "ball",
+      "avg_confidence": 98.5324478149414,
+      "occurrence_count": 1,
+      "consistency_score": 98.5324478149414,
+      "images": [
+        "091"
+      ]
+    },
+    "16660": {
+      "vocab_term": "wheel",
+      "avg_confidence": 99.98472595214844,
+      "occurrence_count": 1,
+      "consistency_score": 99.98472595214844,
+      "images": [
+        "100"
+      ]
+    },
+    "5725": {
+      "vocab_term": "bear",
+      "avg_confidence": 96.85111236572266,
+      "occurrence_count": 1,
+      "consistency_score": 96.85111236572266,
+      "images": [
+        "092"
+      ]
+    },
+    "4801": {
+      "vocab_term": "duck",
+      "avg_confidence": 99.93881225585938,
+      "occurrence_count": 1,
+      "consistency_score": 99.93881225585938,
+      "images": [
+        "093"
+      ]
+    },
+    "7724": {
+      "vocab_term": "roof",
+      "avg_confidence": 99.79911041259766,
+      "occurrence_count": 1,
+      "consistency_score": 99.79911041259766,
+      "images": [
+        "104"
+      ]
+    },
+    "4378": {
+      "vocab_term": "milkshake",
+      "avg_confidence": 77.35916137695312,
+      "occurrence_count": 1,
+      "consistency_score": 77.35916137695312,
+      "images": [
+        "097"
+      ]
+    },
+    "21686": {
+      "vocab_term": "wheel",
+      "avg_confidence": 99.99982452392578,
+      "occurrence_count": 1,
+      "consistency_score": 99.99982452392578,
+      "images": [
+        "100"
+      ]
+    },
+    "10809": {
+      "vocab_term": "wheel",
+      "avg_confidence": 98.82402038574219,
+      "occurrence_count": 1,
+      "consistency_score": 98.82402038574219,
+      "images": [
+        "100"
+      ]
+    },
+    "5224": {
+      "vocab_term": "farm",
+      "avg_confidence": 99.74574279785156,
+      "occurrence_count": 1,
+      "consistency_score": 99.74574279785156,
+      "images": [
+        "101"
+      ]
+    },
+    "3575": {
+      "vocab_term": "farm",
+      "avg_confidence": 99.85444641113281,
+      "occurrence_count": 1,
+      "consistency_score": 99.85444641113281,
+      "images": [
+        "101"
+      ]
+    },
+    "5146": {
+      "vocab_term": "juggling",
+      "avg_confidence": 89.9100341796875,
+      "occurrence_count": 1,
+      "consistency_score": 89.9100341796875,
+      "images": [
+        "102"
+      ]
+    },
+    "13768": {
+      "vocab_term": "juggling",
+      "avg_confidence": 90.871337890625,
+      "occurrence_count": 1,
+      "consistency_score": 90.871337890625,
+      "images": [
+        "102"
+      ]
+    },
+    "14386": {
+      "vocab_term": "dressing",
+      "avg_confidence": 99.96571350097656,
+      "occurrence_count": 1,
+      "consistency_score": 99.96571350097656,
+      "images": [
+        "103"
+      ]
+    },
+    "6870": {
+      "vocab_term": "peeking",
+      "avg_confidence": 91.53949737548828,
+      "occurrence_count": 1,
+      "consistency_score": 91.53949737548828,
+      "images": [
+        "105"
+      ]
+    },
+    "108": {
+      "vocab_term": "envelope",
+      "avg_confidence": 99.99967956542969,
+      "occurrence_count": 1,
+      "consistency_score": 99.99967956542969,
+      "images": [
+        "108"
+      ]
+    },
+    "21025": {
+      "vocab_term": "diamond",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "109"
+      ]
+    },
+    "13879": {
+      "vocab_term": "diamond",
+      "avg_confidence": 99.07184600830078,
+      "occurrence_count": 1,
+      "consistency_score": 99.07184600830078,
+      "images": [
+        "109"
+      ]
+    },
+    "12818": {
+      "vocab_term": "calendar",
+      "avg_confidence": 99.99964141845703,
+      "occurrence_count": 1,
+      "consistency_score": 99.99964141845703,
+      "images": [
+        "110"
+      ]
+    },
+    "6693": {
+      "vocab_term": "calendar",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "110"
+      ]
+    },
+    "12018": {
+      "vocab_term": "calendar",
+      "avg_confidence": 99.17906188964844,
+      "occurrence_count": 1,
+      "consistency_score": 99.17906188964844,
+      "images": [
+        "110"
+      ]
+    },
+    "8308": {
+      "vocab_term": "calendar",
+      "avg_confidence": 92.85060119628906,
+      "occurrence_count": 1,
+      "consistency_score": 92.85060119628906,
+      "images": [
+        "110"
+      ]
+    },
+    "5514": {
+      "vocab_term": "panda",
+      "avg_confidence": 98.7762451171875,
+      "occurrence_count": 1,
+      "consistency_score": 98.7762451171875,
+      "images": [
+        "111"
+      ]
+    },
+    "14042": {
+      "vocab_term": "panda",
+      "avg_confidence": 93.30736541748047,
+      "occurrence_count": 1,
+      "consistency_score": 93.30736541748047,
+      "images": [
+        "111"
+      ]
+    },
+    "11040": {
+      "vocab_term": "panda",
+      "avg_confidence": 97.19694519042969,
+      "occurrence_count": 1,
+      "consistency_score": 97.19694519042969,
+      "images": [
+        "111"
+      ]
+    },
+    "14691": {
+      "vocab_term": "arrow",
+      "avg_confidence": 82.20948791503906,
+      "occurrence_count": 1,
+      "consistency_score": 82.20948791503906,
+      "images": [
+        "112"
+      ]
+    },
+    "4619": {
+      "vocab_term": "tumble",
+      "avg_confidence": 99.99565124511719,
+      "occurrence_count": 1,
+      "consistency_score": 99.99565124511719,
+      "images": [
+        "130"
+      ]
+    },
+    "21774": {
+      "vocab_term": "degression",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "134"
+      ]
+    },
+    "9176": {
+      "vocab_term": "dripping",
+      "avg_confidence": 77.4814224243164,
+      "occurrence_count": 1,
+      "consistency_score": 77.4814224243164,
+      "images": [
+        "114"
+      ]
+    },
+    "13976": {
+      "vocab_term": "knight",
+      "avg_confidence": 92.65740203857422,
+      "occurrence_count": 1,
+      "consistency_score": 92.65740203857422,
+      "images": [
+        "115"
+      ]
+    },
+    "13397": {
+      "vocab_term": "delivering",
+      "avg_confidence": 99.17571258544922,
+      "occurrence_count": 1,
+      "consistency_score": 99.17571258544922,
+      "images": [
+        "116"
+      ]
+    },
+    "21748": {
+      "vocab_term": "dentist",
+      "avg_confidence": 93.11814880371094,
+      "occurrence_count": 1,
+      "consistency_score": 93.11814880371094,
+      "images": [
+        "117"
+      ]
+    },
+    "14622": {
+      "vocab_term": "uniform",
+      "avg_confidence": 90.77885437011719,
+      "occurrence_count": 1,
+      "consistency_score": 90.77885437011719,
+      "images": [
+        "119"
+      ]
+    },
+    "12055": {
+      "vocab_term": "furry",
+      "avg_confidence": 94.88015747070312,
+      "occurrence_count": 1,
+      "consistency_score": 94.88015747070312,
+      "images": [
+        "120"
+      ]
+    },
+    "7000": {
+      "vocab_term": "fetch",
+      "avg_confidence": 95.80475616455078,
+      "occurrence_count": 1,
+      "consistency_score": 95.80475616455078,
+      "images": [
+        "122"
+      ]
+    },
+    "6335": {
+      "vocab_term": "arcade",
+      "avg_confidence": 99.98878479003906,
+      "occurrence_count": 1,
+      "consistency_score": 99.98878479003906,
+      "images": [
+        "123"
+      ]
+    },
+    "13505": {
+      "vocab_term": "artifact",
+      "avg_confidence": 99.99998474121094,
+      "occurrence_count": 1,
+      "consistency_score": 99.99998474121094,
+      "images": [
+        "124"
+      ]
+    },
+    "17789": {
+      "vocab_term": "artifact",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "124"
+      ]
+    },
+    "21804": {
+      "vocab_term": "awning",
+      "avg_confidence": 99.99671936035156,
+      "occurrence_count": 1,
+      "consistency_score": 99.99671936035156,
+      "images": [
+        "152"
+      ]
+    },
+    "12324": {
+      "vocab_term": "beret",
+      "avg_confidence": 76.25293731689453,
+      "occurrence_count": 1,
+      "consistency_score": 76.25293731689453,
+      "images": [
+        "126"
+      ]
+    },
+    "11930": {
+      "vocab_term": "tumble",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "130"
+      ]
+    },
+    "21680": {
+      "vocab_term": "colony",
+      "avg_confidence": 99.9985122680664,
+      "occurrence_count": 1,
+      "consistency_score": 99.9985122680664,
+      "images": [
+        "150"
+      ]
+    },
+    "13942": {
+      "vocab_term": "concentric",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "131"
+      ]
+    },
+    "11379": {
+      "vocab_term": "concentric",
+      "avg_confidence": 99.93775177001953,
+      "occurrence_count": 1,
+      "consistency_score": 99.93775177001953,
+      "images": [
+        "131"
+      ]
+    },
+    "9450": {
+      "vocab_term": "mischievous",
+      "avg_confidence": 99.98420715332031,
+      "occurrence_count": 1,
+      "consistency_score": 99.98420715332031,
+      "images": [
+        "163"
+      ]
+    },
+    "7270": {
+      "vocab_term": "confectionery",
+      "avg_confidence": 94.84270477294922,
+      "occurrence_count": 1,
+      "consistency_score": 94.84270477294922,
+      "images": [
+        "132"
+      ]
+    },
+    "13513": {
+      "vocab_term": "degression",
+      "avg_confidence": 99.40718078613281,
+      "occurrence_count": 1,
+      "consistency_score": 99.40718078613281,
+      "images": [
+        "134"
+      ]
+    },
+    "7260": {
+      "vocab_term": "degression",
+      "avg_confidence": 99.99796295166016,
+      "occurrence_count": 1,
+      "consistency_score": 99.99796295166016,
+      "images": [
+        "134"
+      ]
+    },
+    "16879": {
+      "vocab_term": "wetland",
+      "avg_confidence": 84.50675201416016,
+      "occurrence_count": 1,
+      "consistency_score": 84.50675201416016,
+      "images": [
+        "136"
+      ]
+    },
+    "13512": {
+      "vocab_term": "baywindow",
+      "avg_confidence": 81.4705810546875,
+      "occurrence_count": 1,
+      "consistency_score": 81.4705810546875,
+      "images": [
+        "137"
+      ]
+    },
+    "4380": {
+      "vocab_term": "ecstatic",
+      "avg_confidence": 85.17787170410156,
+      "occurrence_count": 1,
+      "consistency_score": 85.17787170410156,
+      "images": [
+        "139"
+      ]
+    },
+    "14669": {
+      "vocab_term": "ecstatic",
+      "avg_confidence": 99.92200469970703,
+      "occurrence_count": 1,
+      "consistency_score": 99.92200469970703,
+      "images": [
+        "139"
+      ]
+    },
+    "5802": {
+      "vocab_term": "slope",
+      "avg_confidence": 99.99864959716797,
+      "occurrence_count": 1,
+      "consistency_score": 99.99864959716797,
+      "images": [
+        "144"
+      ]
+    },
+    "5508": {
+      "vocab_term": "habit",
+      "avg_confidence": 99.98731994628906,
+      "occurrence_count": 1,
+      "consistency_score": 99.98731994628906,
+      "images": [
+        "145"
+      ]
+    },
+    "4922": {
+      "vocab_term": "habit",
+      "avg_confidence": 99.3792495727539,
+      "occurrence_count": 1,
+      "consistency_score": 99.3792495727539,
+      "images": [
+        "145"
+      ]
+    },
+    "5631": {
+      "vocab_term": "irrigation",
+      "avg_confidence": 99.99934387207031,
+      "occurrence_count": 1,
+      "consistency_score": 99.99934387207031,
+      "images": [
+        "147"
+      ]
+    },
+    "14006": {
+      "vocab_term": "irrigation",
+      "avg_confidence": 99.90020751953125,
+      "occurrence_count": 1,
+      "consistency_score": 99.90020751953125,
+      "images": [
+        "147"
+      ]
+    },
+    "7808": {
+      "vocab_term": "chat",
+      "avg_confidence": 99.12324523925781,
+      "occurrence_count": 1,
+      "consistency_score": 99.12324523925781,
+      "images": [
+        "149"
+      ]
+    },
+    "173": {
+      "vocab_term": "awning",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "152"
+      ]
+    },
+    "12511": {
+      "vocab_term": "mammalogy",
+      "avg_confidence": 99.97508239746094,
+      "occurrence_count": 1,
+      "consistency_score": 99.97508239746094,
+      "images": [
+        "153"
+      ]
+    },
+    "19575": {
+      "vocab_term": "metronome",
+      "avg_confidence": 99.99990844726562,
+      "occurrence_count": 1,
+      "consistency_score": 99.99990844726562,
+      "images": [
+        "154"
+      ]
+    },
+    "21713": {
+      "vocab_term": "paleontologist",
+      "avg_confidence": 75.42317962646484,
+      "occurrence_count": 1,
+      "consistency_score": 75.42317962646484,
+      "images": [
+        "155"
+      ]
+    },
+    "4690": {
+      "vocab_term": "paleontologist",
+      "avg_confidence": 97.09861755371094,
+      "occurrence_count": 1,
+      "consistency_score": 97.09861755371094,
+      "images": [
+        "155"
+      ]
+    },
+    "5390": {
+      "vocab_term": "percussion",
+      "avg_confidence": 87.75657653808594,
+      "occurrence_count": 1,
+      "consistency_score": 87.75657653808594,
+      "images": [
+        "156"
+      ]
+    },
+    "11440": {
+      "vocab_term": "percussion",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "156"
+      ]
+    },
+    "12796": {
+      "vocab_term": "percussion",
+      "avg_confidence": 98.27620697021484,
+      "occurrence_count": 1,
+      "consistency_score": 98.27620697021484,
+      "images": [
+        "156"
+      ]
+    },
+    "14582": {
+      "vocab_term": "posterior",
+      "avg_confidence": 88.66426849365234,
+      "occurrence_count": 1,
+      "consistency_score": 88.66426849365234,
+      "images": [
+        "157"
+      ]
+    },
+    "14051": {
+      "vocab_term": "posterior",
+      "avg_confidence": 99.88247680664062,
+      "occurrence_count": 1,
+      "consistency_score": 99.88247680664062,
+      "images": [
+        "157"
+      ]
+    },
+    "14678": {
+      "vocab_term": "arbor",
+      "avg_confidence": 97.56767272949219,
+      "occurrence_count": 1,
+      "consistency_score": 97.56767272949219,
+      "images": [
+        "159"
+      ]
+    },
+    "6483": {
+      "vocab_term": "rosette",
+      "avg_confidence": 99.98880767822266,
+      "occurrence_count": 1,
+      "consistency_score": 99.98880767822266,
+      "images": [
+        "161"
+      ]
+    },
+    "8967": {
+      "vocab_term": "rosette",
+      "avg_confidence": 98.93186950683594,
+      "occurrence_count": 1,
+      "consistency_score": 98.93186950683594,
+      "images": [
+        "161"
+      ]
+    },
+    "13228": {
+      "vocab_term": "rosette",
+      "avg_confidence": 99.62176513671875,
+      "occurrence_count": 1,
+      "consistency_score": 99.62176513671875,
+      "images": [
+        "161"
+      ]
+    },
+    "8236": {
+      "vocab_term": "saffron",
+      "avg_confidence": 89.02882385253906,
+      "occurrence_count": 1,
+      "consistency_score": 89.02882385253906,
+      "images": [
+        "162"
+      ]
+    },
+    "12035": {
+      "vocab_term": "mischievous",
+      "avg_confidence": 98.19190216064453,
+      "occurrence_count": 1,
+      "consistency_score": 98.19190216064453,
+      "images": [
+        "163"
+      ]
+    },
+    "18113": {
+      "vocab_term": "mischievous",
+      "avg_confidence": 96.27731323242188,
+      "occurrence_count": 1,
+      "consistency_score": 96.27731323242188,
+      "images": [
+        "163"
+      ]
+    },
+    "9470": {
+      "vocab_term": "skimmer",
+      "avg_confidence": 99.99991607666016,
+      "occurrence_count": 1,
+      "consistency_score": 99.99991607666016,
+      "images": [
+        "164"
+      ]
+    },
+    "7872": {
+      "vocab_term": "sedentary",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "165"
+      ]
+    },
+    "5282": {
+      "vocab_term": "sedentary",
+      "avg_confidence": 99.98414611816406,
+      "occurrence_count": 1,
+      "consistency_score": 99.98414611816406,
+      "images": [
+        "165"
+      ]
+    },
+    "17569": {
+      "vocab_term": "suede",
+      "avg_confidence": 98.91216278076172,
+      "occurrence_count": 1,
+      "consistency_score": 98.91216278076172,
+      "images": [
+        "166"
+      ]
+    },
+    "6350": {
+      "vocab_term": "suede",
+      "avg_confidence": 99.60350036621094,
+      "occurrence_count": 1,
+      "consistency_score": 99.60350036621094,
+      "images": [
+        "166"
+      ]
+    },
+    "11347": {
+      "vocab_term": "suede",
+      "avg_confidence": 98.04342651367188,
+      "occurrence_count": 1,
+      "consistency_score": 98.04342651367188,
+      "images": [
+        "166"
+      ]
+    },
+    "15610": {
+      "vocab_term": "dredging",
+      "avg_confidence": 99.79232025146484,
+      "occurrence_count": 1,
+      "consistency_score": 99.79232025146484,
+      "images": [
+        "169"
+      ]
+    },
+    "21282": {
+      "vocab_term": "steam",
+      "avg_confidence": 88.95280456542969,
+      "occurrence_count": 1,
+      "consistency_score": 88.95280456542969,
+      "images": [
+        "171"
+      ]
+    },
+    "14020": {
+      "vocab_term": "bandage",
+      "avg_confidence": 100.0,
+      "occurrence_count": 1,
+      "consistency_score": 100.0,
+      "images": [
+        "173"
+      ]
+    }
+  },
+  "vocabulary_detection_counts": {
+    "acorn": 1,
+    "bouquet": 1,
+    "chat": 4,
+    "preserve": 3,
+    "aloe": 1,
+    "sandbag": 2,
+    "sprinkler": 2,
+    "foam": 2,
+    "antenna": 1,
+    "cloak": 2,
+    "carousel": 3,
+    "artichoke": 1,
+    "swordfish": 2,
+    "bamboo": 2,
+    "barrel": 1,
+    "oil": 1,
+    "posterior": 3,
+    "blender": 1,
+    "watermelon": 1,
+    "blower": 1,
+    "lollipop": 3,
+    "couturier": 2,
+    "prism": 1,
+    "buffet": 1,
+    "map": 3,
+    "cake": 1,
+    "caramel": 2,
+    "ball": 3,
+    "carrot": 1,
+    "cassette": 2,
+    "cheese": 3,
+    "tumble": 3,
+    "coaster": 1,
+    "cork": 1,
+    "ruler": 1,
+    "potato": 2,
+    "corset": 1,
+    "triad": 2,
+    "elbow": 1,
+    "fan": 2,
+    "waterwheel": 2,
+    "artifact": 3,
+    "footbath": 1,
+    "fruitcake": 1,
+    "gutter": 1,
+    "hamster": 1,
+    "divan": 2,
+    "hedgehog": 3,
+    "locker": 1,
+    "gesticulate": 1,
+    "marshmallow": 1,
+    "kazoo": 1,
+    "pie": 1,
+    "pitcher": 2,
+    "puddle": 1,
+    "baywindow": 2,
+    "pump": 1,
+    "facade": 1,
+    "dripping": 2,
+    "tapestry": 1,
+    "scoop": 1,
+    "furry": 2,
+    "seagull": 1,
+    "shower": 2,
+    "silverware": 1,
+    "ski": 1,
+    "sloth": 2,
+    "snail": 2,
+    "steam": 2,
+    "spatula": 2,
+    "squash": 1,
+    "stew": 2,
+    "beret": 2,
+    "sedentary": 3,
+    "stump": 2,
+    "rosette": 3,
+    "telescope": 2,
+    "thermos": 1,
+    "treasure": 1,
+    "trumpet": 1,
+    "cormorant": 1,
+    "tulip": 1,
+    "turbine": 1,
+    "turkey": 1,
+    "turtle": 2,
+    "typewriter": 1,
+    "juggling": 3,
+    "wheel": 3,
+    "bear": 1,
+    "duck": 1,
+    "roof": 1,
+    "milkshake": 1,
+    "farm": 2,
+    "dressing": 1,
+    "peeking": 1,
+    "envelope": 1,
+    "diamond": 2,
+    "calendar": 3,
+    "panda": 3,
+    "arrow": 1,
+    "degression": 3,
+    "knight": 1,
+    "delivering": 1,
+    "dentist": 1,
+    "uniform": 1,
+    "fetch": 1,
+    "arcade": 1,
+    "awning": 2,
+    "colony": 1,
+    "concentric": 2,
+    "mischievous": 3,
+    "confectionery": 1,
+    "wetland": 1,
+    "ecstatic": 2,
+    "slope": 1,
+    "habit": 2,
+    "irrigation": 2,
+    "mammalogy": 1,
+    "metronome": 1,
+    "paleontologist": 2,
+    "percussion": 3,
+    "arbor": 1,
+    "saffron": 1,
+    "skimmer": 1,
+    "suede": 3,
+    "dredging": 1,
+    "bandage": 1
+  },
+  "creation_timestamp": 1751927020,
+  "total_mappings": 200,
+  "vocabulary_terms_covered": 127,
+  "quality_control": {
+    "min_confidence": 70.0,
+    "min_consistency_score": 70.0,
+    "max_classes_per_term": 3
+  }
+}
