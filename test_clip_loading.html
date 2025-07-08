@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CLIP Loading</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .clip-btn {
+            background: #28a745;
+            color: white;
+        }
+        .efficient-btn {
+            background: #ffc107;
+            color: black;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .error {
+            color: #dc3545;
+        }
+        .success {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test CLIP Results Loading</h1>
+        
+        <button class="btn clip-btn" onclick="testCLIPLoading()">
+            🤖 Test CLIP Results Loading
+        </button>
+        
+        <button class="btn efficient-btn" onclick="testEfficientNetLoading()">
+            ⚡ Test EfficientNet Results Loading
+        </button>
+        
+        <button class="btn" onclick="testBothAndCompare()">
+            📊 Test Both and Compare
+        </button>
+        
+        <div id="results" class="results">
+            Click a button above to test loading...
+        </div>
+    </div>
+
+    <script>
+        async function testCLIPLoading() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = 'Testing CLIP loading...';
+            
+            try {
+                console.log('Attempting to load CLIP results...');
+                const response = await fetch('./clip_vocab_analysis_1752007567.json');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const results = data.results || [];
+                
+                resultsDiv.innerHTML = `✅ SUCCESS: Loaded ${results.length} CLIP results
+                
+First result:
+${JSON.stringify(results[0], null, 2)}
+
+Metadata:
+${JSON.stringify(data.metadata, null, 2)}`;
+                resultsDiv.className = 'results success';
+                
+            } catch (error) {
+                console.error('CLIP loading error:', error);
+                resultsDiv.innerHTML = `❌ ERROR loading CLIP results:
+${error.message}
+
+Stack trace:
+${error.stack}`;
+                resultsDiv.className = 'results error';
+            }
+        }
+
+        async function testEfficientNetLoading() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = 'Testing EfficientNet loading...';
+            
+            try {
+                console.log('Attempting to load EfficientNet results...');
+                let response = await fetch('./simple_grid_selection_fixed_1751995650.json');
+                
+                if (!response.ok) {
+                    console.log('First file failed, trying backup...');
+                    response = await fetch('./simple_grid_selection_1751993817.json');
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const results = data.results || [];
+                
+                resultsDiv.innerHTML = `✅ SUCCESS: Loaded ${results.length} EfficientNet results
+                
+First result:
+${JSON.stringify(results[0], null, 2)}
+
+Metadata:
+${JSON.stringify(data.metadata, null, 2)}`;
+                resultsDiv.className = 'results success';
+                
+            } catch (error) {
+                console.error('EfficientNet loading error:', error);
+                resultsDiv.innerHTML = `❌ ERROR loading EfficientNet results:
+${error.message}
+
+Stack trace:
+${error.stack}`;
+                resultsDiv.className = 'results error';
+            }
+        }
+
+        async function testBothAndCompare() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = 'Testing both models...';
+            
+            try {
+                // Load CLIP results
+                const clipResponse = await fetch('./clip_vocab_analysis_1752007567.json');
+                const clipData = await clipResponse.json();
+                const clipResults = clipData.results || [];
+                
+                // Load EfficientNet results
+                let efficientResponse = await fetch('./simple_grid_selection_fixed_1751995650.json');
+                if (!efficientResponse.ok) {
+                    efficientResponse = await fetch('./simple_grid_selection_1751993817.json');
+                }
+                const efficientData = await efficientResponse.json();
+                const efficientResults = efficientData.results || [];
+                
+                // Find vocab-004 in both
+                const clipVocab004 = clipResults.find(r => r.screenshot_id === '004');
+                const efficientVocab004 = efficientResults.find(r => r.screenshot_id === '004');
+                
+                resultsDiv.innerHTML = `✅ SUCCESS: Loaded both models
+                
+CLIP Results: ${clipResults.length} items
+EfficientNet Results: ${efficientResults.length} items
+
+VOCAB-004 COMPARISON:
+
+CLIP (vocab-004):
+- Expected: ${clipVocab004?.expected_vocab}
+- Found: ${clipVocab004?.expected_found}
+- Best match: ${clipVocab004?.best_match_position}
+- Confidence: ${clipVocab004?.best_match_confidence}%
+
+EfficientNet (vocab-004):
+- Expected: ${efficientVocab004?.expected_vocab}
+- Found: ${efficientVocab004?.model_selection !== null}
+- Selection: ${efficientVocab004?.model_selection}
+- Confidence: ${efficientVocab004?.selection_confidence}%
+
+CLIP Grid Results for vocab-004:
+${JSON.stringify(clipVocab004?.grid_results, null, 2)}`;
+                resultsDiv.className = 'results success';
+                
+            } catch (error) {
+                console.error('Comparison error:', error);
+                resultsDiv.innerHTML = `❌ ERROR in comparison:
+${error.message}`;
+                resultsDiv.className = 'results error';
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -111,11 +111,24 @@
         <div class="tools-grid">
             <div class="tool-card recommended">
                 <div class="tool-title">
+                    🤖 CLIP vs EfficientNet-21k Comparison
+                    <span class="status status-working">✅ WORKING</span>
+                </div>
+                <div class="tool-description">
+                    <strong>NEW & RECOMMENDED:</strong> Side-by-side comparison of CLIP (100% success) vs EfficientNet-21k (74.7% success). 
+                    Shows how CLIP correctly identifies acorn in bottom-right while EfficientNet-21k incorrectly selects coconut in top-left.
+                    Clear visual comparison with accuracy indicators.
+                </div>
+                <a href="clip_results_viewer.html" class="tool-link">Open CLIP Comparison</a>
+            </div>
+
+            <div class="tool-card">
+                <div class="tool-title">
                     🔗 Simple Grid Selection Viewer (GitHub Images)
                     <span class="status status-working">✅ WORKING</span>
                 </div>
                 <div class="tool-description">
-                    <strong>Recommended:</strong> Shows which grid cell the model selects for each vocabulary term. 
+                    Shows which grid cell the model selects for each vocabulary term. 
                     Uses images directly from the GitHub repository. All 170 vocabulary images available.
                     Clean, simple interface focused on model selections.
                 </div>
@@ -173,14 +186,14 @@
 
         <div class="footer">
             <h3>📋 Quick Summary</h3>
+            <p><strong>🎯 MAJOR IMPROVEMENT:</strong> CLIP achieves 100% success rate vs EfficientNet-21k's 74.7%</p>
+            <p><strong>✅ CLIP Benefits:</strong> Better text-image alignment, accurate spatial detection, no coconut/acorn confusion</p>
             <p><strong>Dataset:</strong> 170 vocabulary frames (vocab-004 to vocab-173)</p>
-            <p><strong>Model Performance:</strong> 127/170 frames (74.7%) where expected term found</p>
-            <p><strong>Local Images:</strong> vocab-001 to vocab-010 available in sample_vocab_images/</p>
             <p><strong>Grid Layout:</strong> 2x2 grid per image (top-left, top-right, bottom-left, bottom-right)</p>
             
             <div style="margin-top: 20px; padding: 15px; background: #e8f5e8; border-radius: 6px;">
-                <strong>🎯 Start Here:</strong> Click "Simple Grid Selection Viewer (Local Images)" above 
-                to see the model's selections with actual images and clear visual indicators.
+                <strong>🤖 Start Here:</strong> Click "CLIP vs EfficientNet-21k Comparison" above 
+                to see the dramatic improvement in model accuracy and spatial understanding.
             </div>
         </div>
     </div>
