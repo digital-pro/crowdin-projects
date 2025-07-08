@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed EfficientNet-21k Vocabulary Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: black;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .results-container {
+            margin-top: 30px;
+        }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .image-item {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        .image-header {
+            padding: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .correct-top-match {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-color: #28a745;
+            color: #155724;
+        }
+        .found-elsewhere {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-color: #ffc107;
+            color: #856404;
+        }
+        .not-found {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .screenshot {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .grid-results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: #ddd;
+        }
+        .grid-cell {
+            background: white;
+            padding: 10px;
+            font-size: 12px;
+            text-align: center;
+        }
+        .grid-cell-header {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .top-match-correct {
+            background: #d4edda;
+            color: #155724;
+        }
+        .top-match-wrong {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .found-not-top {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-legend {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            color: white;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Fixed EfficientNet-21k Vocabulary Analysis</h1>
+            <p>Corrected display showing true grid cell status</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="loadFixedResults()">
+                🔧 Load Fixed Analysis Results
+            </button>
+            <button class="btn btn-success" onclick="showComparison()">
+                📊 Show Before/After Comparison
+            </button>
+            <button class="btn btn-warning" onclick="explainTheFix()">
+                💡 Explain The Fix
+            </button>
+        </div>
+
+        <div class="status-legend" style="display: none;" id="legend">
+            <div class="legend-item correct-top-match">
+                <span>✅</span> Expected term is TOP match
+            </div>
+            <div class="legend-item found-elsewhere">
+                <span>🔶</span> Expected term found but NOT top
+            </div>
+            <div class="legend-item not-found">
+                <span>❌</span> Expected term NOT found
+            </div>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Sample data based on the debug results
+        const FIXED_RESULTS = [
+            {
+                id: '004',
+                expected: 'acorn',
+                status: 'TOP_MATCH',
+                image_url: 'https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-004.png',
+                cells: {
+                    'top-left': { term: 'acorn', confidence: 99.9, isExpected: true, isTop: true },
+                    'top-right': { term: 'bouquet', confidence: 83.0, isExpected: false, isTop: true },
+                    'bottom-left': { term: 'chat', confidence: 95.7, isExpected: false, isTop: true },
+                    'bottom-right': { term: 'preserve', confidence: 99.9, isExpected: false, isTop: true }
+                }
+            },
+            {
+                id: '005',
+                expected: 'aloe',
+                status: 'TOP_MATCH',
+                image_url: 'https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-005.png',
+                cells: {
+                    'top-left': { term: 'preserve', confidence: 55.1, isExpected: false, isTop: true },
+                    'top-right': { term: 'aloe', confidence: 98.4, isExpected: true, isTop: true },
+                    'bottom-left': { term: 'sandbag', confidence: 99.8, isExpected: false, isTop: true },
+                    'bottom-right': { term: 'sprinkler', confidence: 100.0, isExpected: false, isTop: true }
+                }
+            },
+            {
+                id: '006',
+                expected: 'antenna',
+                status: 'TOP_MATCH',
+                image_url: 'https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-006.png',
+                cells: {
+                    'top-left': { term: 'foam', confidence: 100.0, isExpected: false, isTop: true },
+                    'top-right': { term: 'antenna', confidence: 100.0, isExpected: true, isTop: true },
+                    'bottom-left': { term: 'cloak', confidence: 71.7, isExpected: false, isTop: true },
+                    'bottom-right': { term: 'carousel', confidence: 100.0, isExpected: false, isTop: true }
+                }
+            },
+            {
+                id: '007',
+                expected: 'artichoke',
+                status: 'TOP_MATCH',
+                image_url: 'https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-007.png',
+                cells: {
+                    'top-left': { term: 'cheese', confidence: 58.7, isExpected: false, isTop: true },
+                    'top-right': { term: 'artichoke', confidence: 100.0, isExpected: true, isTop: true },
+                    'bottom-left': { term: 'swordfish', confidence: 93.0, isExpected: false, isTop: true },
+                    'bottom-right': { term: 'facade', confidence: 69.4, isExpected: false, isTop: true }
+                }
+            },
+            {
+                id: '008',
+                expected: 'bamboo',
+                status: 'TOP_MATCH',
+                image_url: 'https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-008.png',
+                cells: {
+                    'top-left': { term: 'chat', confidence: 99.8, isExpected: false, isTop: true },
+                    'top-right': { term: 'bamboo', confidence: 100.0, isExpected: true, isTop: true },
+                    'bottom-left': { term: 'sprinkler', confidence: 98.2, isExpected: false, isTop: true },
+                    'bottom-right': { term: 'bamboo', confidence: 99.3, isExpected: true, isTop: true }
+                }
+            },
+            {
+                id: '009',
+                expected: 'barrel',
+                status: 'TOP_MATCH',
+                image_url: 'https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-009.png',
+                cells: {
+                    'top-left': { term: 'foam', confidence: 58.8, isExpected: false, isTop: true },
+                    'top-right': { term: 'antenna', confidence: 95.1, isExpected: false, isTop: true },
+                    'bottom-left': { term: 'barrel', confidence: 99.2, isExpected: true, isTop: true },
+                    'bottom-right': { term: 'preserve', confidence: 38.5, isExpected: false, isTop: true }
+                }
+            }
+        ];
+
+        function loadFixedResults() {
+            document.getElementById('legend').style.display = 'flex';
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            // Add summary stats
+            const topMatches = FIXED_RESULTS.filter(r => r.status === 'TOP_MATCH').length;
+            const foundElsewhere = FIXED_RESULTS.filter(r => r.status === 'FOUND_ELSEWHERE').length;
+            const notFound = FIXED_RESULTS.filter(r => r.status === 'NOT_FOUND').length;
+
+            const summaryDiv = document.createElement('div');
+            summaryDiv.innerHTML = `
+                <h3>📊 Fixed Analysis Summary</h3>
+                <div class="summary-stats">
+                    <div class="stat-card" style="background: #28a745;">
+                        <div class="stat-value">${topMatches}</div>
+                        <div class="stat-label">Expected term is TOP match</div>
+                    </div>
+                    <div class="stat-card" style="background: #ffc107;">
+                        <div class="stat-value">${foundElsewhere}</div>
+                        <div class="stat-label">Expected found but not top</div>
+                    </div>
+                    <div class="stat-card" style="background: #dc3545;">
+                        <div class="stat-value">${notFound}</div>
+                        <div class="stat-label">Expected term not found</div>
+                    </div>
+                </div>
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                    <strong>🔧 What's Fixed:</strong> Now you can see exactly when expected terms are found as top matches vs. when they're detected but overshadowed by other terms. No more misleading "CORRECT ✅" status!
+                </div>
+            `;
+            resultsDiv.appendChild(summaryDiv);
+
+            // Add image grid
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'image-grid';
+
+            FIXED_RESULTS.forEach(result => {
+                const hasTopMatch = Object.values(result.cells).some(cell => cell.isExpected && cell.isTop);
+                const hasExpectedAnywhere = Object.values(result.cells).some(cell => cell.isExpected);
+                
+                let status, statusClass, statusIcon;
+                if (hasTopMatch) {
+                    status = 'Expected term is TOP match';
+                    statusClass = 'correct-top-match';
+                    statusIcon = '✅';
+                } else if (hasExpectedAnywhere) {
+                    status = 'Expected found but NOT top';
+                    statusClass = 'found-elsewhere';
+                    statusIcon = '🔶';
+                } else {
+                    status = 'Expected term NOT found';
+                    statusClass = 'not-found';
+                    statusIcon = '❌';
+                }
+
+                const imageDiv = document.createElement('div');
+                imageDiv.className = `image-item ${statusClass}`;
+                imageDiv.innerHTML = `
+                    <div class="image-header">
+                        vocab-${result.id}.png<br>
+                        <small>Expected: "${result.expected}"</small><br>
+                        <strong>${statusIcon} ${status}</strong>
+                    </div>
+                    <img src="${result.image_url}" alt="vocab-${result.id}" class="screenshot">
+                    <div class="grid-results">
+                        ${Object.entries(result.cells).map(([position, cell]) => {
+                            let cellClass = '';
+                            let cellIcon = '';
+                            
+                            if (cell.isExpected && cell.isTop) {
+                                cellClass = 'top-match-correct';
+                                cellIcon = '✅';
+                            } else if (cell.isExpected && !cell.isTop) {
+                                cellClass = 'found-not-top';
+                                cellIcon = '🔶';
+                            } else {
+                                cellClass = 'top-match-wrong';
+                                cellIcon = '❌';
+                            }
+                            
+                            return `
+                                <div class="grid-cell ${cellClass}">
+                                    <div class="grid-cell-header">${position.replace('-', ' ')}</div>
+                                    <div>${cellIcon} ${cell.term}</div>
+                                    <div>${cell.confidence.toFixed(1)}%</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+                gridDiv.appendChild(imageDiv);
+            });
+
+            resultsDiv.appendChild(gridDiv);
+        }
+
+        function showComparison() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <h3>📊 Before vs After Comparison</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                    <div style="background: #f8d7da; padding: 20px; border-radius: 8px; border: 2px solid #dc3545;">
+                        <h4 style="color: #721c24; margin-top: 0;">❌ BEFORE (Buggy)</h4>
+                        <div style="background: white; padding: 15px; border-radius: 4px; margin: 10px 0;">
+                            <strong>vocab-004.png</strong><br>
+                            Expected: "acorn"<br>
+                            <span style="color: #28a745; font-weight: bold;">✅ CORRECT</span><br><br>
+                            <div style="font-size: 12px;">
+                                <div>top-left: <strong>acorn</strong> (99.9%)</div>
+                                <div>top-right: <span style="color: #dc3545;">bouquet</span> (83.0%)</div>
+                                <div>bottom-left: <span style="color: #dc3545;">chat</span> (95.7%)</div>
+                                <div>bottom-right: <span style="color: #dc3545;">preserve</span> (99.9%)</div>
+                            </div>
+                        </div>
+                        <p style="color: #721c24;"><strong>Problem:</strong> Claims "CORRECT" but shows wrong terms in 3/4 grid cells!</p>
+                    </div>
+                    
+                    <div style="background: #d4edda; padding: 20px; border-radius: 8px; border: 2px solid #28a745;">
+                        <h4 style="color: #155724; margin-top: 0;">✅ AFTER (Fixed)</h4>
+                        <div style="background: white; padding: 15px; border-radius: 4px; margin: 10px 0;">
+                            <strong>vocab-004.png</strong><br>
+                            Expected: "acorn"<br>
+                            <span style="color: #28a745; font-weight: bold;">✅ Expected term is TOP match</span><br><br>
+                            <div style="font-size: 12px;">
+                                <div style="background: #d4edda; padding: 2px;">top-left: <strong>✅ acorn</strong> (99.9%)</div>
+                                <div style="background: #f8d7da; padding: 2px;">top-right: <strong>❌ bouquet</strong> (83.0%)</div>
+                                <div style="background: #f8d7da; padding: 2px;">bottom-left: <strong>❌ chat</strong> (95.7%)</div>
+                                <div style="background: #f8d7da; padding: 2px;">bottom-right: <strong>❌ preserve</strong> (99.9%)</div>
+                            </div>
+                        </div>
+                        <p style="color: #155724;"><strong>Solution:</strong> Clear visual indicators show exactly where expected terms are found!</p>
+                    </div>
+                </div>
+                
+                <div style="background: #e8f5e8; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h4>🎯 Key Improvements:</h4>
+                    <ul>
+                        <li><strong>Honest Status:</strong> Shows when expected terms are actually the top predictions</li>
+                        <li><strong>Visual Clarity:</strong> Color-coded grid cells show exactly what's happening</li>
+                        <li><strong>No More Confusion:</strong> Users can see the true performance at a glance</li>
+                        <li><strong>Better Decision Making:</strong> Clear data helps improve the model</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        function explainTheFix() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <h3>💡 Understanding the Fix</h3>
+                
+                <div style="background: #fff3cd; padding: 20px; border-radius: 8px; border: 2px solid #ffc107; margin: 20px 0;">
+                    <h4 style="color: #856404; margin-top: 0;">🚨 The Original Problem</h4>
+                    <p>The system was setting <code>has_correct_detection = true</code> if the expected vocabulary term appeared <strong>anywhere</strong> in the image's results, even if it wasn't the top match in any grid cell.</p>
+                    <p>This meant users would see:</p>
+                    <ul>
+                        <li>"✅ CORRECT" in the header</li>
+                        <li>But wrong vocabulary terms displayed in the grid cells</li>
+                        <li>Very confusing and misleading!</li>
+                    </ul>
+                </div>
+
+                <div style="background: #d4edda; padding: 20px; border-radius: 8px; border: 2px solid #28a745; margin: 20px 0;">
+                    <h4 style="color: #155724; margin-top: 0;">🔧 The Fix</h4>
+                    <p>Now the system distinguishes between three scenarios:</p>
+                    <ol>
+                        <li><strong>✅ TOP MATCH:</strong> Expected term is the #1 prediction in at least one grid cell</li>
+                        <li><strong>🔶 FOUND ELSEWHERE:</strong> Expected term is detected but not as a top match</li>
+                        <li><strong>❌ NOT FOUND:</strong> Expected term is not detected anywhere</li>
+                    </ol>
+                    <p>This gives users complete transparency about what the AI is actually seeing and predicting.</p>
+                </div>
+
+                <div style="background: #e8f5e8; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h4>📊 Impact of the Fix</h4>
+                    <p>With the corrected analysis:</p>
+                    <ul>
+                        <li><strong>True Accuracy:</strong> Shows when expected terms are actually the top predictions</li>
+                        <li><strong>Better Debugging:</strong> Reveals when the model finds terms but they're overshadowed</li>
+                        <li><strong>Improved Trust:</strong> Users can see exactly what's happening</li>
+                        <li><strong>Actionable Insights:</strong> Clear data for model improvement</li>
+                    </ul>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 2px solid #6c757d; margin: 20px 0;">
+                    <h4 style="color: #495057; margin-top: 0;">🔍 Technical Details</h4>
+                    <p>The fix involved:</p>
+                    <ol>
+                        <li><strong>Status Logic:</strong> Changed from "found anywhere" to "found as top match"</li>
+                        <li><strong>Visual Indicators:</strong> Added color coding for different scenarios</li>
+                        <li><strong>Grid Cell Analysis:</strong> Show exactly what term is predicted for each cell</li>
+                        <li><strong>Transparency:</strong> Display confidence levels and ranking information</li>
+                    </ol>
+                </div>
+            `;
+        }
+
+        // Load fixed results by default
+        window.addEventListener('DOMContentLoaded', loadFixedResults);
+    </script>
+</body>
+</html> 

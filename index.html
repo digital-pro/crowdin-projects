@@ -3,182 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vocabulary Image Analysis Tools</title>
+    <title>EfficientNet-21k Vocabulary Analysis Tools</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
+            margin: 0;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
+            background-color: #f5f5f5;
         }
         .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
             padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        h1 {
+        .header {
             text-align: center;
             margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        .tool-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-            margin: 30px 0;
-        }
-        .tool-card {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 25px;
-            text-align: center;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-        .tool-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
-            background: rgba(255, 255, 255, 0.25);
-        }
-        .tool-card h3 {
-            margin-top: 0;
-            font-size: 1.5em;
-            margin-bottom: 15px;
-        }
-        .tool-card p {
-            margin: 15px 0;
-            line-height: 1.6;
-        }
-        .btn {
-            display: inline-block;
-            padding: 12px 25px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            margin: 10px 5px;
-        }
-        .btn:hover {
-            background: white;
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-        .btn.primary {
-            background: #28a745;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            border-radius: 8px;
         }
-        .btn.primary:hover {
-            background: #218838;
-        }
-        .stats {
+        .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin: 30px 0;
         }
-        .stat-card {
-            background: rgba(255, 255, 255, 0.2);
+        .tool-card {
+            border: 2px solid #ddd;
+            border-radius: 8px;
             padding: 20px;
-            border-radius: 10px;
-            text-align: center;
+            background: white;
+            transition: all 0.3s;
         }
-        .stat-number {
-            font-size: 2.5em;
+        .tool-card:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .tool-title {
+            font-size: 1.2em;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .tool-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        .tool-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .tool-link:hover {
+            background: #0056b3;
+        }
+        .recommended {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #f8fff9 0%, #e8f5e8 100%);
+        }
+        .recommended .tool-title {
+            color: #28a745;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-working {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-limited {
+            background: #fff3cd;
+            color: #856404;
         }
         .footer {
             text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
-            font-size: 0.9em;
-            opacity: 0.8;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            color: #666;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎯 Vocabulary Image Analysis Tools</h1>
-        
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-number">170</div>
-                <div>Vocabulary Images</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">4</div>
-                <div>Analysis Methods</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">21k</div>
-                <div>EfficientNet Classes</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">100%</div>
-                <div>Best Accuracy</div>
-            </div>
+        <div class="header">
+            <h1>🎯 EfficientNet-21k Vocabulary Analysis Tools</h1>
+            <p>Choose your analysis tool below</p>
         </div>
 
-        <div class="tool-grid">
-            <div class="tool-card">
-                <h3>🚀 Main Analysis Tool</h3>
-                <p>Complete vocabulary image analysis with ResNet-50 and multiple EfficientNet-21k approaches. Compare all methods side-by-side with beautiful visualizations.</p>
-                <p><strong>Features:</strong></p>
-                <ul style="text-align: left; margin: 15px 0;">
-                    <li>ResNet-50 baseline analysis</li>
-                    <li>EfficientNet-21k enhanced results</li>
-                    <li>Location-aware perfect accuracy</li>
-                    <li>Optimized global mapping (best balance)</li>
-                    <li>Interactive grid cell analysis</li>
-                    <li>Download results as JSON</li>
-                </ul>
-                <a href="real-imagenet-resnet.html" class="btn primary">🎯 Open Main Tool</a>
+        <div class="tools-grid">
+            <div class="tool-card recommended">
+                <div class="tool-title">
+                    🔗 Simple Grid Selection Viewer (GitHub Images)
+                    <span class="status status-working">✅ WORKING</span>
+                </div>
+                <div class="tool-description">
+                    <strong>Recommended:</strong> Shows which grid cell the model selects for each vocabulary term. 
+                    Uses images directly from the GitHub repository. All 170 vocabulary images available.
+                    Clean, simple interface focused on model selections.
+                </div>
+                <a href="simple_grid_viewer_github.html" class="tool-link">Open GitHub Viewer</a>
             </div>
 
             <div class="tool-card">
-                <h3>📊 Simple Results Viewer</h3>
-                <p>Quick and simple viewer for analyzing vocabulary detection results. Perfect for rapid inspection of specific images.</p>
-                <p><strong>Best for:</strong> Quick checks, specific image analysis</p>
-                <a href="simple_results_viewer.html" class="btn">📊 View Results</a>
+                <div class="tool-title">
+                    🖼️ Simple Grid Selection Viewer (Local Images)
+                    <span class="status status-limited">⚠️ LIMITED</span>
+                </div>
+                <div class="tool-description">
+                    Shows model selections using local sample images (vocab-001 to vocab-010) and smart placeholders for the rest. 
+                    Good for testing but limited image coverage.
+                </div>
+                <a href="simple_grid_viewer_local.html" class="tool-link">Open Local Viewer</a>
             </div>
 
             <div class="tool-card">
-                <h3>🧪 Test Web App</h3>
-                <p>Basic testing interface for web application functionality and debugging.</p>
-                <p><strong>Best for:</strong> Development testing, debugging</p>
-                <a href="test_web_app.html" class="btn">🧪 Test App</a>
+                <div class="tool-title">
+                    🔧 Fixed Grid Selection Viewer
+                    <span class="status status-limited">⚠️ LIMITED</span>
+                </div>
+                <div class="tool-description">
+                    Advanced viewer with multiple image fallback URLs and error handling. 
+                    May have image loading issues due to GitHub access restrictions.
+                </div>
+                <a href="simple_grid_viewer_fixed.html" class="tool-link">Open Fixed Viewer</a>
             </div>
-        </div>
 
-        <div style="background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 10px; margin: 30px 0;">
-            <h3>🎯 Recommended Workflow</h3>
-            <ol style="text-align: left; line-height: 1.8;">
-                <li><strong>Start with Main Tool:</strong> Click "🎯 Open Main Tool" above</li>
-                <li><strong>Try Different Methods:</strong> 
-                    <ul>
-                        <li>🚀 EfficientNet-21k Results (baseline)</li>
-                        <li>🎯 Enhanced EfficientNet-21k (204 classes)</li>
-                        <li>🎯 Location-Aware (100% accuracy, sparse)</li>
-                        <li>🌐 Optimized Global (best balance) ⭐ <strong>RECOMMENDED</strong></li>
-                    </ul>
-                </li>
-                <li><strong>Compare Results:</strong> See visual comparisons and statistics</li>
-                <li><strong>Download Data:</strong> Save results for further analysis</li>
-            </ol>
+            <div class="tool-card">
+                <div class="tool-title">
+                    📊 Original ResNet + EfficientNet Comparison
+                    <span class="status status-limited">⚠️ LIMITED</span>
+                </div>
+                <div class="tool-description">
+                    Comprehensive analysis tool showing ResNet-50 vs EfficientNet-21k results with 
+                    detailed grid cell analysis and confidence scores. Complex interface with multiple analysis modes.
+                </div>
+                <a href="real-imagenet-resnet.html" class="tool-link">Open Comparison Tool</a>
+            </div>
+
+            <div class="tool-card">
+                <div class="tool-title">
+                    🔍 Debug & Fixed Analysis
+                    <span class="status status-working">✅ WORKING</span>
+                </div>
+                <div class="tool-description">
+                    Shows the corrected analysis that fixes the grid display bug. 
+                    Demonstrates the difference between "found anywhere" vs "top match" detection.
+                </div>
+                <a href="real-imagenet-resnet-fixed.html" class="tool-link">Open Debug Tool</a>
+            </div>
         </div>
 
         <div class="footer">
-            <p>🖥️ Server running on localhost:8000 | 🎯 EfficientNet-21k Vocabulary Analysis | 📊 GPU-Accelerated Processing</p>
-            <p>Use the <strong>🌐 Optimized Global</strong> method for the best balance of accuracy and usefulness!</p>
+            <h3>📋 Quick Summary</h3>
+            <p><strong>Dataset:</strong> 170 vocabulary frames (vocab-004 to vocab-173)</p>
+            <p><strong>Model Performance:</strong> 127/170 frames (74.7%) where expected term found</p>
+            <p><strong>Local Images:</strong> vocab-001 to vocab-010 available in sample_vocab_images/</p>
+            <p><strong>Grid Layout:</strong> 2x2 grid per image (top-left, top-right, bottom-left, bottom-right)</p>
+            
+            <div style="margin-top: 20px; padding: 15px; background: #e8f5e8; border-radius: 6px;">
+                <strong>🎯 Start Here:</strong> Click "Simple Grid Selection Viewer (Local Images)" above 
+                to see the model's selections with actual images and clear visual indicators.
+            </div>
         </div>
     </div>
 </body>

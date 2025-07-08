@@ -1,0 +1,5478 @@
+{
+  "metadata": {
+    "created_at": "2025-07-08 09:56:57",
+    "total_frames": 170,
+    "frames_with_selection": 127,
+    "selection_rate_percent": 74.70588235294117,
+    "description": "Simple grid selection results - which cell does the model think contains the expected vocabulary term?"
+  },
+  "results": [
+    {
+      "screenshot_id": "004",
+      "expected_vocab": "acorn",
+      "model_selection": "top_left",
+      "selection_confidence": 99.90177154541016,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.90177154541016
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "acorn",
+          "confidence": 99.90177154541016
+        },
+        "top_right": {
+          "term": "bouquet",
+          "confidence": 83.04598999023438
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 95.65167236328125
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 99.86107635498047
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-004.png"
+    },
+    {
+      "screenshot_id": "005",
+      "expected_vocab": "aloe",
+      "model_selection": "top_right",
+      "selection_confidence": 98.40766906738281,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 98.40766906738281
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "preserve",
+          "confidence": 55.135292053222656
+        },
+        "top_right": {
+          "term": "aloe",
+          "confidence": 98.40766906738281
+        },
+        "bottom_left": {
+          "term": "sandbag",
+          "confidence": 99.8052749633789
+        },
+        "bottom_right": {
+          "term": "sprinkler",
+          "confidence": 99.98170471191406
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-005.png"
+    },
+    {
+      "screenshot_id": "006",
+      "expected_vocab": "antenna",
+      "model_selection": "top_right",
+      "selection_confidence": 99.95028686523438,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 99.95028686523438
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "foam",
+          "confidence": 99.99607849121094
+        },
+        "top_right": {
+          "term": "antenna",
+          "confidence": 99.95028686523438
+        },
+        "bottom_left": {
+          "term": "cloak",
+          "confidence": 71.67975616455078
+        },
+        "bottom_right": {
+          "term": "carousel",
+          "confidence": 100.0
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-006.png"
+    },
+    {
+      "screenshot_id": "007",
+      "expected_vocab": "artichoke",
+      "model_selection": "top_right",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "cheese",
+          "confidence": 58.69174575805664
+        },
+        "top_right": {
+          "term": "artichoke",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "swordfish",
+          "confidence": 93.01396942138672
+        },
+        "bottom_right": {
+          "term": "facade",
+          "confidence": 69.40908813476562
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-007.png"
+    },
+    {
+      "screenshot_id": "008",
+      "expected_vocab": "bamboo",
+      "model_selection": "top_right",
+      "selection_confidence": 99.99868774414062,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 99.99868774414062
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.28974914550781
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 1.0344001211137765e-08
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "chat",
+          "confidence": 99.7508544921875
+        },
+        "top_right": {
+          "term": "bamboo",
+          "confidence": 99.99868774414062
+        },
+        "bottom_left": {
+          "term": "sprinkler",
+          "confidence": 98.18394470214844
+        },
+        "bottom_right": {
+          "term": "bamboo",
+          "confidence": 99.28974914550781
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-008.png"
+    },
+    {
+      "screenshot_id": "009",
+      "expected_vocab": "barrel",
+      "model_selection": "bottom_left",
+      "selection_confidence": 99.22856140136719,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 99.22856140136719
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "foam",
+          "confidence": 58.79801559448242
+        },
+        "top_right": {
+          "term": "antenna",
+          "confidence": 95.05927276611328
+        },
+        "bottom_left": {
+          "term": "barrel",
+          "confidence": 99.22856140136719
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 38.52043151855469
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-009.png"
+    },
+    {
+      "screenshot_id": "010",
+      "expected_vocab": "blender",
+      "model_selection": "bottom_left",
+      "selection_confidence": 99.36833190917969,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 99.36833190917969
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 1.1036329851776827e-05
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "oil",
+          "confidence": 99.93588256835938
+        },
+        "top_right": {
+          "term": "posterior",
+          "confidence": 99.99998474121094
+        },
+        "bottom_left": {
+          "term": "blender",
+          "confidence": 99.36833190917969
+        },
+        "bottom_right": {
+          "term": "watermelon",
+          "confidence": 99.40222930908203
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-010.png"
+    },
+    {
+      "screenshot_id": "011",
+      "expected_vocab": "blower",
+      "model_selection": "top_right",
+      "selection_confidence": 99.98120880126953,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 99.98120880126953
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "watermelon",
+          "confidence": 59.07398986816406
+        },
+        "top_right": {
+          "term": "blower",
+          "confidence": 99.98120880126953
+        },
+        "bottom_left": {
+          "term": "lollipop",
+          "confidence": 97.09953308105469
+        },
+        "bottom_right": {
+          "term": "foam",
+          "confidence": 75.31698608398438
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-011.png"
+    },
+    {
+      "screenshot_id": "012",
+      "expected_vocab": "bouquet",
+      "model_selection": "bottom_right",
+      "selection_confidence": 99.93203735351562,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_right",
+          "confidence": 99.93203735351562
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "gutter",
+          "confidence": 46.77997970581055
+        },
+        "top_right": {
+          "term": "preserve",
+          "confidence": 17.902067184448242
+        },
+        "bottom_left": {
+          "term": "couturier",
+          "confidence": 99.54554748535156
+        },
+        "bottom_right": {
+          "term": "bouquet",
+          "confidence": 99.93203735351562
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-012.png"
+    },
+    {
+      "screenshot_id": "013",
+      "expected_vocab": "buffet",
+      "model_selection": "top_right",
+      "selection_confidence": 98.50181579589844,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 98.50181579589844
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 2.7866461277008057
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "prism",
+          "confidence": 91.1482925415039
+        },
+        "top_right": {
+          "term": "buffet",
+          "confidence": 98.50181579589844
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 74.2996826171875
+        },
+        "bottom_right": {
+          "term": "map",
+          "confidence": 91.64228057861328
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-013.png"
+    },
+    {
+      "screenshot_id": "014",
+      "expected_vocab": "bulldozer",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "couturier",
+          "confidence": 99.9994125366211
+        },
+        "top_right": {
+          "term": "ball",
+          "confidence": 58.169532775878906
+        },
+        "bottom_left": {
+          "term": "lollipop",
+          "confidence": 38.52764129638672
+        },
+        "bottom_right": {
+          "term": "watermelon",
+          "confidence": 91.02470397949219
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-014.png"
+    },
+    {
+      "screenshot_id": "015",
+      "expected_vocab": "cake",
+      "model_selection": "top_left",
+      "selection_confidence": 96.5577392578125,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 96.5577392578125
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "cake",
+          "confidence": 96.5577392578125
+        },
+        "top_right": {
+          "term": "cloak",
+          "confidence": 65.95285034179688
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 98.26044464111328
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 32.29368209838867
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-015.png"
+    },
+    {
+      "screenshot_id": "016",
+      "expected_vocab": "caramel",
+      "model_selection": "top_right",
+      "selection_confidence": 99.98448181152344,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 99.98448181152344
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 72.60064697265625
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "mischievous",
+          "confidence": 11.83112621307373
+        },
+        "top_right": {
+          "term": "caramel",
+          "confidence": 99.98448181152344
+        },
+        "bottom_left": {
+          "term": "caramel",
+          "confidence": 72.60064697265625
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 99.0520248413086
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-016.png"
+    },
+    {
+      "screenshot_id": "017",
+      "expected_vocab": "carousel",
+      "model_selection": "top_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.91883850097656
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 97.60801696777344
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "carousel",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "carousel",
+          "confidence": 99.91883850097656
+        },
+        "bottom_left": {
+          "term": "ball",
+          "confidence": 99.99998474121094
+        },
+        "bottom_right": {
+          "term": "carousel",
+          "confidence": 97.60801696777344
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-017.png"
+    },
+    {
+      "screenshot_id": "018",
+      "expected_vocab": "carrot",
+      "model_selection": "top_right",
+      "selection_confidence": 98.93162536621094,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 98.93162536621094
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "preserve",
+          "confidence": 96.2086410522461
+        },
+        "top_right": {
+          "term": "carrot",
+          "confidence": 98.93162536621094
+        },
+        "bottom_left": {
+          "term": "swordfish",
+          "confidence": 99.33235931396484
+        },
+        "bottom_right": {
+          "term": "chat",
+          "confidence": 73.74664306640625
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-018.png"
+    },
+    {
+      "screenshot_id": "019",
+      "expected_vocab": "cassette",
+      "model_selection": "bottom_left",
+      "selection_confidence": 99.99760437011719,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 93.28034210205078
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 99.99760437011719
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "chat",
+          "confidence": 99.99175262451172
+        },
+        "top_right": {
+          "term": "cassette",
+          "confidence": 93.28034210205078
+        },
+        "bottom_left": {
+          "term": "cassette",
+          "confidence": 99.99760437011719
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 98.63893127441406
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-019.png"
+    },
+    {
+      "screenshot_id": "020",
+      "expected_vocab": "cheese",
+      "model_selection": "top_right",
+      "selection_confidence": 99.99998474121094,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.5056381225586
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.99998474121094
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.84741973876953
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "cheese",
+          "confidence": 99.5056381225586
+        },
+        "top_right": {
+          "term": "cheese",
+          "confidence": 99.99998474121094
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 99.94639587402344
+        },
+        "bottom_right": {
+          "term": "cheese",
+          "confidence": 99.84741973876953
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-020.png"
+    },
+    {
+      "screenshot_id": "021",
+      "expected_vocab": "cloak",
+      "model_selection": "top_left",
+      "selection_confidence": 99.22227478027344,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.22227478027344
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 96.19012451171875
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "cloak",
+          "confidence": 99.22227478027344
+        },
+        "top_right": {
+          "term": "watermelon",
+          "confidence": 91.93870544433594
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 99.10511016845703
+        },
+        "bottom_right": {
+          "term": "cloak",
+          "confidence": 96.19012451171875
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-021.png"
+    },
+    {
+      "screenshot_id": "022",
+      "expected_vocab": "clothespin",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "chat",
+          "confidence": 92.13356018066406
+        },
+        "top_right": {
+          "term": "tumble",
+          "confidence": 83.22990417480469
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 99.99442291259766
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 100.0
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-022.png"
+    },
+    {
+      "screenshot_id": "023",
+      "expected_vocab": "coaster",
+      "model_selection": "top_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "coaster",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "couturier",
+          "confidence": 81.42143249511719
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "sandbag",
+          "confidence": 96.05238342285156
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-023.png"
+    },
+    {
+      "screenshot_id": "024",
+      "expected_vocab": "cork",
+      "model_selection": "top_right",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "chat",
+          "confidence": 75.79820251464844
+        },
+        "top_right": {
+          "term": "cork",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 99.99224853515625
+        },
+        "bottom_right": {
+          "term": "ruler",
+          "confidence": 92.11756134033203
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-024.png"
+    },
+    {
+      "screenshot_id": "025",
+      "expected_vocab": "cornbread",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "couturier",
+          "confidence": 99.99974822998047
+        },
+        "top_right": {
+          "term": "ball",
+          "confidence": 99.91598510742188
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 99.99597930908203
+        },
+        "bottom_right": {
+          "term": "cloak",
+          "confidence": 86.02861022949219
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-025.png"
+    },
+    {
+      "screenshot_id": "026",
+      "expected_vocab": "corset",
+      "model_selection": "bottom_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "foam",
+          "confidence": 58.70207977294922
+        },
+        "top_right": {
+          "term": "potato",
+          "confidence": 96.81705474853516
+        },
+        "bottom_left": {
+          "term": "corset",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "panda",
+          "confidence": 63.53377151489258
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-026.png"
+    },
+    {
+      "screenshot_id": "027",
+      "expected_vocab": "dumpling",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "couturier",
+          "confidence": 84.84016418457031
+        },
+        "top_right": {
+          "term": "cloak",
+          "confidence": 48.455772399902344
+        },
+        "bottom_left": {
+          "term": "sprinkler",
+          "confidence": 95.47586059570312
+        },
+        "bottom_right": {
+          "term": "ball",
+          "confidence": 99.40579986572266
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-027.png"
+    },
+    {
+      "screenshot_id": "028",
+      "expected_vocab": "elbow",
+      "model_selection": "bottom_left",
+      "selection_confidence": 74.85603332519531,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 74.85603332519531
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "triad",
+          "confidence": 99.55288696289062
+        },
+        "top_right": {
+          "term": "sprinkler",
+          "confidence": 99.97789001464844
+        },
+        "bottom_left": {
+          "term": "elbow",
+          "confidence": 74.85603332519531
+        },
+        "bottom_right": {
+          "term": "ruler",
+          "confidence": 99.9919662475586
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-028.png"
+    },
+    {
+      "screenshot_id": "029",
+      "expected_vocab": "fan",
+      "model_selection": "bottom_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.99864196777344
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "fan",
+          "confidence": 99.99864196777344
+        },
+        "top_right": {
+          "term": "cloak",
+          "confidence": 83.1680679321289
+        },
+        "bottom_left": {
+          "term": "fan",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "sprinkler",
+          "confidence": 99.50469970703125
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-029.png"
+    },
+    {
+      "screenshot_id": "030",
+      "expected_vocab": "foam",
+      "model_selection": "top_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 0.4208681583404541
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 97.91381072998047
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "foam",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "waterwheel",
+          "confidence": 88.44094848632812
+        },
+        "bottom_left": {
+          "term": "swordfish",
+          "confidence": 99.33560180664062
+        },
+        "bottom_right": {
+          "term": "foam",
+          "confidence": 97.91381072998047
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-030.png"
+    },
+    {
+      "screenshot_id": "031",
+      "expected_vocab": "footbath",
+      "model_selection": "bottom_right",
+      "selection_confidence": 85.59832000732422,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_right",
+          "confidence": 85.59832000732422
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "potato",
+          "confidence": 57.29806900024414
+        },
+        "top_right": {
+          "term": "artifact",
+          "confidence": 98.46810150146484
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "footbath",
+          "confidence": 85.59832000732422
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-031.png"
+    },
+    {
+      "screenshot_id": "032",
+      "expected_vocab": "fruitcake",
+      "model_selection": "bottom_left",
+      "selection_confidence": 81.73062896728516,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 81.73062896728516
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "divan",
+          "confidence": 12.133491516113281
+        },
+        "top_right": {
+          "term": "preserve",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "fruitcake",
+          "confidence": 81.73062896728516
+        },
+        "bottom_right": {
+          "term": "couturier",
+          "confidence": 92.08416748046875
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-032.png"
+    },
+    {
+      "screenshot_id": "033",
+      "expected_vocab": "gutter",
+      "model_selection": "bottom_left",
+      "selection_confidence": 98.22765350341797,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 98.22765350341797
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "tulip",
+          "confidence": 48.200157165527344
+        },
+        "top_right": {
+          "term": "preserve",
+          "confidence": 33.715023040771484
+        },
+        "bottom_left": {
+          "term": "gutter",
+          "confidence": 98.22765350341797
+        },
+        "bottom_right": {
+          "term": "chat",
+          "confidence": 75.58647155761719
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-033.png"
+    },
+    {
+      "screenshot_id": "034",
+      "expected_vocab": "hamster",
+      "model_selection": "top_left",
+      "selection_confidence": 87.50399017333984,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 87.50399017333984
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "hamster",
+          "confidence": 87.50399017333984
+        },
+        "top_right": {
+          "term": "divan",
+          "confidence": 80.30059051513672
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "swordfish",
+          "confidence": 76.32327270507812
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-034.png"
+    },
+    {
+      "screenshot_id": "035",
+      "expected_vocab": "hedgehog",
+      "model_selection": "bottom_right",
+      "selection_confidence": 99.99773406982422,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 97.51441955566406
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.9940185546875
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.99773406982422
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "hedgehog",
+          "confidence": 97.51441955566406
+        },
+        "top_right": {
+          "term": "hedgehog",
+          "confidence": 99.9940185546875
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 99.94359588623047
+        },
+        "bottom_right": {
+          "term": "hedgehog",
+          "confidence": 99.99773406982422
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-035.png"
+    },
+    {
+      "screenshot_id": "036",
+      "expected_vocab": "hoe",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "preserve",
+          "confidence": 98.62014770507812
+        },
+        "top_right": {
+          "term": "antenna",
+          "confidence": 99.50142669677734
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 100.0
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-036.png"
+    },
+    {
+      "screenshot_id": "037",
+      "expected_vocab": "hopscotch",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "ball",
+          "confidence": 54.644073486328125
+        },
+        "top_right": {
+          "term": "preserve",
+          "confidence": 74.1357421875
+        },
+        "bottom_left": {
+          "term": "triad",
+          "confidence": 98.43773651123047
+        },
+        "bottom_right": {
+          "term": "sandbag",
+          "confidence": 73.97748565673828
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-037.png"
+    },
+    {
+      "screenshot_id": "038",
+      "expected_vocab": "kimono",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "couturier",
+          "confidence": 95.21757507324219
+        },
+        "top_right": {
+          "term": "preserve",
+          "confidence": 99.99932098388672
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 93.91583251953125
+        },
+        "bottom_right": {
+          "term": "chat",
+          "confidence": 64.38639068603516
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-038.png"
+    },
+    {
+      "screenshot_id": "039",
+      "expected_vocab": "latch",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "preserve",
+          "confidence": 99.99870300292969
+        },
+        "top_right": {
+          "term": "preserve",
+          "confidence": 98.30986022949219
+        },
+        "bottom_left": {
+          "term": "swordfish",
+          "confidence": 94.4008560180664
+        },
+        "bottom_right": {
+          "term": "fan",
+          "confidence": 99.8651123046875
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-039.png"
+    },
+    {
+      "screenshot_id": "040",
+      "expected_vocab": "locker",
+      "model_selection": "bottom_right",
+      "selection_confidence": 99.48076629638672,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_right",
+          "confidence": 99.48076629638672
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "preserve",
+          "confidence": 99.99995422363281
+        },
+        "top_right": {
+          "term": "foam",
+          "confidence": 99.90301513671875
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 81.70060729980469
+        },
+        "bottom_right": {
+          "term": "locker",
+          "confidence": 99.48076629638672
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-040.png"
+    },
+    {
+      "screenshot_id": "041",
+      "expected_vocab": "lollipop",
+      "model_selection": "top_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 97.92204284667969
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.73836517333984
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "lollipop",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "gesticulate",
+          "confidence": 98.08904266357422
+        },
+        "bottom_left": {
+          "term": "lollipop",
+          "confidence": 97.92204284667969
+        },
+        "bottom_right": {
+          "term": "lollipop",
+          "confidence": 99.73836517333984
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-041.png"
+    },
+    {
+      "screenshot_id": "042",
+      "expected_vocab": "map",
+      "model_selection": "bottom_left",
+      "selection_confidence": 99.99165344238281,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.97587585449219
+        },
+        {
+          "position": "top_right",
+          "confidence": 97.72461700439453
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 99.99165344238281
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "map",
+          "confidence": 99.97587585449219
+        },
+        "top_right": {
+          "term": "map",
+          "confidence": 97.72461700439453
+        },
+        "bottom_left": {
+          "term": "map",
+          "confidence": 99.99165344238281
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 6.964986801147461
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-042.png"
+    },
+    {
+      "screenshot_id": "043",
+      "expected_vocab": "marshmallow",
+      "model_selection": "bottom_right",
+      "selection_confidence": 98.40711212158203,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_right",
+          "confidence": 98.40711212158203
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "preserve",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "gesticulate",
+          "confidence": 98.93524932861328
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 95.33212280273438
+        },
+        "bottom_right": {
+          "term": "marshmallow",
+          "confidence": 98.40711212158203
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-043.png"
+    },
+    {
+      "screenshot_id": "044",
+      "expected_vocab": "net",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "couturier",
+          "confidence": 71.7933578491211
+        },
+        "top_right": {
+          "term": "sedentary",
+          "confidence": 56.853538513183594
+        },
+        "bottom_left": {
+          "term": "map",
+          "confidence": 3.2843399047851562
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 90.343994140625
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-044.png"
+    },
+    {
+      "screenshot_id": "045",
+      "expected_vocab": "oil",
+      "model_selection": "top_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "oil",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "shower",
+          "confidence": 55.81159591674805
+        },
+        "bottom_left": {
+          "term": "kazoo",
+          "confidence": 98.25791931152344
+        },
+        "bottom_right": {
+          "term": "marshmallow",
+          "confidence": 79.29451751708984
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-045.png"
+    },
+    {
+      "screenshot_id": "046",
+      "expected_vocab": "omelet",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "ball",
+          "confidence": 99.99115753173828
+        },
+        "top_right": {
+          "term": "couturier",
+          "confidence": 54.17268371582031
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 99.99423217773438
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 99.96311950683594
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-046.png"
+    },
+    {
+      "screenshot_id": "047",
+      "expected_vocab": "pie",
+      "model_selection": "top_right",
+      "selection_confidence": 85.40422058105469,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 85.40422058105469
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "prism",
+          "confidence": 57.72566223144531
+        },
+        "top_right": {
+          "term": "pie",
+          "confidence": 85.40422058105469
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 99.9998779296875
+        },
+        "bottom_right": {
+          "term": "chat",
+          "confidence": 84.43988800048828
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-047.png"
+    },
+    {
+      "screenshot_id": "048",
+      "expected_vocab": "pistachio",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "calendar",
+          "confidence": 0.6474626064300537
+        },
+        "top_right": {
+          "term": "cloak",
+          "confidence": 81.13856506347656
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 97.06412506103516
+        },
+        "bottom_right": {
+          "term": "foam",
+          "confidence": 100.0
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-048.png"
+    },
+    {
+      "screenshot_id": "049",
+      "expected_vocab": "pitcher",
+      "model_selection": "top_right",
+      "selection_confidence": 81.8642578125,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 81.8642578125
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 72.7216567993164
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "couturier",
+          "confidence": 79.89443969726562
+        },
+        "top_right": {
+          "term": "pitcher",
+          "confidence": 81.8642578125
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 99.99967956542969
+        },
+        "bottom_right": {
+          "term": "pitcher",
+          "confidence": 72.7216567993164
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-049.png"
+    },
+    {
+      "screenshot_id": "050",
+      "expected_vocab": "potato",
+      "model_selection": "top_right",
+      "selection_confidence": 99.97915649414062,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 94.3388900756836
+        },
+        {
+          "position": "top_left",
+          "confidence": 2.079119809650365e-07
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.97915649414062
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "potato",
+          "confidence": 94.3388900756836
+        },
+        "top_right": {
+          "term": "potato",
+          "confidence": 99.97915649414062
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 80.87893676757812
+        },
+        "bottom_right": {
+          "term": "fan",
+          "confidence": 99.99838256835938
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-050.png"
+    },
+    {
+      "screenshot_id": "051",
+      "expected_vocab": "prism",
+      "model_selection": "top_left",
+      "selection_confidence": 98.98809814453125,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 98.98809814453125
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 8.428295496416827e-13
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 1.8972559634455877e-10
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "prism",
+          "confidence": 98.98809814453125
+        },
+        "top_right": {
+          "term": "preserve",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "swordfish",
+          "confidence": 99.99989318847656
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 99.99995422363281
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-051.png"
+    },
+    {
+      "screenshot_id": "052",
+      "expected_vocab": "puddle",
+      "model_selection": "top_right",
+      "selection_confidence": 99.75577545166016,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 99.75577545166016
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "triad",
+          "confidence": 99.81922149658203
+        },
+        "top_right": {
+          "term": "puddle",
+          "confidence": 99.75577545166016
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 98.93965148925781
+        },
+        "bottom_right": {
+          "term": "baywindow",
+          "confidence": 99.7768783569336
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-052.png"
+    },
+    {
+      "screenshot_id": "053",
+      "expected_vocab": "pump",
+      "model_selection": "bottom_left",
+      "selection_confidence": 88.83499145507812,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 88.83499145507812
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "preserve",
+          "confidence": 66.00194549560547
+        },
+        "top_right": {
+          "term": "kazoo",
+          "confidence": 66.28672790527344
+        },
+        "bottom_left": {
+          "term": "pump",
+          "confidence": 88.83499145507812
+        },
+        "bottom_right": {
+          "term": "facade",
+          "confidence": 96.73188781738281
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-053.png"
+    },
+    {
+      "screenshot_id": "054",
+      "expected_vocab": "rice",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "chat",
+          "confidence": 45.03178024291992
+        },
+        "top_right": {
+          "term": "acorn",
+          "confidence": 99.81649780273438
+        },
+        "bottom_left": {
+          "term": "swordfish",
+          "confidence": 82.51786041259766
+        },
+        "bottom_right": {
+          "term": "sprinkler",
+          "confidence": 99.99739837646484
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-054.png"
+    },
+    {
+      "screenshot_id": "055",
+      "expected_vocab": "saddle",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "dripping",
+          "confidence": 97.67623901367188
+        },
+        "top_right": {
+          "term": "kazoo",
+          "confidence": 54.388816833496094
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 99.99925994873047
+        },
+        "bottom_right": {
+          "term": "divan",
+          "confidence": 65.69877624511719
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-055.png"
+    },
+    {
+      "screenshot_id": "056",
+      "expected_vocab": "sandbag",
+      "model_selection": "top_right",
+      "selection_confidence": 99.99675750732422,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 85.44822692871094
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.99675750732422
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 1.7366837710142136e-05
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "sandbag",
+          "confidence": 85.44822692871094
+        },
+        "top_right": {
+          "term": "sandbag",
+          "confidence": 99.99675750732422
+        },
+        "bottom_left": {
+          "term": "couturier",
+          "confidence": 99.74454498291016
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 43.15522766113281
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-056.png"
+    },
+    {
+      "screenshot_id": "057",
+      "expected_vocab": "scaffolding",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "divan",
+          "confidence": 99.04014587402344
+        },
+        "top_right": {
+          "term": "divan",
+          "confidence": 66.55712127685547
+        },
+        "bottom_left": {
+          "term": "tapestry",
+          "confidence": 99.89381408691406
+        },
+        "bottom_right": {
+          "term": "chat",
+          "confidence": 81.34814453125
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-057.png"
+    },
+    {
+      "screenshot_id": "058",
+      "expected_vocab": "scoop",
+      "model_selection": "top_right",
+      "selection_confidence": 78.48722076416016,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 78.48722076416016
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 9.756464081078775e-09
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "foam",
+          "confidence": 99.44625854492188
+        },
+        "top_right": {
+          "term": "scoop",
+          "confidence": 78.48722076416016
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 65.53887939453125
+        },
+        "bottom_right": {
+          "term": "couturier",
+          "confidence": 62.688236236572266
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-058.png"
+    },
+    {
+      "screenshot_id": "059",
+      "expected_vocab": "seagull",
+      "model_selection": "bottom_right",
+      "selection_confidence": 74.71257781982422,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_right",
+          "confidence": 74.71257781982422
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "foam",
+          "confidence": 99.91069793701172
+        },
+        "top_right": {
+          "term": "furry",
+          "confidence": 98.62059783935547
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 89.11992645263672
+        },
+        "bottom_right": {
+          "term": "seagull",
+          "confidence": 74.71257781982422
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-059.png"
+    },
+    {
+      "screenshot_id": "060",
+      "expected_vocab": "ship",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "couturier",
+          "confidence": 99.98167419433594
+        },
+        "top_right": {
+          "term": "ball",
+          "confidence": 99.99998474121094
+        },
+        "bottom_left": {
+          "term": "stump",
+          "confidence": 63.585906982421875
+        },
+        "bottom_right": {
+          "term": "potato",
+          "confidence": 39.30351257324219
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-060.png"
+    },
+    {
+      "screenshot_id": "061",
+      "expected_vocab": "shower",
+      "model_selection": "top_right",
+      "selection_confidence": 98.83263397216797,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 98.83263397216797
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 93.65678405761719
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "ruler",
+          "confidence": 96.85906982421875
+        },
+        "top_right": {
+          "term": "shower",
+          "confidence": 98.83263397216797
+        },
+        "bottom_left": {
+          "term": "tulip",
+          "confidence": 21.943130493164062
+        },
+        "bottom_right": {
+          "term": "shower",
+          "confidence": 93.65678405761719
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-061.png"
+    },
+    {
+      "screenshot_id": "062",
+      "expected_vocab": "silverware",
+      "model_selection": "top_right",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "foam",
+          "confidence": 93.95802307128906
+        },
+        "top_right": {
+          "term": "silverware",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "map",
+          "confidence": 99.94015502929688
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 100.0
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-062.png"
+    },
+    {
+      "screenshot_id": "063",
+      "expected_vocab": "sink",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "arcade",
+          "confidence": 8.200146675109863
+        },
+        "top_right": {
+          "term": "spatula",
+          "confidence": 61.374717712402344
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 99.99932861328125
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 99.99960327148438
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-063.png"
+    },
+    {
+      "screenshot_id": "064",
+      "expected_vocab": "ski",
+      "model_selection": "top_left",
+      "selection_confidence": 99.97042846679688,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.97042846679688
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "ski",
+          "confidence": 99.97042846679688
+        },
+        "top_right": {
+          "term": "carousel",
+          "confidence": 96.39984130859375
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 98.90975952148438
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 66.54656982421875
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-064.png"
+    },
+    {
+      "screenshot_id": "065",
+      "expected_vocab": "sloth",
+      "model_selection": "top_left",
+      "selection_confidence": 98.82234954833984,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 98.82234954833984
+        },
+        {
+          "position": "top_left",
+          "confidence": 0.013404314406216145
+        },
+        {
+          "position": "top_right",
+          "confidence": 95.5040512084961
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 0.001901036943309009
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 1.0202325938735157e-05
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "sloth",
+          "confidence": 98.82234954833984
+        },
+        "top_right": {
+          "term": "sloth",
+          "confidence": 95.5040512084961
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 99.95057678222656
+        },
+        "bottom_right": {
+          "term": "potato",
+          "confidence": 97.58250427246094
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-065.png"
+    },
+    {
+      "screenshot_id": "066",
+      "expected_vocab": "snail",
+      "model_selection": "bottom_right",
+      "selection_confidence": 99.38762664794922,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 80.32258605957031
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.38762664794922
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "foam",
+          "confidence": 80.46692657470703
+        },
+        "top_right": {
+          "term": "snail",
+          "confidence": 80.32258605957031
+        },
+        "bottom_left": {
+          "term": "sprinkler",
+          "confidence": 98.14730072021484
+        },
+        "bottom_right": {
+          "term": "snail",
+          "confidence": 99.38762664794922
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-066.png"
+    },
+    {
+      "screenshot_id": "067",
+      "expected_vocab": "sorbet",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "chat",
+          "confidence": 91.80451202392578
+        },
+        "top_right": {
+          "term": "posterior",
+          "confidence": 30.38889503479004
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 95.53345489501953
+        },
+        "bottom_right": {
+          "term": "cheese",
+          "confidence": 98.73084259033203
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-067.png"
+    },
+    {
+      "screenshot_id": "068",
+      "expected_vocab": "spatula",
+      "model_selection": "bottom_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.99995422363281
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "preserve",
+          "confidence": 99.99995422363281
+        },
+        "top_right": {
+          "term": "steam",
+          "confidence": 84.57901000976562
+        },
+        "bottom_left": {
+          "term": "spatula",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "spatula",
+          "confidence": 99.99995422363281
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-068.png"
+    },
+    {
+      "screenshot_id": "069",
+      "expected_vocab": "sprinkler",
+      "model_selection": "top_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.99866485595703
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "sprinkler",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "preserve",
+          "confidence": 51.94242477416992
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 60.52229309082031
+        },
+        "bottom_right": {
+          "term": "sprinkler",
+          "confidence": 99.99866485595703
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-069.png"
+    },
+    {
+      "screenshot_id": "070",
+      "expected_vocab": "squash",
+      "model_selection": "top_right",
+      "selection_confidence": 83.36300659179688,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 83.36300659179688
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "pitcher",
+          "confidence": 44.08606719970703
+        },
+        "top_right": {
+          "term": "squash",
+          "confidence": 83.36300659179688
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 94.68177795410156
+        },
+        "bottom_right": {
+          "term": "cloak",
+          "confidence": 96.18814086914062
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-070.png"
+    },
+    {
+      "screenshot_id": "071",
+      "expected_vocab": "squirrel",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "divan",
+          "confidence": 89.89765930175781
+        },
+        "top_right": {
+          "term": "divan",
+          "confidence": 47.56090545654297
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 88.21434020996094
+        },
+        "bottom_right": {
+          "term": "cloak",
+          "confidence": 85.96820068359375
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-071.png"
+    },
+    {
+      "screenshot_id": "072",
+      "expected_vocab": "stew",
+      "model_selection": "top_right",
+      "selection_confidence": 98.93058013916016,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 98.93058013916016
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 98.7423095703125
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 4.743981776300643e-07
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "preserve",
+          "confidence": 37.7240104675293
+        },
+        "top_right": {
+          "term": "stew",
+          "confidence": 98.93058013916016
+        },
+        "bottom_left": {
+          "term": "stew",
+          "confidence": 98.7423095703125
+        },
+        "bottom_right": {
+          "term": "divan",
+          "confidence": 99.96601104736328
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-072.png"
+    },
+    {
+      "screenshot_id": "073",
+      "expected_vocab": "rubber band",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "beret",
+          "confidence": 99.0215072631836
+        },
+        "top_right": {
+          "term": "sedentary",
+          "confidence": 98.6669921875
+        },
+        "bottom_left": {
+          "term": "map",
+          "confidence": 73.78121185302734
+        },
+        "bottom_right": {
+          "term": "chat",
+          "confidence": 62.614906311035156
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-073.png"
+    },
+    {
+      "screenshot_id": "074",
+      "expected_vocab": "stump",
+      "model_selection": "top_right",
+      "selection_confidence": 93.0889892578125,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 86.56169128417969
+        },
+        {
+          "position": "top_right",
+          "confidence": 93.0889892578125
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 4.3612502226817346e-17
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "stump",
+          "confidence": 86.56169128417969
+        },
+        "top_right": {
+          "term": "stump",
+          "confidence": 93.0889892578125
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 99.99977111816406
+        },
+        "bottom_right": {
+          "term": "swordfish",
+          "confidence": 97.62261199951172
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-074.png"
+    },
+    {
+      "screenshot_id": "075",
+      "expected_vocab": "sunflower",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "divan",
+          "confidence": 99.96234130859375
+        },
+        "top_right": {
+          "term": "chat",
+          "confidence": 99.99991607666016
+        },
+        "bottom_left": {
+          "term": "ball",
+          "confidence": 89.40422821044922
+        },
+        "bottom_right": {
+          "term": "watermelon",
+          "confidence": 23.304262161254883
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-075.png"
+    },
+    {
+      "screenshot_id": "076",
+      "expected_vocab": "swordfish",
+      "model_selection": "bottom_left",
+      "selection_confidence": 99.99998474121094,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 99.99998474121094
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.33069610595703
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "foam",
+          "confidence": 99.9999771118164
+        },
+        "top_right": {
+          "term": "furry",
+          "confidence": 98.64718627929688
+        },
+        "bottom_left": {
+          "term": "swordfish",
+          "confidence": 99.99998474121094
+        },
+        "bottom_right": {
+          "term": "swordfish",
+          "confidence": 99.33069610595703
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-076.png"
+    },
+    {
+      "screenshot_id": "077",
+      "expected_vocab": "tapestry",
+      "model_selection": "bottom_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "prism",
+          "confidence": 68.73572540283203
+        },
+        "top_right": {
+          "term": "rosette",
+          "confidence": 99.92898559570312
+        },
+        "bottom_left": {
+          "term": "tapestry",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "fruitcake",
+          "confidence": 52.66646194458008
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-077.png"
+    },
+    {
+      "screenshot_id": "078",
+      "expected_vocab": "teabag",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "lollipop",
+          "confidence": 98.17160034179688
+        },
+        "top_right": {
+          "term": "watermelon",
+          "confidence": 49.027923583984375
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 99.9772720336914
+        },
+        "bottom_right": {
+          "term": "sprinkler",
+          "confidence": 4.678722858428955
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-078.png"
+    },
+    {
+      "screenshot_id": "079",
+      "expected_vocab": "telescope",
+      "model_selection": "bottom_right",
+      "selection_confidence": 99.99897766113281,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 75.73833465576172
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.99897766113281
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "telescope",
+          "confidence": 75.73833465576172
+        },
+        "top_right": {
+          "term": "furry",
+          "confidence": 99.62820434570312
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 60.3597526550293
+        },
+        "bottom_right": {
+          "term": "telescope",
+          "confidence": 99.99897766113281
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-079.png"
+    },
+    {
+      "screenshot_id": "080",
+      "expected_vocab": "thermos",
+      "model_selection": "top_left",
+      "selection_confidence": 99.99996185302734,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.99996185302734
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "thermos",
+          "confidence": 99.99996185302734
+        },
+        "top_right": {
+          "term": "preserve",
+          "confidence": 99.99878692626953
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 90.9234619140625
+        },
+        "bottom_right": {
+          "term": "ball",
+          "confidence": 63.60211181640625
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-080.png"
+    },
+    {
+      "screenshot_id": "081",
+      "expected_vocab": "treasure",
+      "model_selection": "bottom_right",
+      "selection_confidence": 99.99486541748047,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_right",
+          "confidence": 99.99486541748047
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "oil",
+          "confidence": 99.97684478759766
+        },
+        "top_right": {
+          "term": "preserve",
+          "confidence": 96.12091827392578
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 99.99365997314453
+        },
+        "bottom_right": {
+          "term": "treasure",
+          "confidence": 99.99486541748047
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-081.png"
+    },
+    {
+      "screenshot_id": "082",
+      "expected_vocab": "trumpet",
+      "model_selection": "bottom_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "couturier",
+          "confidence": 52.13607406616211
+        },
+        "top_right": {
+          "term": "bear",
+          "confidence": 63.77800750732422
+        },
+        "bottom_left": {
+          "term": "trumpet",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "foam",
+          "confidence": 72.59320068359375
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-082.png"
+    },
+    {
+      "screenshot_id": "083",
+      "expected_vocab": "tulip",
+      "model_selection": "top_right",
+      "selection_confidence": 99.14112091064453,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 99.14112091064453
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "cormorant",
+          "confidence": 99.99073791503906
+        },
+        "top_right": {
+          "term": "tulip",
+          "confidence": 99.14112091064453
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 61.37845993041992
+        },
+        "bottom_right": {
+          "term": "watermelon",
+          "confidence": 99.99854278564453
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-083.png"
+    },
+    {
+      "screenshot_id": "084",
+      "expected_vocab": "turbine",
+      "model_selection": "top_right",
+      "selection_confidence": 99.81678771972656,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 99.81678771972656
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "foam",
+          "confidence": 99.86849212646484
+        },
+        "top_right": {
+          "term": "turbine",
+          "confidence": 99.81678771972656
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 99.99978637695312
+        },
+        "bottom_right": {
+          "term": "buffet",
+          "confidence": 52.099945068359375
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-084.png"
+    },
+    {
+      "screenshot_id": "085",
+      "expected_vocab": "turkey",
+      "model_selection": "top_left",
+      "selection_confidence": 99.62688446044922,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.62688446044922
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "turkey",
+          "confidence": 99.62688446044922
+        },
+        "top_right": {
+          "term": "ball",
+          "confidence": 21.5782527923584
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 98.49942016601562
+        },
+        "bottom_right": {
+          "term": "couturier",
+          "confidence": 86.11101531982422
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-085.png"
+    },
+    {
+      "screenshot_id": "086",
+      "expected_vocab": "turtle",
+      "model_selection": "top_left",
+      "selection_confidence": 99.99493408203125,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.99493408203125
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.99258422851562
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "turtle",
+          "confidence": 99.99493408203125
+        },
+        "top_right": {
+          "term": "turtle",
+          "confidence": 99.99258422851562
+        },
+        "bottom_left": {
+          "term": "mischievous",
+          "confidence": 50.34465026855469
+        },
+        "bottom_right": {
+          "term": "couturier",
+          "confidence": 99.36442565917969
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-086.png"
+    },
+    {
+      "screenshot_id": "087",
+      "expected_vocab": "typewriter",
+      "model_selection": "bottom_right",
+      "selection_confidence": 97.00556945800781,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_right",
+          "confidence": 97.00556945800781
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "preserve",
+          "confidence": 84.29891204833984
+        },
+        "top_right": {
+          "term": "preserve",
+          "confidence": 99.98829650878906
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 99.96784973144531
+        },
+        "bottom_right": {
+          "term": "typewriter",
+          "confidence": 97.00556945800781
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-087.png"
+    },
+    {
+      "screenshot_id": "088",
+      "expected_vocab": "watermelon",
+      "model_selection": "top_right",
+      "selection_confidence": 99.99932098388672,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 99.99932098388672
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "divan",
+          "confidence": 98.74874114990234
+        },
+        "top_right": {
+          "term": "watermelon",
+          "confidence": 99.99932098388672
+        },
+        "bottom_left": {
+          "term": "typewriter",
+          "confidence": 80.90834045410156
+        },
+        "bottom_right": {
+          "term": "divan",
+          "confidence": 95.04954528808594
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-088.png"
+    },
+    {
+      "screenshot_id": "089",
+      "expected_vocab": "waterwheel",
+      "model_selection": "top_left",
+      "selection_confidence": 99.99656677246094,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.99656677246094
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 96.45638275146484
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "waterwheel",
+          "confidence": 99.99656677246094
+        },
+        "top_right": {
+          "term": "preserve",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "hedgehog",
+          "confidence": 99.88868713378906
+        },
+        "bottom_right": {
+          "term": "waterwheel",
+          "confidence": 96.45638275146484
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-089.png"
+    },
+    {
+      "screenshot_id": "090",
+      "expected_vocab": "ant",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "oil",
+          "confidence": 77.94666290283203
+        },
+        "top_right": {
+          "term": "juggling",
+          "confidence": 87.191650390625
+        },
+        "bottom_left": {
+          "term": "furry",
+          "confidence": 60.72515869140625
+        },
+        "bottom_right": {
+          "term": "foam",
+          "confidence": 97.41056060791016
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-090.png"
+    },
+    {
+      "screenshot_id": "091",
+      "expected_vocab": "ball",
+      "model_selection": "top_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "top_right",
+          "confidence": 100.0
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 98.5324478149414
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "ball",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "ball",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "ball",
+          "confidence": 98.5324478149414
+        },
+        "bottom_right": {
+          "term": "wheel",
+          "confidence": 99.92942810058594
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-091.png"
+    },
+    {
+      "screenshot_id": "092",
+      "expected_vocab": "bear",
+      "model_selection": "top_right",
+      "selection_confidence": 96.85111236572266,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 96.85111236572266
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "bouquet",
+          "confidence": 56.27977752685547
+        },
+        "top_right": {
+          "term": "bear",
+          "confidence": 96.85111236572266
+        },
+        "bottom_left": {
+          "term": "sprinkler",
+          "confidence": 98.79391479492188
+        },
+        "bottom_right": {
+          "term": "waterwheel",
+          "confidence": 58.99288558959961
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-092.png"
+    },
+    {
+      "screenshot_id": "093",
+      "expected_vocab": "duck",
+      "model_selection": "top_left",
+      "selection_confidence": 99.93881225585938,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.93881225585938
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "duck",
+          "confidence": 99.93881225585938
+        },
+        "top_right": {
+          "term": "artifact",
+          "confidence": 99.9998550415039
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 99.9996566772461
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 100.0
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-093.png"
+    },
+    {
+      "screenshot_id": "094",
+      "expected_vocab": "fork",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "dripping",
+          "confidence": 79.26361846923828
+        },
+        "top_right": {
+          "term": "fan",
+          "confidence": 87.83341217041016
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 47.9985466003418
+        },
+        "bottom_right": {
+          "term": "sprinkler",
+          "confidence": 99.97862243652344
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-094.png"
+    },
+    {
+      "screenshot_id": "095",
+      "expected_vocab": "kitten",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "dripping",
+          "confidence": 94.58041381835938
+        },
+        "top_right": {
+          "term": "ball",
+          "confidence": 99.57899475097656
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "roof",
+          "confidence": 92.17437744140625
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-095.png"
+    },
+    {
+      "screenshot_id": "096",
+      "expected_vocab": "knee",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "ball",
+          "confidence": 99.99720764160156
+        },
+        "top_right": {
+          "term": "kazoo",
+          "confidence": 57.404380798339844
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 99.99993133544922
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-096.png"
+    },
+    {
+      "screenshot_id": "097",
+      "expected_vocab": "milkshake",
+      "model_selection": "top_right",
+      "selection_confidence": 77.35916137695312,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 77.35916137695312
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "ball",
+          "confidence": 98.31511688232422
+        },
+        "top_right": {
+          "term": "milkshake",
+          "confidence": 77.35916137695312
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 99.4671401977539
+        },
+        "bottom_right": {
+          "term": "divan",
+          "confidence": 17.413331985473633
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-097.png"
+    },
+    {
+      "screenshot_id": "098",
+      "expected_vocab": "skin",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "fan",
+          "confidence": 64.51957702636719
+        },
+        "top_right": {
+          "term": "acorn",
+          "confidence": 21.072982788085938
+        },
+        "bottom_left": {
+          "term": "sprinkler",
+          "confidence": 99.83336639404297
+        },
+        "bottom_right": {
+          "term": "bouquet",
+          "confidence": 70.34214782714844
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-098.png"
+    },
+    {
+      "screenshot_id": "099",
+      "expected_vocab": "wall",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "telescope",
+          "confidence": 98.90882110595703
+        },
+        "top_right": {
+          "term": "bear",
+          "confidence": 92.8302993774414
+        },
+        "bottom_left": {
+          "term": "ruler",
+          "confidence": 99.98562622070312
+        },
+        "bottom_right": {
+          "term": "foam",
+          "confidence": 100.0
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-099.png"
+    },
+    {
+      "screenshot_id": "100",
+      "expected_vocab": "wheel",
+      "model_selection": "top_left",
+      "selection_confidence": 99.99982452392578,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.99982452392578
+        },
+        {
+          "position": "top_right",
+          "confidence": 98.82402038574219
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.98472595214844
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "wheel",
+          "confidence": 99.99982452392578
+        },
+        "top_right": {
+          "term": "wheel",
+          "confidence": 98.82402038574219
+        },
+        "bottom_left": {
+          "term": "acorn",
+          "confidence": 58.250701904296875
+        },
+        "bottom_right": {
+          "term": "wheel",
+          "confidence": 99.98472595214844
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-100.png"
+    },
+    {
+      "screenshot_id": "101",
+      "expected_vocab": "farm",
+      "model_selection": "bottom_right",
+      "selection_confidence": 99.85444641113281,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.74574279785156
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.85444641113281
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "farm",
+          "confidence": 99.74574279785156
+        },
+        "top_right": {
+          "term": "beret",
+          "confidence": 39.402408599853516
+        },
+        "bottom_left": {
+          "term": "swordfish",
+          "confidence": 90.21654510498047
+        },
+        "bottom_right": {
+          "term": "farm",
+          "confidence": 99.85444641113281
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-101.png"
+    },
+    {
+      "screenshot_id": "102",
+      "expected_vocab": "juggling",
+      "model_selection": "top_right",
+      "selection_confidence": 99.99968719482422,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 89.9100341796875
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.99968719482422
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 90.871337890625
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "juggling",
+          "confidence": 89.9100341796875
+        },
+        "top_right": {
+          "term": "juggling",
+          "confidence": 99.99968719482422
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "juggling",
+          "confidence": 90.871337890625
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-102.png"
+    },
+    {
+      "screenshot_id": "103",
+      "expected_vocab": "dressing",
+      "model_selection": "bottom_right",
+      "selection_confidence": 99.96571350097656,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_right",
+          "confidence": 99.96571350097656
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "swordfish",
+          "confidence": 61.62566375732422
+        },
+        "top_right": {
+          "term": "spatula",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 99.93492126464844
+        },
+        "bottom_right": {
+          "term": "dressing",
+          "confidence": 99.96571350097656
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-103.png"
+    },
+    {
+      "screenshot_id": "104",
+      "expected_vocab": "roof",
+      "model_selection": "bottom_right",
+      "selection_confidence": 99.79911041259766,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_right",
+          "confidence": 99.79911041259766
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "hedgehog",
+          "confidence": 99.83609008789062
+        },
+        "top_right": {
+          "term": "ruler",
+          "confidence": 84.46282958984375
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "roof",
+          "confidence": 99.79911041259766
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-104.png"
+    },
+    {
+      "screenshot_id": "105",
+      "expected_vocab": "peeking",
+      "model_selection": "top_left",
+      "selection_confidence": 91.53949737548828,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 91.53949737548828
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "peeking",
+          "confidence": 91.53949737548828
+        },
+        "top_right": {
+          "term": "tapestry",
+          "confidence": 72.06819152832031
+        },
+        "bottom_left": {
+          "term": "swordfish",
+          "confidence": 82.60681915283203
+        },
+        "bottom_right": {
+          "term": "divan",
+          "confidence": 96.25637817382812
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-105.png"
+    },
+    {
+      "screenshot_id": "106",
+      "expected_vocab": "ruler",
+      "model_selection": "top_right",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "watermelon",
+          "confidence": 65.09767150878906
+        },
+        "top_right": {
+          "term": "ruler",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 98.44842529296875
+        },
+        "bottom_right": {
+          "term": "chat",
+          "confidence": 98.16211700439453
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-106.png"
+    },
+    {
+      "screenshot_id": "107",
+      "expected_vocab": "tunnel",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "couturier",
+          "confidence": 63.13066482543945
+        },
+        "top_right": {
+          "term": "ski",
+          "confidence": 0.35038846731185913
+        },
+        "bottom_left": {
+          "term": "trumpet",
+          "confidence": 99.99755859375
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 96.9510726928711
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-107.png"
+    },
+    {
+      "screenshot_id": "108",
+      "expected_vocab": "envelope",
+      "model_selection": "bottom_left",
+      "selection_confidence": 99.99967956542969,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 99.99967956542969
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "divan",
+          "confidence": 74.3243179321289
+        },
+        "top_right": {
+          "term": "watermelon",
+          "confidence": 96.4516830444336
+        },
+        "bottom_left": {
+          "term": "envelope",
+          "confidence": 99.99967956542969
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 97.35400390625
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-108.png"
+    },
+    {
+      "screenshot_id": "109",
+      "expected_vocab": "diamond",
+      "model_selection": "top_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.07184600830078
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "diamond",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "bear",
+          "confidence": 90.7882308959961
+        },
+        "bottom_left": {
+          "term": "couturier",
+          "confidence": 98.66399383544922
+        },
+        "bottom_right": {
+          "term": "diamond",
+          "confidence": 99.07184600830078
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-109.png"
+    },
+    {
+      "screenshot_id": "110",
+      "expected_vocab": "calendar",
+      "model_selection": "top_right",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.99964141845703
+        },
+        {
+          "position": "top_right",
+          "confidence": 100.0
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 99.17906188964844
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "calendar",
+          "confidence": 99.99964141845703
+        },
+        "top_right": {
+          "term": "calendar",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "calendar",
+          "confidence": 99.17906188964844
+        },
+        "bottom_right": {
+          "term": "bamboo",
+          "confidence": 0.0010652699274942279
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-110.png"
+    },
+    {
+      "screenshot_id": "111",
+      "expected_vocab": "panda",
+      "model_selection": "top_left",
+      "selection_confidence": 98.7762451171875,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 98.7762451171875
+        },
+        {
+          "position": "top_right",
+          "confidence": 93.30736541748047
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 3.7478783965205764e-11
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 97.19694519042969
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "panda",
+          "confidence": 98.7762451171875
+        },
+        "top_right": {
+          "term": "panda",
+          "confidence": 93.30736541748047
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 99.99876403808594
+        },
+        "bottom_right": {
+          "term": "panda",
+          "confidence": 97.19694519042969
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-111.png"
+    },
+    {
+      "screenshot_id": "112",
+      "expected_vocab": "arrow",
+      "model_selection": "top_left",
+      "selection_confidence": 82.20948791503906,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 82.20948791503906
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "arrow",
+          "confidence": 82.20948791503906
+        },
+        "top_right": {
+          "term": "tumble",
+          "confidence": 99.90711212158203
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "furry",
+          "confidence": 65.44817352294922
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-112.png"
+    },
+    {
+      "screenshot_id": "113",
+      "expected_vocab": "picking",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "sprinkler",
+          "confidence": 86.92018127441406
+        },
+        "top_right": {
+          "term": "carousel",
+          "confidence": 98.64978790283203
+        },
+        "bottom_left": {
+          "term": "swordfish",
+          "confidence": 60.99631118774414
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 96.36312866210938
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-113.png"
+    },
+    {
+      "screenshot_id": "114",
+      "expected_vocab": "dripping",
+      "model_selection": "top_right",
+      "selection_confidence": 99.18975830078125,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 99.18975830078125
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 77.4814224243164
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "degression",
+          "confidence": 99.6264877319336
+        },
+        "top_right": {
+          "term": "dripping",
+          "confidence": 99.18975830078125
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 52.60121154785156
+        },
+        "bottom_right": {
+          "term": "dripping",
+          "confidence": 77.4814224243164
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-114.png"
+    },
+    {
+      "screenshot_id": "115",
+      "expected_vocab": "knight",
+      "model_selection": "top_right",
+      "selection_confidence": 92.65740203857422,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 0.003155900165438652
+        },
+        {
+          "position": "top_right",
+          "confidence": 92.65740203857422
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "cormorant",
+          "confidence": 59.94046401977539
+        },
+        "top_right": {
+          "term": "knight",
+          "confidence": 92.65740203857422
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 96.69026947021484
+        },
+        "bottom_right": {
+          "term": "triad",
+          "confidence": 92.51759338378906
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-115.png"
+    },
+    {
+      "screenshot_id": "116",
+      "expected_vocab": "delivering",
+      "model_selection": "top_left",
+      "selection_confidence": 99.17571258544922,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.17571258544922
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "delivering",
+          "confidence": 99.17571258544922
+        },
+        "top_right": {
+          "term": "degression",
+          "confidence": 63.6756706237793
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 99.787353515625
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 99.53968811035156
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-116.png"
+    },
+    {
+      "screenshot_id": "117",
+      "expected_vocab": "dentist",
+      "model_selection": "top_right",
+      "selection_confidence": 93.11814880371094,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 93.11814880371094
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "calendar",
+          "confidence": 99.48968505859375
+        },
+        "top_right": {
+          "term": "dentist",
+          "confidence": 93.11814880371094
+        },
+        "bottom_left": {
+          "term": "furry",
+          "confidence": 47.890296936035156
+        },
+        "bottom_right": {
+          "term": "couturier",
+          "confidence": 100.0
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-117.png"
+    },
+    {
+      "screenshot_id": "118",
+      "expected_vocab": "claw",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "divan",
+          "confidence": 99.7571029663086
+        },
+        "top_right": {
+          "term": "sedentary",
+          "confidence": 99.9999771118164
+        },
+        "bottom_left": {
+          "term": "triad",
+          "confidence": 99.87674713134766
+        },
+        "bottom_right": {
+          "term": "foam",
+          "confidence": 94.97764587402344
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-118.png"
+    },
+    {
+      "screenshot_id": "119",
+      "expected_vocab": "uniform",
+      "model_selection": "bottom_left",
+      "selection_confidence": 90.77885437011719,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 90.77885437011719
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "couturier",
+          "confidence": 56.44661331176758
+        },
+        "top_right": {
+          "term": "antenna",
+          "confidence": 69.02354431152344
+        },
+        "bottom_left": {
+          "term": "uniform",
+          "confidence": 90.77885437011719
+        },
+        "bottom_right": {
+          "term": "stump",
+          "confidence": 90.47525024414062
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-119.png"
+    },
+    {
+      "screenshot_id": "120",
+      "expected_vocab": "furry",
+      "model_selection": "bottom_left",
+      "selection_confidence": 99.98292541503906,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 0.0998711809515953
+        },
+        {
+          "position": "top_right",
+          "confidence": 94.88015747070312
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 99.98292541503906
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 3.7865962982177734
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "baywindow",
+          "confidence": 30.445674896240234
+        },
+        "top_right": {
+          "term": "furry",
+          "confidence": 94.88015747070312
+        },
+        "bottom_left": {
+          "term": "furry",
+          "confidence": 99.98292541503906
+        },
+        "bottom_right": {
+          "term": "sprinkler",
+          "confidence": 51.611351013183594
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-120.png"
+    },
+    {
+      "screenshot_id": "121",
+      "expected_vocab": "cormorant",
+      "model_selection": "bottom_left",
+      "selection_confidence": 99.99995422363281,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 99.99995422363281
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "steam",
+          "confidence": 99.62500762939453
+        },
+        "top_right": {
+          "term": "antenna",
+          "confidence": 91.00289916992188
+        },
+        "bottom_left": {
+          "term": "cormorant",
+          "confidence": 99.99995422363281
+        },
+        "bottom_right": {
+          "term": "foam",
+          "confidence": 99.9999771118164
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-121.png"
+    },
+    {
+      "screenshot_id": "122",
+      "expected_vocab": "fetch",
+      "model_selection": "top_left",
+      "selection_confidence": 95.80475616455078,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 95.80475616455078
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "fetch",
+          "confidence": 95.80475616455078
+        },
+        "top_right": {
+          "term": "cormorant",
+          "confidence": 99.48470306396484
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 70.67369842529297
+        },
+        "bottom_right": {
+          "term": "roof",
+          "confidence": 96.09269714355469
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-122.png"
+    },
+    {
+      "screenshot_id": "123",
+      "expected_vocab": "arcade",
+      "model_selection": "top_left",
+      "selection_confidence": 99.98878479003906,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.98878479003906
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "arcade",
+          "confidence": 99.98878479003906
+        },
+        "top_right": {
+          "term": "calendar",
+          "confidence": 87.89892578125
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 99.87433624267578
+        },
+        "bottom_right": {
+          "term": "chat",
+          "confidence": 99.87635803222656
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-123.png"
+    },
+    {
+      "screenshot_id": "124",
+      "expected_vocab": "artifact",
+      "model_selection": "top_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.99998474121094
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "artifact",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "artifact",
+          "confidence": 99.99998474121094
+        },
+        "bottom_left": {
+          "term": "ruler",
+          "confidence": 99.9998779296875
+        },
+        "bottom_right": {
+          "term": "artifact",
+          "confidence": 100.0
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-124.png"
+    },
+    {
+      "screenshot_id": "125",
+      "expected_vocab": "aversion",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "cormorant",
+          "confidence": 73.7778091430664
+        },
+        "top_right": {
+          "term": "foam",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 93.87442779541016
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 99.99874877929688
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-125.png"
+    },
+    {
+      "screenshot_id": "126",
+      "expected_vocab": "beret",
+      "model_selection": "top_right",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 100.0
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 76.25293731689453
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "awning",
+          "confidence": 99.11571502685547
+        },
+        "top_right": {
+          "term": "beret",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "couturier",
+          "confidence": 91.93781280517578
+        },
+        "bottom_right": {
+          "term": "beret",
+          "confidence": 76.25293731689453
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-126.png"
+    },
+    {
+      "screenshot_id": "127",
+      "expected_vocab": "applaud",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "lollipop",
+          "confidence": 82.41600036621094
+        },
+        "top_right": {
+          "term": "awning",
+          "confidence": 99.98113250732422
+        },
+        "bottom_left": {
+          "term": "trumpet",
+          "confidence": 41.39234924316406
+        },
+        "bottom_right": {
+          "term": "foam",
+          "confidence": 99.7909164428711
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-127.png"
+    },
+    {
+      "screenshot_id": "128",
+      "expected_vocab": "timid",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "preserve",
+          "confidence": 99.95573425292969
+        },
+        "top_right": {
+          "term": "ruler",
+          "confidence": 85.39556884765625
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 57.283912658691406
+        },
+        "bottom_right": {
+          "term": "diamond",
+          "confidence": 89.95557403564453
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-128.png"
+    },
+    {
+      "screenshot_id": "129",
+      "expected_vocab": "camp",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "cormorant",
+          "confidence": 0.02831270731985569
+        },
+        "top_right": {
+          "term": "kazoo",
+          "confidence": 68.76727294921875
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "chat",
+          "confidence": 98.69066619873047
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-129.png"
+    },
+    {
+      "screenshot_id": "130",
+      "expected_vocab": "tumble",
+      "model_selection": "top_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.9984359741211
+        },
+        {
+          "position": "top_right",
+          "confidence": 1.204279556077381e-07
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 99.99565124511719
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "tumble",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "tumble",
+          "confidence": 99.9984359741211
+        },
+        "bottom_left": {
+          "term": "tumble",
+          "confidence": 99.99565124511719
+        },
+        "bottom_right": {
+          "term": "colony",
+          "confidence": 99.76361083984375
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-130.png"
+    },
+    {
+      "screenshot_id": "131",
+      "expected_vocab": "concentric",
+      "model_selection": "top_right",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 6.233218050055462e-16
+        },
+        {
+          "position": "top_right",
+          "confidence": 100.0
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 99.93775177001953
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "spatula",
+          "confidence": 99.99993133544922
+        },
+        "top_right": {
+          "term": "concentric",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "concentric",
+          "confidence": 99.93775177001953
+        },
+        "bottom_right": {
+          "term": "foam",
+          "confidence": 96.59618377685547
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-131.png"
+    },
+    {
+      "screenshot_id": "132",
+      "expected_vocab": "confectionery",
+      "model_selection": "bottom_right",
+      "selection_confidence": 94.84270477294922,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_right",
+          "confidence": 94.84270477294922
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "mischievous",
+          "confidence": 78.59556579589844
+        },
+        "top_right": {
+          "term": "pitcher",
+          "confidence": 34.51872634887695
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 46.63003921508789
+        },
+        "bottom_right": {
+          "term": "confectionery",
+          "confidence": 94.84270477294922
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-132.png"
+    },
+    {
+      "screenshot_id": "133",
+      "expected_vocab": "couturier",
+      "model_selection": "bottom_left",
+      "selection_confidence": 99.960205078125,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 99.7684097290039
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 99.960205078125
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "waterwheel",
+          "confidence": 47.26455307006836
+        },
+        "top_right": {
+          "term": "couturier",
+          "confidence": 99.7684097290039
+        },
+        "bottom_left": {
+          "term": "couturier",
+          "confidence": 99.960205078125
+        },
+        "bottom_right": {
+          "term": "watermelon",
+          "confidence": 84.36537170410156
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-133.png"
+    },
+    {
+      "screenshot_id": "134",
+      "expected_vocab": "degression",
+      "model_selection": "top_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.40718078613281
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.99796295166016
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "degression",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "degression",
+          "confidence": 99.40718078613281
+        },
+        "bottom_left": {
+          "term": "spatula",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "degression",
+          "confidence": 99.99796295166016
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-134.png"
+    },
+    {
+      "screenshot_id": "135",
+      "expected_vocab": "divan",
+      "model_selection": "top_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "top_right",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "divan",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "divan",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "couturier",
+          "confidence": 66.9732894897461
+        },
+        "bottom_right": {
+          "term": "sedentary",
+          "confidence": 99.9879150390625
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-135.png"
+    },
+    {
+      "screenshot_id": "136",
+      "expected_vocab": "wetland",
+      "model_selection": "top_right",
+      "selection_confidence": 84.50675201416016,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 84.50675201416016
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 0.005281525664031506
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "calendar",
+          "confidence": 99.99940490722656
+        },
+        "top_right": {
+          "term": "wetland",
+          "confidence": 84.50675201416016
+        },
+        "bottom_left": {
+          "term": "ball",
+          "confidence": 55.859710693359375
+        },
+        "bottom_right": {
+          "term": "diamond",
+          "confidence": 87.30664825439453
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-136.png"
+    },
+    {
+      "screenshot_id": "137",
+      "expected_vocab": "baywindow",
+      "model_selection": "top_left",
+      "selection_confidence": 99.98985290527344,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.98985290527344
+        },
+        {
+          "position": "top_right",
+          "confidence": 81.4705810546875
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 2.5486202076647382e-20
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "baywindow",
+          "confidence": 99.98985290527344
+        },
+        "top_right": {
+          "term": "baywindow",
+          "confidence": 81.4705810546875
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 59.40380096435547
+        },
+        "bottom_right": {
+          "term": "juggling",
+          "confidence": 99.98257446289062
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-137.png"
+    },
+    {
+      "screenshot_id": "138",
+      "expected_vocab": "aesthete",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "preserve",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "cheese",
+          "confidence": 83.44058990478516
+        },
+        "bottom_left": {
+          "term": "sprinkler",
+          "confidence": 91.66693878173828
+        },
+        "bottom_right": {
+          "term": "swordfish",
+          "confidence": 50.562713623046875
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-138.png"
+    },
+    {
+      "screenshot_id": "139",
+      "expected_vocab": "ecstatic",
+      "model_selection": "top_right",
+      "selection_confidence": 99.92200469970703,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 85.17787170410156
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.92200469970703
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "ecstatic",
+          "confidence": 85.17787170410156
+        },
+        "top_right": {
+          "term": "ecstatic",
+          "confidence": 99.92200469970703
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 99.99880981445312
+        },
+        "bottom_right": {
+          "term": "irrigation",
+          "confidence": 65.7018814086914
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-139.png"
+    },
+    {
+      "screenshot_id": "140",
+      "expected_vocab": "rickety",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "dripping",
+          "confidence": 70.47325134277344
+        },
+        "top_right": {
+          "term": "degression",
+          "confidence": 63.228328704833984
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 99.995361328125
+        },
+        "bottom_right": {
+          "term": "sprinkler",
+          "confidence": 99.99618530273438
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-140.png"
+    },
+    {
+      "screenshot_id": "141",
+      "expected_vocab": "gourmet",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "elbow",
+          "confidence": 45.05849075317383
+        },
+        "top_right": {
+          "term": "couturier",
+          "confidence": 99.99984741210938
+        },
+        "bottom_left": {
+          "term": "beret",
+          "confidence": 96.53268432617188
+        },
+        "bottom_right": {
+          "term": "watermelon",
+          "confidence": 98.0757827758789
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-141.png"
+    },
+    {
+      "screenshot_id": "142",
+      "expected_vocab": "gesticulate",
+      "model_selection": "top_right",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "couturier",
+          "confidence": 89.61415100097656
+        },
+        "top_right": {
+          "term": "gesticulate",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 57.37175750732422
+        },
+        "bottom_right": {
+          "term": "chat",
+          "confidence": 88.62369537353516
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-142.png"
+    },
+    {
+      "screenshot_id": "143",
+      "expected_vocab": "facade",
+      "model_selection": "bottom_right",
+      "selection_confidence": 99.96452331542969,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 4.867084044235526e-06
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.96452331542969
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "map",
+          "confidence": 99.30645751953125
+        },
+        "top_right": {
+          "term": "waterwheel",
+          "confidence": 99.04714965820312
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 14.668591499328613
+        },
+        "bottom_right": {
+          "term": "facade",
+          "confidence": 99.96452331542969
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-143.png"
+    },
+    {
+      "screenshot_id": "144",
+      "expected_vocab": "slope",
+      "model_selection": "bottom_right",
+      "selection_confidence": 99.99864959716797,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_right",
+          "confidence": 99.99864959716797
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "colony",
+          "confidence": 99.98588562011719
+        },
+        "top_right": {
+          "term": "map",
+          "confidence": 99.90933990478516
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 99.90296173095703
+        },
+        "bottom_right": {
+          "term": "slope",
+          "confidence": 99.99864959716797
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-144.png"
+    },
+    {
+      "screenshot_id": "145",
+      "expected_vocab": "habit",
+      "model_selection": "bottom_left",
+      "selection_confidence": 99.98731994628906,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 99.98731994628906
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.3792495727539
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "couturier",
+          "confidence": 99.99178314208984
+        },
+        "top_right": {
+          "term": "foam",
+          "confidence": 75.1266860961914
+        },
+        "bottom_left": {
+          "term": "habit",
+          "confidence": 99.98731994628906
+        },
+        "bottom_right": {
+          "term": "habit",
+          "confidence": 99.3792495727539
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-145.png"
+    },
+    {
+      "screenshot_id": "146",
+      "expected_vocab": "intersection",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "waterwheel",
+          "confidence": 54.0257682800293
+        },
+        "top_right": {
+          "term": "awning",
+          "confidence": 99.87287139892578
+        },
+        "bottom_left": {
+          "term": "furry",
+          "confidence": 71.34844970703125
+        },
+        "bottom_right": {
+          "term": "steam",
+          "confidence": 96.1086654663086
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-146.png"
+    },
+    {
+      "screenshot_id": "147",
+      "expected_vocab": "irrigation",
+      "model_selection": "top_left",
+      "selection_confidence": 99.99934387207031,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.99934387207031
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.90020751953125
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "irrigation",
+          "confidence": 99.99934387207031
+        },
+        "top_right": {
+          "term": "irrigation",
+          "confidence": 99.90020751953125
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 99.99224090576172
+        },
+        "bottom_right": {
+          "term": "steam",
+          "confidence": 72.81664276123047
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-147.png"
+    },
+    {
+      "screenshot_id": "148",
+      "expected_vocab": "kazoo",
+      "model_selection": "top_right",
+      "selection_confidence": 99.9908218383789,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 99.9908218383789
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "spatula",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "kazoo",
+          "confidence": 99.9908218383789
+        },
+        "bottom_left": {
+          "term": "ruler",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "tapestry",
+          "confidence": 99.99982452392578
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-148.png"
+    },
+    {
+      "screenshot_id": "149",
+      "expected_vocab": "chat",
+      "model_selection": "bottom_right",
+      "selection_confidence": 99.9930419921875,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 93.1412124633789
+        },
+        {
+          "position": "top_right",
+          "confidence": 94.8440933227539
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 99.12324523925781
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.9930419921875
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "chat",
+          "confidence": 93.1412124633789
+        },
+        "top_right": {
+          "term": "chat",
+          "confidence": 94.8440933227539
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 99.12324523925781
+        },
+        "bottom_right": {
+          "term": "chat",
+          "confidence": 99.9930419921875
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-149.png"
+    },
+    {
+      "screenshot_id": "150",
+      "expected_vocab": "colony",
+      "model_selection": "top_left",
+      "selection_confidence": 99.9985122680664,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.9985122680664
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 45.649898529052734
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "colony",
+          "confidence": 99.9985122680664
+        },
+        "top_right": {
+          "term": "foam",
+          "confidence": 68.53739166259766
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 54.34268569946289
+        },
+        "bottom_right": {
+          "term": "tapestry",
+          "confidence": 99.88579559326172
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-150.png"
+    },
+    {
+      "screenshot_id": "151",
+      "expected_vocab": "preserve",
+      "model_selection": "top_left",
+      "selection_confidence": 99.99993133544922,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.99993133544922
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 99.9887924194336
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 84.8988037109375
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "preserve",
+          "confidence": 99.99993133544922
+        },
+        "top_right": {
+          "term": "antenna",
+          "confidence": 98.93537902832031
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 99.9887924194336
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 84.8988037109375
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-151.png"
+    },
+    {
+      "screenshot_id": "152",
+      "expected_vocab": "awning",
+      "model_selection": "top_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.99671936035156
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "awning",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "couturier",
+          "confidence": 64.11138916015625
+        },
+        "bottom_left": {
+          "term": "cormorant",
+          "confidence": 99.99525451660156
+        },
+        "bottom_right": {
+          "term": "awning",
+          "confidence": 99.99671936035156
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-152.png"
+    },
+    {
+      "screenshot_id": "153",
+      "expected_vocab": "mammalogy",
+      "model_selection": "bottom_left",
+      "selection_confidence": 99.97508239746094,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 99.97508239746094
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "triad",
+          "confidence": 99.99928283691406
+        },
+        "top_right": {
+          "term": "map",
+          "confidence": 58.054386138916016
+        },
+        "bottom_left": {
+          "term": "mammalogy",
+          "confidence": 99.97508239746094
+        },
+        "bottom_right": {
+          "term": "ruler",
+          "confidence": 100.0
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-153.png"
+    },
+    {
+      "screenshot_id": "154",
+      "expected_vocab": "metronome",
+      "model_selection": "bottom_left",
+      "selection_confidence": 99.99990844726562,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 99.99990844726562
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "ruler",
+          "confidence": 99.05831909179688
+        },
+        "top_right": {
+          "term": "divan",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "metronome",
+          "confidence": 99.99990844726562
+        },
+        "bottom_right": {
+          "term": "foam",
+          "confidence": 100.0
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-154.png"
+    },
+    {
+      "screenshot_id": "155",
+      "expected_vocab": "paleontologist",
+      "model_selection": "bottom_right",
+      "selection_confidence": 97.09861755371094,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 75.42317962646484
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 97.09861755371094
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "paleontologist",
+          "confidence": 75.42317962646484
+        },
+        "top_right": {
+          "term": "artifact",
+          "confidence": 97.23548126220703
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 99.9999771118164
+        },
+        "bottom_right": {
+          "term": "paleontologist",
+          "confidence": 97.09861755371094
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-155.png"
+    },
+    {
+      "screenshot_id": "156",
+      "expected_vocab": "percussion",
+      "model_selection": "bottom_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 87.75657653808594
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 98.27620697021484
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "percussion",
+          "confidence": 87.75657653808594
+        },
+        "top_right": {
+          "term": "artichoke",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "percussion",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "percussion",
+          "confidence": 98.27620697021484
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-156.png"
+    },
+    {
+      "screenshot_id": "157",
+      "expected_vocab": "posterior",
+      "model_selection": "top_right",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 100.0
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 88.66426849365234
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.88247680664062
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "couturier",
+          "confidence": 99.99909210205078
+        },
+        "top_right": {
+          "term": "posterior",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "posterior",
+          "confidence": 88.66426849365234
+        },
+        "bottom_right": {
+          "term": "posterior",
+          "confidence": 99.88247680664062
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-157.png"
+    },
+    {
+      "screenshot_id": "158",
+      "expected_vocab": "precarious",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "couturier",
+          "confidence": 38.328941345214844
+        },
+        "top_right": {
+          "term": "carousel",
+          "confidence": 99.9984359741211
+        },
+        "bottom_left": {
+          "term": "foam",
+          "confidence": 99.99993896484375
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 100.0
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-158.png"
+    },
+    {
+      "screenshot_id": "159",
+      "expected_vocab": "arbor",
+      "model_selection": "top_right",
+      "selection_confidence": 97.56767272949219,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 97.56767272949219
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "foam",
+          "confidence": 99.96488952636719
+        },
+        "top_right": {
+          "term": "arbor",
+          "confidence": 97.56767272949219
+        },
+        "bottom_left": {
+          "term": "sandbag",
+          "confidence": 98.61641693115234
+        },
+        "bottom_right": {
+          "term": "telescope",
+          "confidence": 99.96200561523438
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-159.png"
+    },
+    {
+      "screenshot_id": "160",
+      "expected_vocab": "resuscitation",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "chat",
+          "confidence": 49.20852279663086
+        },
+        "top_right": {
+          "term": "ball",
+          "confidence": 69.4375991821289
+        },
+        "bottom_left": {
+          "term": "couturier",
+          "confidence": 66.68699645996094
+        },
+        "bottom_right": {
+          "term": "tulip",
+          "confidence": 58.5604133605957
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-160.png"
+    },
+    {
+      "screenshot_id": "161",
+      "expected_vocab": "rosette",
+      "model_selection": "top_left",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.98880767822266
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.62176513671875
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "rosette",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "rosette",
+          "confidence": 99.98880767822266
+        },
+        "bottom_left": {
+          "term": "divan",
+          "confidence": 0.11172734946012497
+        },
+        "bottom_right": {
+          "term": "rosette",
+          "confidence": 99.62176513671875
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-161.png"
+    },
+    {
+      "screenshot_id": "162",
+      "expected_vocab": "saffron",
+      "model_selection": "top_left",
+      "selection_confidence": 89.02882385253906,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 89.02882385253906
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "saffron",
+          "confidence": 89.02882385253906
+        },
+        "top_right": {
+          "term": "beret",
+          "confidence": 99.87933349609375
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 99.52857208251953
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-162.png"
+    },
+    {
+      "screenshot_id": "163",
+      "expected_vocab": "mischievous",
+      "model_selection": "bottom_right",
+      "selection_confidence": 99.98420715332031,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 98.19190216064453
+        },
+        {
+          "position": "top_right",
+          "confidence": 96.27731323242188
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.98420715332031
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "mischievous",
+          "confidence": 98.19190216064453
+        },
+        "top_right": {
+          "term": "mischievous",
+          "confidence": 96.27731323242188
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 80.59080505371094
+        },
+        "bottom_right": {
+          "term": "mischievous",
+          "confidence": 99.98420715332031
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-163.png"
+    },
+    {
+      "screenshot_id": "164",
+      "expected_vocab": "skimmer",
+      "model_selection": "top_right",
+      "selection_confidence": 99.99991607666016,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 99.99991607666016
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "ruler",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "skimmer",
+          "confidence": 99.99991607666016
+        },
+        "bottom_left": {
+          "term": "kazoo",
+          "confidence": 96.1788101196289
+        },
+        "bottom_right": {
+          "term": "spatula",
+          "confidence": 99.99365997314453
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-164.png"
+    },
+    {
+      "screenshot_id": "165",
+      "expected_vocab": "sedentary",
+      "model_selection": "top_right",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 100.0
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 100.0
+        },
+        {
+          "position": "bottom_right",
+          "confidence": 99.98414611816406
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "colony",
+          "confidence": 53.569095611572266
+        },
+        "top_right": {
+          "term": "sedentary",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "sedentary",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "sedentary",
+          "confidence": 99.98414611816406
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-165.png"
+    },
+    {
+      "screenshot_id": "166",
+      "expected_vocab": "suede",
+      "model_selection": "top_right",
+      "selection_confidence": 99.60350036621094,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 98.91216278076172
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.60350036621094
+        },
+        {
+          "position": "bottom_left",
+          "confidence": 98.04342651367188
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "suede",
+          "confidence": 98.91216278076172
+        },
+        "top_right": {
+          "term": "suede",
+          "confidence": 99.60350036621094
+        },
+        "bottom_left": {
+          "term": "suede",
+          "confidence": 98.04342651367188
+        },
+        "bottom_right": {
+          "term": "couturier",
+          "confidence": 24.50626564025879
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-166.png"
+    },
+    {
+      "screenshot_id": "167",
+      "expected_vocab": "turnstile",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "calendar",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "gesticulate",
+          "confidence": 38.438079833984375
+        },
+        "bottom_left": {
+          "term": "rosette",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "cork",
+          "confidence": 99.9883041381836
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-167.png"
+    },
+    {
+      "screenshot_id": "168",
+      "expected_vocab": "triad",
+      "model_selection": "top_left",
+      "selection_confidence": 99.86103820800781,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 99.86103820800781
+        },
+        {
+          "position": "top_right",
+          "confidence": 99.61502838134766
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "triad",
+          "confidence": 99.86103820800781
+        },
+        "top_right": {
+          "term": "triad",
+          "confidence": 99.61502838134766
+        },
+        "bottom_left": {
+          "term": "chat",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "sandbag",
+          "confidence": 97.20098114013672
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-168.png"
+    },
+    {
+      "screenshot_id": "169",
+      "expected_vocab": "dredging",
+      "model_selection": "bottom_left",
+      "selection_confidence": 99.79232025146484,
+      "expected_found_in_cells": [
+        {
+          "position": "bottom_left",
+          "confidence": 99.79232025146484
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "fan",
+          "confidence": 25.591934204101562
+        },
+        "top_right": {
+          "term": "preserve",
+          "confidence": 99.8177490234375
+        },
+        "bottom_left": {
+          "term": "dredging",
+          "confidence": 99.79232025146484
+        },
+        "bottom_right": {
+          "term": "sprinkler",
+          "confidence": 99.99800872802734
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-169.png"
+    },
+    {
+      "screenshot_id": "170",
+      "expected_vocab": "urban",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "swordfish",
+          "confidence": 99.9763412475586
+        },
+        "top_right": {
+          "term": "preserve",
+          "confidence": 74.16584777832031
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "preserve",
+          "confidence": 99.99923706054688
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-170.png"
+    },
+    {
+      "screenshot_id": "171",
+      "expected_vocab": "steam",
+      "model_selection": "top_right",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_left",
+          "confidence": 88.95280456542969
+        },
+        {
+          "position": "top_right",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "steam",
+          "confidence": 88.95280456542969
+        },
+        "top_right": {
+          "term": "steam",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "preserve",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "facade",
+          "confidence": 89.11418914794922
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-171.png"
+    },
+    {
+      "screenshot_id": "172",
+      "expected_vocab": "vertebra",
+      "model_selection": null,
+      "selection_confidence": 0,
+      "expected_found_in_cells": [],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "spatula",
+          "confidence": 94.45856475830078
+        },
+        "top_right": {
+          "term": "artifact",
+          "confidence": 58.79792022705078
+        },
+        "bottom_left": {
+          "term": "rosette",
+          "confidence": 59.24970626831055
+        },
+        "bottom_right": {
+          "term": "ball",
+          "confidence": 99.72346496582031
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-172.png"
+    },
+    {
+      "screenshot_id": "173",
+      "expected_vocab": "bandage",
+      "model_selection": "top_right",
+      "selection_confidence": 100.0,
+      "expected_found_in_cells": [
+        {
+          "position": "top_right",
+          "confidence": 100.0
+        }
+      ],
+      "all_cell_predictions": {
+        "top_left": {
+          "term": "rosette",
+          "confidence": 100.0
+        },
+        "top_right": {
+          "term": "bandage",
+          "confidence": 100.0
+        },
+        "bottom_left": {
+          "term": "ruler",
+          "confidence": 100.0
+        },
+        "bottom_right": {
+          "term": "spatula",
+          "confidence": 100.0
+        }
+      },
+      "image_url": "https://raw.githubusercontent.com/levante-framework/core-tasks/more-tasks-tested/task-screenshots/vocab/vocab-173.png"
+    }
+  ]
+}
