@@ -1,1 +1,253 @@
- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLIP vs EfficientNet-21k Vocabulary Analysis</title>
+    <meta name="description" content="Comprehensive comparison of CLIP and EfficientNet-21k models for vocabulary image classification across 170 test images">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .stats-banner {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+        .tools-section {
+            margin: 40px 0;
+        }
+        .tools-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        .tool-card {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        .tool-card:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,123,255,0.1);
+        }
+        .tool-card.featured {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #f8fff9 0%, #e8f5e8 100%);
+        }
+        .tool-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .tool-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .tool-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .tool-link:hover {
+            background: #0056b3;
+        }
+        .tool-link.featured {
+            background: #28a745;
+        }
+        .tool-link.featured:hover {
+            background: #1e7e34;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .badge-new {
+            background: #28a745;
+            color: white;
+        }
+        .badge-working {
+            background: #17a2b8;
+            color: white;
+        }
+        .methodology {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        .methodology h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .methodology ul {
+            color: #666;
+            line-height: 1.6;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+        }
+        .github-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+        .github-link:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 CLIP vs EfficientNet-21k</h1>
+            <p>Comprehensive Vocabulary Image Classification Analysis</p>
+        </div>
+
+        <div class="stats-banner">
+            <h3>📊 Key Findings</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">CLIP Success Rate</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">74.7%</div>
+                    <div class="stat-label">EfficientNet-21k Success Rate</div>
+                </div>
+            </div>
+            <p style="margin-top: 15px; opacity: 0.9;">
+                CLIP demonstrates superior performance in vocabulary image classification with perfect accuracy across all 170 test images.
+            </p>
+        </div>
+
+        <div class="tools-section">
+            <h2>🔬 Interactive Analysis Tools</h2>
+            
+            <div class="tool-card featured">
+                <div class="tool-title">
+                    🤖 CLIP vs EfficientNet-21k Comparison
+                    <span class="badge badge-new">RECOMMENDED</span>
+                </div>
+                <div class="tool-description">
+                    <strong>Primary Analysis Tool:</strong> Side-by-side comparison showing how CLIP achieves 100% accuracy while EfficientNet-21k struggles with spatial localization and object identification. Includes visual grid overlays, confidence scores, and detailed analysis of the famous "coconut vs acorn" misclassification case.
+                </div>
+                <a href="clip_results_viewer.html" class="tool-link featured">Open Main Comparison</a>
+            </div>
+
+            <div class="tool-card">
+                <div class="tool-title">
+                    📊 Simplified Comparison View
+                    <span class="badge badge-working">WORKING</span>
+                </div>
+                <div class="tool-description">
+                    Clean, streamlined interface focusing on model performance differences. Shows success rates, grid cell selections, and filtering options to highlight cases where the models disagree.
+                </div>
+                <a href="clip_comparison_simple.html" class="tool-link">Open Simple View</a>
+            </div>
+
+            <div class="tool-card">
+                <div class="tool-title">
+                    🔧 Debug & Testing Tools
+                    <span class="badge badge-working">WORKING</span>
+                </div>
+                <div class="tool-description">
+                    Development tools for testing data loading, debugging button functionality, and inspecting the underlying JSON data structures. Useful for understanding the technical implementation.
+                </div>
+                <a href="debug_clip_buttons.html" class="tool-link">Open Debug Tools</a>
+            </div>
+        </div>
+
+        <div class="methodology">
+            <h3>🧪 Methodology</h3>
+            <ul>
+                <li><strong>Dataset:</strong> 170 vocabulary images (vocab-004 to vocab-173) from the Levante framework</li>
+                <li><strong>Grid Analysis:</strong> Each image divided into 2×2 grid (top-left, top-right, bottom-left, bottom-right)</li>
+                <li><strong>Task:</strong> Identify which grid cell contains the target vocabulary term</li>
+                <li><strong>Models:</strong> CLIP (OpenAI) vs EfficientNet-21k (Google) with enhanced class mapping</li>
+                <li><strong>Metrics:</strong> Success rate based on correct grid cell identification</li>
+                <li><strong>Key Finding:</strong> CLIP's text-image alignment significantly outperforms EfficientNet-21k's image-only approach</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>
+                <strong>Research Impact:</strong> This analysis demonstrates the superiority of multimodal models (CLIP) over traditional image classification models (EfficientNet-21k) for vocabulary-specific tasks requiring spatial understanding.
+            </p>
+            <a href="https://github.com/digital-pro/crowdin-projects" class="github-link">
+                📁 View Source Code on GitHub
+            </a>
+        </div>
+    </div>
+</body>
+</html> 
