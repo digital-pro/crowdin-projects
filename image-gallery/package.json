@@ -1,7 +1,7 @@
 {
   "name": "image-gallery",
   "version": "1.0.0",
-  "description": "Vue TypeScript Image Gallery for LEVANTE Core Task Assets",
+  "description": "Image Gallery for LEVANTE Core Task Assets",
   "type": "module",
   "scripts": {
     "dev": "vite",

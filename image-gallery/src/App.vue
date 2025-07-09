@@ -391,8 +391,8 @@ const filteredGitHubScreenshots = computed(() => {
         bVal = b.size
         break
       default:
-        aVal = String(a[field]).toLowerCase()
-        bVal = String(b[field]).toLowerCase()
+        aVal = String((a as any)[field]).toLowerCase()
+        bVal = String((b as any)[field]).toLowerCase()
     }
 
     if (aVal < bVal) return githubScreenshotSortOptions.value.direction === 'asc' ? -1 : 1
@@ -440,8 +440,8 @@ const filteredScreenshots = computed(() => {
         bVal = b.strings.length
         break
       default:
-        aVal = String(a[field]).toLowerCase()
-        bVal = String(b[field]).toLowerCase()
+        aVal = String((a as any)[field]).toLowerCase()
+        bVal = String((b as any)[field]).toLowerCase()
     }
 
     if (aVal < bVal) return screenshotSortOptions.value.direction === 'asc' ? -1 : 1
