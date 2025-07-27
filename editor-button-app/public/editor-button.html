@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crowdin Editor Button</title>
+    <title>Levante Audio Test</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -22,7 +22,7 @@
             -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 30px;
+            padding: 25px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             text-align: center;
             max-width: 500px;
@@ -31,15 +31,11 @@
         
         h1 {
             color: #333;
-            margin-bottom: 10px;
-            font-size: 24px;
+            margin-bottom: 20px;
+            font-size: 18px;
         }
         
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
+
         
         .button-group {
             display: flex;
@@ -52,9 +48,9 @@
             background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
             color: white;
             border: none;
-            padding: 15px 25px;
+            padding: 12px 20px;
             border-radius: 50px;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -76,25 +72,7 @@
             transform: none;
         }
         
-        .debug-info {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-            text-align: left;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .debug-title {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-            text-align: center;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
+
         
         .status {
             margin-top: 15px;
@@ -120,40 +98,367 @@
             color: #0c5460;
             border: 1px solid #bee5eb;
         }
+        
+        .audio-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #eee;
+        }
+        
+        .audio-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .audio-btn {
+            flex: 1;
+            background: linear-gradient(45deg, #9C27B0, #673AB7);
+        }
+        
+        .audio-generation {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        
+        .service-selection, .voice-selection {
+            margin-bottom: 15px;
+        }
+        
+        .service-selection label, .voice-selection label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .service-selection select, .voice-selection select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .service-selection select:focus, .voice-selection select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .audio-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .audio-actions button {
+            flex: 1;
+            padding: 12px;
+            font-size: 14px;
+        }
+        
+        .cancel-btn {
+            background: linear-gradient(45deg, #757575, #616161) !important;
+        }
+        
+        .settings-btn {
+            background: linear-gradient(45deg, #FF9800, #F57C00) !important;
+        }
+        
+        .loading-spinner {
+            width: 12px;
+            height: 12px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 0;
+            border: none;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        
+        .close {
+            color: white;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        .close:hover {
+            opacity: 0.7;
+        }
+        
+        .credentials-form {
+            padding: 30px;
+        }
+        
+        .credential-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .credential-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .credential-group input {
+            width: 100%;
+            padding: 12px 45px 12px 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: monospace;
+            background: #f9f9f9;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        
+        .credential-group input:focus {
+            outline: none;
+            border-color: #4facfe;
+            background: white;
+        }
+        
+        .toggle-visibility {
+            position: absolute;
+            right: 10px;
+            top: 35px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+        }
+        
+        .toggle-visibility:hover {
+            opacity: 0.7;
+        }
+        
+        .credentials-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .credentials-buttons .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+        }
+        
+        .btn-success {
+            background: linear-gradient(45deg, #43e97b, #38f9d7);
+        }
+        
+        .credential-status {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .credential-status p {
+            margin: 0 0 15px 0;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .status-grid {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+        
+        .status-label {
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .status-indicator {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .status-indicator.present {
+            color: #28a745;
+        }
+        
+        .status-indicator.missing {
+            color: #dc3545;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎯 Crowdin Editor Button</h1>
-        <p class="subtitle">Custom actions for your translation workflow</p>
+        <h1>🎵 Levante Audio Test</h1>
         
         <div class="button-group">
-            <button onclick="performAction('get-string-info')" id="stringInfoBtn">
-                📝 Get String Info & Key
-            </button>
-            <button onclick="performAction('analyze-context')" id="analyzeBtn">
-                🔍 Analyze Full Context
-            </button>
-            <button onclick="performAction('fetch-via-api')" id="apiBtn">
-                🌐 Fetch via Crowdin API
-            </button>
-            <button onclick="performAction('custom-action')" id="customBtn">
-                ⚡ Custom Action
-            </button>
+            <div class="audio-section">
+                <div class="audio-buttons">
+                    <button onclick="playCurrentAudio()" id="playAudioBtn" class="audio-btn">
+                        🎵 Play Current Audio
+                    </button>
+                    <button onclick="showAudioGeneration()" id="generateAudioBtn" class="audio-btn">
+                        🎤 Generate New Audio
+                    </button>
+                </div>
+                <div id="audioGeneration" class="audio-generation" style="display: none;">
+                    <div class="service-selection">
+                        <label for="audioService">Service:</label>
+                        <select id="audioService" onchange="onServiceChange()">
+                            <option value="">Select Service...</option>
+                            <option value="PlayHT">PlayHT</option>
+                            <option value="ElevenLabs">ElevenLabs</option>
+                        </select>
+                    </div>
+                    <div class="voice-selection">
+                        <label for="voiceSelect">Voice:</label>
+                        <select id="voiceSelect" onchange="onVoiceChange()">
+                            <option value="">Select Voice...</option>
+                        </select>
+                    </div>
+                    <div class="audio-actions">
+                        <button onclick="generateAudio()" id="generateBtn" disabled>
+                            Generate Audio
+                        </button>
+                        <button onclick="showCredentialsModal()" class="settings-btn">
+                            ⚙️ API Settings
+                        </button>
+                        <button onclick="hideAudioGeneration()" class="cancel-btn">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div id="status" class="status" style="display: none;"></div>
-        
-        <div class="debug-info">
-            <div class="debug-title">🐛 Debug Information</div>
-            <div id="debug-content">
-                <strong>Current URL:</strong> <span id="current-url"></span><br>
-                <strong>URL Parameters:</strong> <span id="url-params"></span><br>
-                <strong>Referrer:</strong> <span id="referrer"></span><br>
-                <strong>In iframe:</strong> <span id="in-iframe"></span><br>
-                <strong>Crowdin Context:</strong> <span id="crowdin-context">Detecting...</span><br>
-                <strong>String Key:</strong> <span id="string-key">Not available</span><br>
-                <strong>String ID:</strong> <span id="string-id">Not available</span><br>
+    </div>
+
+    <!-- Credentials Modal -->
+    <div id="credentialsModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔑 API Credentials</h2>
+                <span class="close" onclick="closeCredentialsModal()">&times;</span>
+            </div>
+            <div class="credentials-form">
+                <div class="credential-group">
+                    <label for="playhtApiKey">PlayHT API Key:</label>
+                    <input type="password" id="playhtApiKey" placeholder="Enter PlayHT API Key">
+                    <button type="button" class="toggle-visibility" onclick="togglePasswordVisibility('playhtApiKey')">👁️</button>
+                </div>
+                <div class="credential-group">
+                    <label for="playhtUserId">PlayHT User ID:</label>
+                    <input type="password" id="playhtUserId" placeholder="Enter PlayHT User ID">
+                    <button type="button" class="toggle-visibility" onclick="togglePasswordVisibility('playhtUserId')">👁️</button>
+                </div>
+                <div class="credential-group">
+                    <label for="elevenlabsApiKey">ElevenLabs API Key:</label>
+                    <input type="password" id="elevenlabsApiKey" placeholder="Enter ElevenLabs API Key">
+                    <button type="button" class="toggle-visibility" onclick="togglePasswordVisibility('elevenlabsApiKey')">👁️</button>
+                </div>
+                <div class="credentials-buttons">
+                    <button onclick="saveCredentials()" class="btn btn-primary">
+                        💾 Save Credentials
+                    </button>
+                    <button onclick="recoverCredentials()" class="btn btn-success">
+                        🔄 Recover Credentials
+                    </button>
+                    <button onclick="clearCredentials()" class="btn btn-secondary">
+                        🗑️ Clear All
+                    </button>
+                </div>
+                <div class="credential-status" id="credentialStatus">
+                    <p><strong>Current Status:</strong></p>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <span class="status-label">PlayHT API Key:</span>
+                            <span id="playhtKeyStatus" class="status-indicator">❌ Not Set</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">PlayHT User ID:</span>
+                            <span id="playhtUserStatus" class="status-indicator">❌ Not Set</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">ElevenLabs API Key:</span>
+                            <span id="elevenlabsKeyStatus" class="status-indicator">❌ Not Set</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -226,22 +531,7 @@
             return context;
         }
         
-        function updateDebugInfo() {
-            const context = getEnhancedCrowdinContext();
-            
-            document.getElementById('current-url').textContent = window.location.href;
-            document.getElementById('url-params').textContent = window.location.search || 'None';
-            document.getElementById('referrer').textContent = document.referrer || 'None';
-            document.getElementById('in-iframe').textContent = window.self !== window.top ? 'Yes' : 'No';
-            document.getElementById('crowdin-context').textContent = Object.keys(context).length > 0 ? JSON.stringify(context, null, 2) : 'No context detected';
-            document.getElementById('string-key').textContent = context.stringKey || context.identifier || context.key || 'Not available';
-            document.getElementById('string-id').textContent = context.stringId || 'Not available';
-            
-            // Log context for debugging
-            if (Object.keys(context).length > 0) {
-                console.log('Current context:', context);
-            }
-        }
+
         
         function showStatus(message, type) {
             const statusEl = document.getElementById('status');
@@ -256,66 +546,7 @@
             }
         }
         
-        async function performAction(action) {
-            const button = document.getElementById(action === 'get-string-info' ? 'stringInfoBtn' : 
-                                                action === 'analyze-context' ? 'analyzeBtn' : 
-                                                action === 'fetch-via-api' ? 'apiBtn' : 'customBtn');
-            
-            button.disabled = true;
-            showStatus('Processing...', 'loading');
-            
-            try {
-                const crowdinContext = getEnhancedCrowdinContext();
-                
-                const requestData = {
-                    action: action,
-                    timestamp: new Date().toISOString(),
-                    crowdinContext: crowdinContext,
-                    userAgent: navigator.userAgent,
-                    referrer: document.referrer,
-                    url: window.location.href,
-                    inIframe: window.self !== window.top,
-                    // Additional context that might contain string key
-                    windowLocation: {
-                        href: window.location.href,
-                        search: window.location.search,
-                        hash: window.location.hash,
-                        pathname: window.location.pathname
-                    }
-                };
-                
-                console.log('Sending request:', requestData);
-                
-                const response = await fetch('/api/button-action', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(requestData)
-                });
-                
-                const result = await response.json();
-                console.log('Response:', result);
-                
-                if (result.success) {
-                    showStatus(`✅ ${result.message}`, 'success');
-                    
-                    // Update debug info with response
-                    if (result.extractedStringInfo) {
-                        document.getElementById('string-key').textContent = 
-                            result.extractedStringInfo.stringKey || 'Not found';
-                    }
-                } else {
-                    showStatus(`❌ Action failed: ${result.message}`, 'error');
-                }
-                
-            } catch (error) {
-                console.error('Error:', error);
-                showStatus(`❌ Error: ${error.message}`, 'error');
-            } finally {
-                button.disabled = false;
-            }
-        }
+
         
         // Function to actively request context from Crowdin
         function requestCrowdinContext() {
@@ -347,7 +578,6 @@
                         const context = window.parent.crowdin.getContext();
                         if (context) {
                             receivedContext = { ...receivedContext, ...context };
-                            updateDebugInfo();
                         }
                     } catch (e) {
                         console.log('Cannot access parent crowdin object');
@@ -358,17 +588,12 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            updateDebugInfo();
-            
             // Request context immediately
             requestCrowdinContext();
             
             // Request context again after a short delay
             setTimeout(requestCrowdinContext, 500);
             setTimeout(requestCrowdinContext, 2000);
-            
-            // Update debug info every 2 seconds to catch dynamic changes
-            setInterval(updateDebugInfo, 2000);
         });
         
         // Store received context data
@@ -382,19 +607,16 @@
             if (event.data) {
                 if (event.data.type === 'crowdin-context' || event.data.type === 'context') {
                     receivedContext = { ...receivedContext, ...event.data.context };
-                    updateDebugInfo();
                 }
                 
                 // Handle direct context data
                 if (event.data.stringId || event.data.stringKey || event.data.projectId) {
                     receivedContext = { ...receivedContext, ...event.data };
-                    updateDebugInfo();
                 }
                 
                 // Handle Crowdin app framework messages
                 if (event.data.type === 'app-context' || event.data.type === 'editor-context') {
                     receivedContext = { ...receivedContext, ...event.data };
-                    updateDebugInfo();
                 }
             }
         });
@@ -404,6 +626,724 @@
             const urlContext = getCrowdinContext();
             return { ...urlContext, ...receivedContext };
         }
+
+        // Audio Generation Functionality
+        class AudioManager {
+            constructor() {
+                this.apiConfig = {
+                    playht: {
+                        apiUrl: 'https://api.play.ht/api/v2/tts/stream',
+                        voicesUrl: 'https://api.play.ht/api/v2/voices',
+                        apiKey: null,
+                        userId: null
+                    },
+                    elevenlabs: {
+                        apiUrl: 'https://api.elevenlabs.io/v1/text-to-speech',
+                        voicesUrl: 'https://api.elevenlabs.io/v1/voices',
+                        apiKey: null
+                    }
+                };
+                
+                this.voiceCache = {};
+                this.currentService = null;
+                this.currentVoice = null;
+                
+                // Load credentials using the same method as dashboard.js
+                this.loadCredentials();
+            }
+
+            loadCredentials() {
+                console.log('🔄 Loading credentials from storage...');
+                
+                // Load with backup recovery (same as dashboard.js)
+                let playhtApiKey = localStorage.getItem('PLAY_DOT_HT_API_KEY') || '';
+                let playhtUserId = localStorage.getItem('PLAY_DOT_HT_USER_ID') || '';
+                let elevenlabsApiKey = localStorage.getItem('ELEVENLABS_API_KEY') || '';
+
+                // Backup credential recovery - try alternative storage keys
+                if (!playhtApiKey) {
+                    playhtApiKey = localStorage.getItem('playht_api_key') ||
+                                   localStorage.getItem('PLAYHT_API_KEY') ||
+                                   sessionStorage.getItem('PLAY_DOT_HT_API_KEY') || '';
+                }
+
+                if (!playhtUserId) {
+                    playhtUserId = localStorage.getItem('playht_user_id') ||
+                                   localStorage.getItem('PLAYHT_USER_ID') ||
+                                   sessionStorage.getItem('PLAY_DOT_HT_USER_ID') || '';
+                }
+
+                if (!elevenlabsApiKey) {
+                    elevenlabsApiKey = localStorage.getItem('elevenlabs_api_key') ||
+                                       localStorage.getItem('ELEVENLABS_KEY') ||
+                                       sessionStorage.getItem('ELEVENLABS_API_KEY') || '';
+                }
+
+                console.log('🔍 Credential loading results:', {
+                    playhtApiKey: playhtApiKey ? `${playhtApiKey.substring(0, 8)}...` : 'Missing',
+                    playhtUserId: playhtUserId ? `${playhtUserId.substring(0, 8)}...` : 'Missing',
+                    elevenlabsApiKey: elevenlabsApiKey ? `${elevenlabsApiKey.substring(0, 8)}...` : 'Missing'
+                });
+
+                // Update the API config - THIS WAS THE MISSING PART!
+                this.apiConfig.playht.apiKey = playhtApiKey;
+                this.apiConfig.playht.userId = playhtUserId;
+                this.apiConfig.elevenlabs.apiKey = elevenlabsApiKey;
+
+                console.log('✅ API config updated:', {
+                    playhtConfigured: !!(this.apiConfig.playht.apiKey && this.apiConfig.playht.userId),
+                    elevenlabsConfigured: !!this.apiConfig.elevenlabs.apiKey
+                });
+            }
+
+            async loadVoices(service, languageCode = 'en') {
+                const cacheKey = `${service}_${languageCode}`;
+                if (this.voiceCache[cacheKey]) {
+                    return this.voiceCache[cacheKey];
+                }
+
+                try {
+                    let voices = [];
+                    if (service === 'PlayHT') {
+                        voices = await this.loadPlayHTVoices(languageCode);
+                    } else if (service === 'ElevenLabs') {
+                        voices = await this.loadElevenLabsVoices(languageCode);
+                    }
+                    
+                    this.voiceCache[cacheKey] = voices;
+                    return voices;
+                } catch (error) {
+                    console.error(`Error loading ${service} voices:`, error);
+                    return [];
+                }
+            }
+
+            async loadPlayHTVoices(languageCode = 'en') {
+                console.log('🎤 Loading PlayHT voices from CSV for language:', languageCode);
+                
+                try {
+                    // Load voices from CSV file instead of API
+                    const response = await fetch('/preloaded_voices/comprehensive_female_voices_v1.csv');
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to load CSV: ${response.status}`);
+                    }
+                    
+                    const csvText = await response.text();
+                    console.log('📦 PlayHT CSV loaded, parsing...');
+                    
+                    // Parse CSV
+                    const lines = csvText.split('\n');
+                    const headers = lines[0].split(',');
+                    const voices = [];
+                    
+                    for (let i = 1; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (!line) continue;
+                        
+                        const values = line.split(',');
+                        const voice = {};
+                        
+                        headers.forEach((header, index) => {
+                            voice[header.trim()] = values[index] ? values[index].trim() : '';
+                        });
+                        
+                        // Only include PlayHT voices
+                        if (voice.service === 'PlayHT') {
+                            voices.push({
+                                id: voice.id,
+                                name: voice.name,
+                                language: voice.language,
+                                language_code: voice.language_code,
+                                gender: voice.gender,
+                                age: voice.age,
+                                accent: voice.accent,
+                                style: voice.style,
+                                description: voice.description
+                            });
+                        }
+                    }
+                    
+                    console.log(`📊 PlayHT Total voices from CSV: ${voices.length}`);
+                    
+                    // Filter by language if specified
+                    let filteredVoices = voices;
+                    if (languageCode && languageCode !== 'en') {
+                        filteredVoices = voices.filter(voice => {
+                            const voiceLang = voice.language_code || voice.language || '';
+                            return voiceLang.toLowerCase().includes(languageCode.toLowerCase());
+                        });
+                    }
+                    
+                    console.log(`🎯 PlayHT Filtered voices for "${languageCode}": ${filteredVoices.length}`);
+                    
+                    // Log first few voices for debugging
+                    if (filteredVoices.length > 0) {
+                        console.log('🎵 First 3 PlayHT voices from CSV:', filteredVoices.slice(0, 3));
+                    }
+                    
+                    return filteredVoices;
+                    
+                } catch (error) {
+                    console.error('Error loading PlayHT voices from CSV:', error);
+                    return [];
+                }
+            }
+
+            async loadElevenLabsVoices(languageCode = 'en') {
+                console.log('🎙️ Loading ElevenLabs voices for language:', languageCode);
+                
+                if (!this.apiConfig.elevenlabs.apiKey) {
+                    console.log('  ❌ ElevenLabs API key missing, falling back to CSV');
+                    return await this.loadElevenLabsVoicesFromCSV(languageCode);
+                }
+                
+                console.log('✅ ElevenLabs API key found, trying API first...');
+                
+                try {
+                    // Try API first
+                    const response = await fetch('https://api.elevenlabs.io/v1/voices?show_legacy=false', {
+                        headers: {
+                            'xi-api-key': this.apiConfig.elevenlabs.apiKey
+                        }
+                    });
+                    
+                    console.log('📡 ElevenLabs API response status:', response.status);
+                    
+                    if (!response.ok) {
+                        throw new Error(`ElevenLabs API error: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    const allVoices = data.voices || [];
+                    
+                    // Filter to only personal/cloned voices (exclude public voices)
+                    const personalVoices = allVoices.filter(voice => {
+                        const category = voice.category || '';
+                        const isPersonal = category === 'cloned' || 
+                                         category === 'professional' || 
+                                         category === 'generated' ||
+                                         category === 'instant';
+                        return isPersonal;
+                    });
+                    
+                    console.log(`🎯 ElevenLabs Personal voices: ${personalVoices.length} personal, ${allVoices.length - personalVoices.length} public (excluded)`);
+                    
+                    if (personalVoices.length > 0) {
+                        console.log('🎵 Using personal ElevenLabs voices from API');
+                        return personalVoices;
+                    } else {
+                        console.log('⚠️ No personal voices found in API, falling back to CSV');
+                        return await this.loadElevenLabsVoicesFromCSV(languageCode);
+                    }
+                    
+                } catch (error) {
+                    console.error('ElevenLabs API failed, falling back to CSV:', error);
+                    return await this.loadElevenLabsVoicesFromCSV(languageCode);
+                }
+            }
+
+            async loadElevenLabsVoicesFromCSV(languageCode = 'en') {
+                console.log('🎙️ Loading ElevenLabs voices from CSV for language:', languageCode);
+                
+                try {
+                    const response = await fetch('/preloaded_voices/comprehensive_female_voices_v1.csv');
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to load CSV: ${response.status}`);
+                    }
+                    
+                    const csvText = await response.text();
+                    console.log('📦 ElevenLabs CSV loaded, parsing...');
+                    
+                    // Parse CSV
+                    const lines = csvText.split('\n');
+                    const headers = lines[0].split(',');
+                    const voices = [];
+                    
+                    for (let i = 1; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (!line) continue;
+                        
+                        const values = line.split(',');
+                        const voice = {};
+                        
+                        headers.forEach((header, index) => {
+                            voice[header.trim()] = values[index] ? values[index].trim() : '';
+                        });
+                        
+                        // Only include ElevenLabs voices, and only professional/generated (no premade)
+                        if (voice.service === 'ElevenLabs' && voice.category !== 'premade') {
+                            voices.push({
+                                voice_id: voice.id,
+                                name: voice.name,
+                                language: voice.language,
+                                language_code: voice.language_code,
+                                gender: voice.gender,
+                                age: voice.age,
+                                accent: voice.accent,
+                                category: voice.category,
+                                description: voice.description
+                            });
+                        }
+                    }
+                    
+                    console.log(`📊 ElevenLabs Total voices from CSV: ${voices.length}`);
+                    
+                    // Filter by language if specified
+                    let filteredVoices = voices;
+                    if (languageCode && languageCode !== 'en') {
+                        filteredVoices = voices.filter(voice => {
+                            const voiceLang = voice.language_code || voice.language || '';
+                            return voiceLang.toLowerCase().includes(languageCode.toLowerCase());
+                        });
+                    }
+                    
+                    console.log(`🎯 ElevenLabs Filtered voices for "${languageCode}": ${filteredVoices.length}`);
+                    
+                    // Log first few voices for debugging
+                    if (filteredVoices.length > 0) {
+                        console.log('🎵 First 3 ElevenLabs voices from CSV:', filteredVoices.slice(0, 3));
+                    }
+                    
+                    return filteredVoices;
+                    
+                } catch (error) {
+                    console.error('Error loading ElevenLabs voices from CSV:', error);
+                    return [];
+                }
+            }
+
+            async generateAudio(service, voiceId, text) {
+                console.log(`🎤 Generating audio with ${service}, voice: ${voiceId}, text: "${text.substring(0, 50)}..."`);
+                
+                if (service === 'PlayHT') {
+                    return await this.generatePlayHTAudio(voiceId, text);
+                } else if (service === 'ElevenLabs') {
+                    return await this.generateElevenLabsAudio(voiceId, text);
+                } else {
+                    throw new Error(`Unsupported service: ${service}`);
+                }
+            }
+
+            async generatePlayHTAudio(voiceId, text) {
+                const requestData = {
+                    text: text,
+                    voice: voiceId,
+                    voice_engine: 'Play3.0-mini',
+                    output_format: 'mp3',
+                    sample_rate: 22050
+                };
+
+                const response = await fetch('/api/playht-proxy', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': this.apiConfig.playht.apiKey,
+                        'X-USER-ID': this.apiConfig.playht.userId,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`PlayHT API error: ${response.status}`);
+                }
+
+                return await response.arrayBuffer();
+            }
+
+            async generateElevenLabsAudio(voiceId, text) {
+                const requestData = {
+                    text: text,
+                    model_id: 'eleven_multilingual_v2',
+                    voice_settings: {
+                        stability: 0.65,
+                        similarity_boost: 0.5,
+                        style: 0.0,
+                        use_speaker_boost: true
+                    }
+                };
+
+                const response = await fetch(`${this.apiConfig.elevenlabs.apiUrl}/${voiceId}`, {
+                    method: 'POST',
+                    headers: {
+                        'xi-api-key': this.apiConfig.elevenlabs.apiKey,
+                        'Content-Type': 'application/json',
+                        'Accept': 'audio/mpeg'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`ElevenLabs API error: ${response.status}`);
+                }
+
+                return await response.arrayBuffer();
+            }
+
+            async playAudioData(audioData) {
+                const audioBlob = new Blob([audioData], { type: 'audio/mpeg' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                
+                return new Promise((resolve, reject) => {
+                    audio.addEventListener('ended', () => {
+                        URL.revokeObjectURL(audioUrl);
+                        resolve();
+                    });
+                    audio.addEventListener('error', (e) => {
+                        URL.revokeObjectURL(audioUrl);
+                        reject(e);
+                    });
+                    audio.play().catch(reject);
+                });
+            }
+        }
+
+        // Initialize audio manager
+        const audioManager = new AudioManager();
+
+        // Audio UI Functions
+        function showAudioGeneration() {
+            document.getElementById('audioGeneration').style.display = 'block';
+            document.getElementById('generateAudioBtn').textContent = '🔽 Hide Audio Generation';
+            document.getElementById('generateAudioBtn').onclick = hideAudioGeneration;
+        }
+
+        function hideAudioGeneration() {
+            document.getElementById('audioGeneration').style.display = 'none';
+            document.getElementById('generateAudioBtn').textContent = '🎤 Generate New Audio';
+            document.getElementById('generateAudioBtn').onclick = showAudioGeneration;
+        }
+
+        async function onServiceChange() {
+            const serviceSelect = document.getElementById('audioService');
+            const voiceSelect = document.getElementById('voiceSelect');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            // Clear voice dropdown
+            voiceSelect.innerHTML = '<option value="">Select Voice...</option>';
+            generateBtn.disabled = true;
+            
+            const selectedService = serviceSelect.value;
+            console.log('🔄 Service changed to:', selectedService);
+            
+            if (!selectedService) {
+                audioManager.currentService = null;
+                return;
+            }
+            
+            // Set the current service in audioManager
+            audioManager.currentService = selectedService;
+            
+            // Reload credentials to ensure they're fresh
+            audioManager.loadCredentials();
+            
+            try {
+                let voices = [];
+                
+                if (selectedService === 'PlayHT') {
+                    voices = await audioManager.loadPlayHTVoices();
+                } else if (selectedService === 'ElevenLabs') {
+                    voices = await audioManager.loadElevenLabsVoices();
+                }
+                
+                console.log(`📋 Populating ${selectedService} dropdown with ${voices.length} voices`);
+                
+                // Populate voice dropdown
+                voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.id || voice.voice_id;
+                    option.textContent = voice.name;
+                    voiceSelect.appendChild(option);
+                });
+                
+                if (voices.length === 0) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = `No ${selectedService} voices available`;
+                    voiceSelect.appendChild(option);
+                }
+                
+            } catch (error) {
+                console.error(`Error loading ${selectedService} voices:`, error);
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = `Error loading ${selectedService} voices`;
+                voiceSelect.appendChild(option);
+            }
+        }
+
+        function onVoiceChange() {
+            const voiceSelect = document.getElementById('voiceSelect');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            audioManager.currentVoice = voiceSelect.value;
+            generateBtn.disabled = !voiceSelect.value;
+        }
+
+        async function generateAudio() {
+            if (!audioManager.currentService || !audioManager.currentVoice) {
+                showStatus('Please select a service and voice', 'error');
+                return;
+            }
+
+            // Refresh credentials before generating audio
+            audioManager.loadCredentials();
+
+            const generateBtn = document.getElementById('generateBtn');
+            const originalText = generateBtn.textContent;
+            
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<div class="loading-spinner"></div> Generating...';
+            
+            try {
+                // Get current string text from context
+                const context = getEnhancedCrowdinContext();
+                const text = context.targetString || context.sourceString || 'Hello, this is a test audio generation.';
+                
+                showStatus(`Generating audio with ${audioManager.currentService}...`, 'loading');
+                
+                const audioData = await audioManager.generateAudio(
+                    audioManager.currentService,
+                    audioManager.currentVoice,
+                    text
+                );
+                
+                await audioManager.playAudioData(audioData);
+                showStatus('Audio generated and played successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error generating audio:', error);
+                showStatus(`Error: ${error.message}`, 'error');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = originalText;
+            }
+        }
+
+        async function playCurrentAudio() {
+            // This would integrate with existing Crowdin audio functionality
+            showStatus('Playing current audio... (placeholder)', 'loading');
+            
+            setTimeout(() => {
+                showStatus('Current audio playback complete', 'success');
+            }, 2000);
+        }
+
+        // Credential Management Functions (based on levante_translations/dashboard.js)
+        function saveCredentials() {
+            const credentials = {
+                playhtApiKey: document.getElementById('playhtApiKey').value,
+                playhtUserId: document.getElementById('playhtUserId').value,
+                elevenlabsApiKey: document.getElementById('elevenlabsApiKey').value
+            };
+
+            // Save to localStorage with multiple backup keys (same as dashboard.js)
+            localStorage.setItem('PLAY_DOT_HT_API_KEY', credentials.playhtApiKey);
+            localStorage.setItem('playht_api_key', credentials.playhtApiKey);
+            localStorage.setItem('PLAY_DOT_HT_USER_ID', credentials.playhtUserId);
+            localStorage.setItem('playht_user_id', credentials.playhtUserId);
+            localStorage.setItem('ELEVENLABS_API_KEY', credentials.elevenlabsApiKey);
+            localStorage.setItem('elevenlabs_api_key', credentials.elevenlabsApiKey);
+
+            // Also save to sessionStorage as backup
+            sessionStorage.setItem('PLAY_DOT_HT_API_KEY', credentials.playhtApiKey);
+            sessionStorage.setItem('PLAY_DOT_HT_USER_ID', credentials.playhtUserId);
+            sessionStorage.setItem('ELEVENLABS_API_KEY', credentials.elevenlabsApiKey);
+
+            // Update the audio manager's API config
+            audioManager.apiConfig.playht.apiKey = credentials.playhtApiKey;
+            audioManager.apiConfig.playht.userId = credentials.playhtUserId;
+            audioManager.apiConfig.elevenlabs.apiKey = credentials.elevenlabsApiKey;
+
+            updateCredentialStatus();
+            showStatus('Credentials saved successfully with backup storage!', 'success');
+            
+            // Close the modal
+            document.getElementById('credentialsModal').style.display = 'none';
+        }
+
+        function loadCredentials() {
+            // Reload credentials in AudioManager first
+            audioManager.loadCredentials();
+
+            // Update form fields with the loaded credentials
+            document.getElementById('playhtApiKey').value = audioManager.apiConfig.playht.apiKey || '';
+            document.getElementById('playhtUserId').value = audioManager.apiConfig.playht.userId || '';
+            document.getElementById('elevenlabsApiKey').value = audioManager.apiConfig.elevenlabs.apiKey || '';
+
+            updateCredentialStatus();
+        }
+
+        function recoverCredentials() {
+            // Try to recover from all possible storage locations
+            const sources = [
+                { name: 'localStorage', storage: localStorage },
+                { name: 'sessionStorage', storage: sessionStorage }
+            ];
+
+            const keys = [
+                { api: 'playht_key', variants: ['PLAY_DOT_HT_API_KEY', 'playht_api_key', 'PLAYHT_API_KEY'] },
+                { api: 'playht_user', variants: ['PLAY_DOT_HT_USER_ID', 'playht_user_id', 'PLAYHT_USER_ID'] },
+                { api: 'elevenlabs', variants: ['ELEVENLABS_API_KEY', 'elevenlabs_api_key', 'ELEVEN_LABS_API_KEY'] }
+            ];
+
+            let recovered = { playht_key: '', playht_user: '', elevenlabs: '' };
+            let recoveryCount = 0;
+
+            sources.forEach(source => {
+                keys.forEach(keyGroup => {
+                    if (!recovered[keyGroup.api]) {
+                        keyGroup.variants.forEach(variant => {
+                            const value = source.storage.getItem(variant);
+                            if (value && value.length > 10) {
+                                recovered[keyGroup.api] = value;
+                                recoveryCount++;
+                            }
+                        });
+                    }
+                });
+            });
+
+            if (recoveryCount > 0) {
+                document.getElementById('playhtApiKey').value = recovered.playht_key;
+                document.getElementById('playhtUserId').value = recovered.playht_user;
+                document.getElementById('elevenlabsApiKey').value = recovered.elevenlabs;
+                
+                updateCredentialStatus();
+                showStatus(`Recovered ${recoveryCount} credential(s) from backup storage!`, 'success');
+            } else {
+                showStatus('No backup credentials found in storage.', 'error');
+            }
+        }
+
+        function clearCredentials() {
+            if (confirm('Are you sure you want to clear all stored credentials?')) {
+                // Clear from all storage locations
+                const keys = [
+                    'PLAY_DOT_HT_API_KEY', 'playht_api_key', 'PLAYHT_API_KEY',
+                    'PLAY_DOT_HT_USER_ID', 'playht_user_id', 'PLAYHT_USER_ID',
+                    'ELEVENLABS_API_KEY', 'elevenlabs_api_key', 'ELEVEN_LABS_API_KEY'
+                ];
+
+                keys.forEach(key => {
+                    localStorage.removeItem(key);
+                    sessionStorage.removeItem(key);
+                });
+
+                // Clear form fields
+                document.getElementById('playhtApiKey').value = '';
+                document.getElementById('playhtUserId').value = '';
+                document.getElementById('elevenlabsApiKey').value = '';
+
+                // Clear audio manager config
+                audioManager.apiConfig.playht.apiKey = null;
+                audioManager.apiConfig.playht.userId = null;
+                audioManager.apiConfig.elevenlabs.apiKey = null;
+
+                updateCredentialStatus();
+                showStatus('All credentials cleared successfully.', 'success');
+            }
+        }
+
+        function updateCredentialStatus() {
+            const playhtKey = audioManager.apiConfig.playht.apiKey;
+            const playhtUser = audioManager.apiConfig.playht.userId;
+            const elevenlabsKey = audioManager.apiConfig.elevenlabs.apiKey;
+
+            document.getElementById('playhtKeyStatus').textContent = 
+                playhtKey && playhtKey.length > 10 ? '✅ Present' : '❌ Not Set';
+            document.getElementById('playhtKeyStatus').className = 
+                playhtKey && playhtKey.length > 10 ? 'status-indicator present' : 'status-indicator missing';
+
+            document.getElementById('playhtUserStatus').textContent = 
+                playhtUser && playhtUser.length > 10 ? '✅ Present' : '❌ Not Set';
+            document.getElementById('playhtUserStatus').className = 
+                playhtUser && playhtUser.length > 10 ? 'status-indicator present' : 'status-indicator missing';
+
+            document.getElementById('elevenlabsKeyStatus').textContent = 
+                elevenlabsKey && elevenlabsKey.length > 10 ? '✅ Present' : '❌ Not Set';
+            document.getElementById('elevenlabsKeyStatus').className = 
+                elevenlabsKey && elevenlabsKey.length > 10 ? 'status-indicator present' : 'status-indicator missing';
+        }
+
+        function showCredentialsModal() {
+            loadCredentials(); // Load current credentials
+            document.getElementById('credentialsModal').style.display = 'block';
+        }
+
+        function closeCredentialsModal() {
+            document.getElementById('credentialsModal').style.display = 'none';
+        }
+
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const toggleBtn = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+
+        // Manual credential testing function (call from browser console)
+        window.testCredentials = function() {
+            console.log('=== MANUAL CREDENTIAL TEST ===');
+            
+            // Test all possible credential keys
+            const allKeys = [
+                'PLAY_DOT_HT_API_KEY', 'playht_api_key', 'PLAYHT_API_KEY',
+                'PLAY_DOT_HT_USER_ID', 'playht_user_id', 'PLAYHT_USER_ID',
+                'ELEVENLABS_API_KEY', 'elevenlabs_api_key', 'ELEVEN_LABS_API_KEY'
+            ];
+            
+            console.log('Testing localStorage:');
+            allKeys.forEach(key => {
+                const value = localStorage.getItem(key);
+                console.log(`  ${key}: ${value ? `Present (${value.length} chars)` : 'Missing'}`);
+            });
+            
+            console.log('Testing sessionStorage:');
+            allKeys.forEach(key => {
+                const value = sessionStorage.getItem(key);
+                console.log(`  ${key}: ${value ? `Present (${value.length} chars)` : 'Missing'}`);
+            });
+            
+            // Show current domain/origin
+            console.log('Current domain:', window.location.origin);
+            console.log('Current hostname:', window.location.hostname);
+            
+            // Force reload credentials
+            audioManager.loadCredentials();
+            console.log('AudioManager credentials after reload:', {
+                playht: audioManager.apiConfig.playht.apiKey ? `Present (${audioManager.apiConfig.playht.apiKey.length} chars)` : 'Missing',
+                playhtUser: audioManager.apiConfig.playht.userId ? `Present (${audioManager.apiConfig.playht.userId.length} chars)` : 'Missing',
+                elevenlabs: audioManager.apiConfig.elevenlabs.apiKey ? `Present (${audioManager.apiConfig.elevenlabs.apiKey.length} chars)` : 'Missing'
+            });
+            console.log('=== END MANUAL TEST ===');
+        };
+
+        // Initialize credentials on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Force reload credentials from storage
+            audioManager.loadCredentials();
+            loadCredentials();
+            updateCredentialStatus();
+            
+            // Log current credentials for debugging
+            console.log('Initialized credentials:', {
+                playht: audioManager.apiConfig.playht.apiKey ? 'Present' : 'Missing',
+                playhtUser: audioManager.apiConfig.playht.userId ? 'Present' : 'Missing', 
+                elevenlabs: audioManager.apiConfig.elevenlabs.apiKey ? 'Present' : 'Missing'
+            });
+            
+            // Show instruction for manual testing
+            console.log('💡 To manually test credentials, run: testCredentials()');
+        });
     </script>
 </body>
 </html> 

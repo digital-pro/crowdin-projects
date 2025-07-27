@@ -1293,6 +1293,182 @@ app.get('/health', (req, res) => {
   res.json(healthStatus);
 });
 
+// Audio Generation API Endpoints
+
+// PlayHT Proxy for TTS generation
+app.post('/api/playht-proxy', async (req, res) => {
+  try {
+    const { text, voice, voice_engine, output_format, sample_rate } = req.body;
+    const apiKey = req.headers.authorization;
+    const userId = req.headers['x-user-id'];
+
+    if (!apiKey || !userId) {
+      return res.status(400).json({ error: 'Missing PlayHT credentials' });
+    }
+
+    const response = await fetch('https://api.play.ht/api/v2/tts/stream', {
+      method: 'POST',
+      headers: {
+        'Authorization': apiKey,
+        'X-USER-ID': userId,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text,
+        voice,
+        voice_engine: voice_engine || 'Play3.0-mini',
+        output_format: output_format || 'mp3',
+        sample_rate: sample_rate || 22050
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return res.status(response.status).json({ 
+        error: 'PlayHT API error', 
+        details: errorText 
+      });
+    }
+
+    // Stream the audio response back to the client
+    response.body.pipe(res);
+    
+  } catch (error) {
+    console.error('PlayHT proxy error:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
+// PlayHT Voices Proxy
+app.post('/api/playht-voices-proxy', async (req, res) => {
+  try {
+    const { languageCode } = req.body;
+    const apiKey = req.headers.authorization;
+    const userId = req.headers['x-user-id'];
+
+    console.log('🎤 PlayHT Voices Proxy - Request received:', {
+      languageCode,
+      hasApiKey: !!apiKey,
+      hasUserId: !!userId,
+      apiKeyStart: apiKey ? apiKey.substring(0, 10) + '...' : 'missing',
+      userIdStart: userId ? userId.substring(0, 10) + '...' : 'missing'
+    });
+
+    if (!apiKey || !userId) {
+      console.error('❌ PlayHT Voices Proxy - Missing credentials');
+      return res.status(400).json({ error: 'Missing PlayHT credentials' });
+    }
+
+    console.log('📡 PlayHT Voices Proxy - Making API call to:', 'https://api.play.ht/api/v2/voices');
+    
+    const response = await fetch('https://api.play.ht/api/v2/voices', {
+      headers: {
+        'Authorization': apiKey,
+        'X-USER-ID': userId
+      }
+    });
+
+    console.log('📡 PlayHT Voices Proxy - API response status:', response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ PlayHT Voices Proxy - API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorText
+      });
+      return res.status(response.status).json({ 
+        error: 'PlayHT API error', 
+        details: errorText 
+      });
+    }
+
+    const data = await response.json();
+    console.log('📦 PlayHT Voices Proxy - Raw API response:', {
+      dataStructure: Object.keys(data),
+      voicesCount: data.voices ? data.voices.length : 0,
+      rawData: data
+    });
+    
+    // Log first few voices if any exist
+    if (data.voices && data.voices.length > 0) {
+      console.log('🎵 PlayHT Voices Proxy - Sample voices:', data.voices.slice(0, 3));
+    } else {
+      console.warn('⚠️ PlayHT Voices Proxy - No voices in response!');
+      console.warn('🔍 This could mean:');
+      console.warn('  1. Account has no configured voices');
+      console.warn('  2. Different API endpoint needed');
+      console.warn('  3. Credentials access different account than expected');
+    }
+    
+    // Filter voices by language if specified
+    let voices = data.voices || [];
+    const originalCount = voices.length;
+    
+    if (languageCode) {
+      voices = voices.filter(voice => {
+        const voiceLang = voice.language || voice.language_code || '';
+        return voiceLang.toLowerCase().includes(languageCode.toLowerCase());
+      });
+      console.log(`🔍 PlayHT Voices Proxy - Language filtering: ${originalCount} → ${voices.length} (for "${languageCode}")`);
+    }
+
+    console.log(`✅ PlayHT Voices Proxy - Returning ${voices.length} voices`);
+    res.json({ voices });
+    
+  } catch (error) {
+    console.error('PlayHT voices proxy error:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
+// ElevenLabs Proxy (if needed for CORS issues)
+app.post('/api/elevenlabs-proxy/:voiceId', async (req, res) => {
+  try {
+    const { voiceId } = req.params;
+    const { text, model_id, voice_settings } = req.body;
+    const apiKey = req.headers['xi-api-key'];
+
+    if (!apiKey) {
+      return res.status(400).json({ error: 'Missing ElevenLabs API key' });
+    }
+
+    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+      method: 'POST',
+      headers: {
+        'xi-api-key': apiKey,
+        'Content-Type': 'application/json',
+        'Accept': 'audio/mpeg'
+      },
+      body: JSON.stringify({
+        text,
+        model_id: model_id || 'eleven_multilingual_v2',
+        voice_settings: voice_settings || {
+          stability: 0.65,
+          similarity_boost: 0.5,
+          style: 0.0,
+          use_speaker_boost: true
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return res.status(response.status).json({ 
+        error: 'ElevenLabs API error', 
+        details: errorText 
+      });
+    }
+
+    // Stream the audio response back to the client
+    response.body.pipe(res);
+    
+  } catch (error) {
+    console.error('ElevenLabs proxy error:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
 // Error handling middleware
 app.use((error, req, res, next) => {
   console.error('Unhandled error:', error);
@@ -1318,7 +1494,10 @@ app.use((req, res) => {
       '/audio-previewer',
       '/translations-panel',
       '/api/get-audio-metadata',
-      '/api/button-action'
+      '/api/button-action',
+      '/api/playht-proxy',
+      '/api/playht-voices-proxy',
+      '/api/elevenlabs-proxy/:voiceId'
     ]
   });
 });
