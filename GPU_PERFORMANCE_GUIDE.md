@@ -52,10 +52,10 @@ pip install transformers>=4.21.0 timm>=0.6.0
 ### Basic GPU Classification
 ```bash
 # Single image with GPU acceleration
-python gpu_optimized_classifier.py --image vocab-004.png --grid --stats
+python scripts/gpu_optimized_classifier.py --image vocab-004.png --grid --stats
 
 # Batch processing with optimal batch size
-python gpu_optimized_classifier.py --batch images/ --output gpu_results.json --batch-size 8 --stats
+python scripts/gpu_optimized_classifier.py --batch images/ --output gpu_results.json --batch-size 8 --stats
 ```
 
 ### Python API Usage
@@ -206,7 +206,7 @@ classifier.batch_classify("images/", batch_size=8, stats=True)
 ### Real-time Stats
 ```bash
 # Show performance statistics
-python gpu_optimized_classifier.py --batch images/ --stats
+python scripts/gpu_optimized_classifier.py --batch images/ --stats
 
 # Output example:
 # 🚀 Performance Statistics:
@@ -233,7 +233,7 @@ print(f"Throughput: {stats['images_per_second']:.1f} images/second")
 
 1. **Test with your vocabulary images**:
    ```bash
-   python gpu_optimized_classifier.py --batch path/to/vocab/images/ --grid --output gpu_results.json --stats
+   python scripts/gpu_optimized_classifier.py --batch path/to/vocab/images/ --grid --output gpu_results.json --stats
    ```
 
 2. **Compare with web application**:

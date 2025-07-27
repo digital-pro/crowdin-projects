@@ -138,7 +138,7 @@ vocab_matches = self.match_vocabulary_terms_hybrid(predictions)  # ✅ Mappings 
 
 ### **Option 1: Python Script**
 ```bash
-python view_results.py
+python scripts/view_results.py
 ```
 
 ### **Option 2: Web Viewer**

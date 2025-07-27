@@ -51,12 +51,12 @@ We have successfully integrated our hybrid EfficientNet-21k analysis results int
 ### **Web App Integration:**
 - `real-imagenet-resnet.html` - Updated with new button and function
 - `test_web_app.html` - Test page to verify integration
-- `convert_hybrid_results.py` - Script to convert results to web format
+- `scripts/convert_hybrid_results.py` - Script to convert results to web format
 
 ### **Analysis Scripts:**
-- `run_full_hybrid_analysis.py` - Full 170-image analysis script
-- `show_key_detections.py` - Display key successful detections
-- `generate_visualization.py` - Create standalone HTML visualization
+- `scripts/run_full_hybrid_analysis.py` - Full 170-image analysis script
+- `scripts/show_key_detections.py` - Display key successful detections
+- `scripts/generate_visualization.py` - Create standalone HTML visualization
 
 ## 🎯 **How to Use**
 

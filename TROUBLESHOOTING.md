@@ -98,13 +98,13 @@ classifier = AdvancedVocabularyClassifier(
 
 ```bash
 # Test basic functionality
-python advanced_efficientnet_classifier.py --list-models
+python scripts/advanced_efficientnet_classifier.py --list-models
 
 # Test with a single image (replace path)
-python python_efficientnet_classifier.py --image path/to/image.jpg --grid
+python scripts/python_efficientnet_classifier.py --image path/to/image.jpg --grid
 
 # Test batch processing
-python advanced_efficientnet_classifier.py --batch images/ --output results.json --report
+python scripts/advanced_efficientnet_classifier.py --batch images/ --output results.json --report
 ```
 
 ## System Requirements

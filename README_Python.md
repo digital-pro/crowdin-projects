@@ -60,23 +60,23 @@ report = classifier.generate_performance_report(results)
 
 ```bash
 # Single image classification
-python python_efficientnet_classifier.py --image vocab-004.png --grid
+python scripts/python_efficientnet_classifier.py --image vocab-004.png --grid
 
 # Batch processing
-python python_efficientnet_classifier.py --batch images/ --output results.json --analyze-performance
+python scripts/python_efficientnet_classifier.py --batch images/ --output results.json --analyze-performance
 ```
 
 ### Advanced Classifier
 
 ```bash
 # List available models
-python advanced_efficientnet_classifier.py --list-models
+python scripts/advanced_efficientnet_classifier.py --list-models
 
 # Use ImageNet-21k model
-python advanced_efficientnet_classifier.py --model timm/tf_efficientnetv2_l.in21k --batch images/ --output results.json --report --grid
+python scripts/advanced_efficientnet_classifier.py --model timm/tf_efficientnetv2_l.in21k --batch images/ --output results.json --report --grid
 
 # Compare different models
-python advanced_efficientnet_classifier.py --model google/efficientnet-b3 --image test.jpg --top-k 20
+python scripts/advanced_efficientnet_classifier.py --model google/efficientnet-b3 --image test.jpg --top-k 20
 ```
 
 ## Recommended Models
