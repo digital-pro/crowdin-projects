@@ -730,26 +730,38 @@
                     }
                     
                     const csvText = await response.text();
-                    console.log('📦 PlayHT CSV loaded, parsing...');
+                    console.log('�� PlayHT CSV loaded, first 500 chars:', csvText.substring(0, 500));
                     
-                    // Parse CSV
+                    // Parse CSV properly - handle quoted values and commas within quotes
                     const lines = csvText.split('\n');
-                    const headers = lines[0].split(',');
+                    const headers = this.parseCSVLine(lines[0]);
+                    console.log('📋 CSV Headers:', headers);
+                    
                     const voices = [];
+                    let playhtCount = 0;
+                    let totalLines = 0;
                     
                     for (let i = 1; i < lines.length; i++) {
                         const line = lines[i].trim();
                         if (!line) continue;
                         
-                        const values = line.split(',');
-                        const voice = {};
+                        totalLines++;
+                        const values = this.parseCSVLine(line);
                         
+                        // Create voice object
+                        const voice = {};
                         headers.forEach((header, index) => {
                             voice[header.trim()] = values[index] ? values[index].trim() : '';
                         });
                         
-                        // Only include PlayHT voices
+                        // Debug first few lines
+                        if (i <= 5) {
+                            console.log(`📝 Line ${i}:`, voice.service, '|', voice.name);
+                        }
+                        
+                        // Only include PlayHT voices (check first column)
                         if (voice.service === 'PlayHT') {
+                            playhtCount++;
                             voices.push({
                                 id: voice.id,
                                 name: voice.name,
@@ -764,6 +776,7 @@
                         }
                     }
                     
+                    console.log(`📊 PlayHT CSV parsing results: ${totalLines} total lines, ${playhtCount} PlayHT voices found`);
                     console.log(`📊 PlayHT Total voices from CSV: ${voices.length}`);
                     
                     // Filter by language if specified
@@ -780,6 +793,8 @@
                     // Log first few voices for debugging
                     if (filteredVoices.length > 0) {
                         console.log('🎵 First 3 PlayHT voices from CSV:', filteredVoices.slice(0, 3));
+                    } else {
+                        console.warn('⚠️ No PlayHT voices found after filtering');
                     }
                     
                     return filteredVoices;
@@ -788,6 +803,29 @@
                     console.error('Error loading PlayHT voices from CSV:', error);
                     return [];
                 }
+            }
+
+            // Helper method to properly parse CSV lines with quoted values
+            parseCSVLine(line) {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current);
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                
+                result.push(current); // Add the last field
+                return result;
             }
 
             async loadElevenLabsVoices(languageCode = 'en') {
