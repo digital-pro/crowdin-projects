@@ -904,13 +904,41 @@
                     console.log(`📊 PlayHT CSV parsing results: ${totalLines} total lines, ${playhtCount} PlayHT voices found`);
                     console.log(`📊 PlayHT Total voices from CSV: ${voices.length}`);
                     
-                    // Filter by language if specified
+                    // Filter by language with improved matching
                     let filteredVoices = voices;
-                    if (languageCode && languageCode !== 'en') {
+                    if (languageCode) {
                         filteredVoices = voices.filter(voice => {
-                            const voiceLang = voice.language_code || voice.language || '';
-                            return voiceLang.toLowerCase().includes(languageCode.toLowerCase());
+                            const voiceLang = (voice.language_code || voice.language || '').toLowerCase();
+                            const targetLang = languageCode.toLowerCase();
+                            
+                            // Exact match first
+                            if (voiceLang === targetLang) return true;
+                            
+                            // Partial match (e.g., "en" matches "english", "fr" matches "french")
+                            if (voiceLang.includes(targetLang) || targetLang.includes(voiceLang)) return true;
+                            
+                            // Language name matching
+                            const languageNames = {
+                                'en': ['english', 'en'],
+                                'es': ['spanish', 'es', 'español'],
+                                'fr': ['french', 'fr', 'français'],
+                                'de': ['german', 'de', 'deutsch'],
+                                'pt': ['portuguese', 'pt', 'português'],
+                                'nl': ['dutch', 'nl', 'nederlands']
+                            };
+                            
+                            const possibleNames = languageNames[targetLang] || [targetLang];
+                            return possibleNames.some(name => voiceLang.includes(name));
                         });
+                        
+                        // If no voices found for specific language, fall back to English
+                        if (filteredVoices.length === 0 && languageCode !== 'en') {
+                            console.log(`⚠️ No PlayHT voices found for "${languageCode}", falling back to English voices`);
+                            filteredVoices = voices.filter(voice => {
+                                const voiceLang = (voice.language_code || voice.language || '').toLowerCase();
+                                return voiceLang.includes('en') || voiceLang.includes('english');
+                            });
+                        }
                     }
                     
                     console.log(`🎯 PlayHT Filtered voices for "${languageCode}": ${filteredVoices.length}`);
@@ -1239,15 +1267,49 @@
             // Load voices for the selected service
             showStatus('Loading voices...', 'info');
             try {
+                // Detect current language from Crowdin context
+                let detectedLanguageCode = 'en'; // Default fallback
+                
+                if (receivedContext && receivedContext.targetLanguageId) {
+                    detectedLanguageCode = receivedContext.targetLanguageId;
+                    console.log('🌍 Using language from receivedContext:', detectedLanguageCode);
+                } else {
+                    // Try to get language from URL params as fallback
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const urlLang = urlParams.get('language') || urlParams.get('lang') || urlParams.get('target_language');
+                    if (urlLang) {
+                        detectedLanguageCode = urlLang;
+                        console.log('🌍 Using language from URL params:', detectedLanguageCode);
+                    }
+                }
+                
+                // Map language codes (fr-CA -> fr, etc.)
+                function mapLanguageCode(langId) {
+                    if (!langId) return 'en';
+                    const lang = langId.toLowerCase();
+                    const languageMappings = {
+                        'es': 'es', 'es-co': 'es', 'es-mx': 'es', 'es-es': 'es',
+                        'en': 'en', 'en-us': 'en', 'en-gb': 'en', 'en-ca': 'en',
+                        'fr': 'fr', 'fr-ca': 'fr', 'fr-fr': 'fr',
+                        'pt': 'pt', 'pt-br': 'pt', 'pt-pt': 'pt',
+                        'de': 'de', 'de-de': 'de',
+                        'nl': 'nl', 'nl-nl': 'nl', 'nl-be': 'nl'
+                    };
+                    return languageMappings[lang] || 'en';
+                }
+                
+                const languageCode = mapLanguageCode(detectedLanguageCode);
+                console.log('🌍 Final language for voice filtering:', { original: detectedLanguageCode, mapped: languageCode });
+                
                 let voices = [];
                 if (selectedService === 'PlayHT') {
-                    voices = await audioManager.loadPlayHTVoices();
+                    voices = await audioManager.loadPlayHTVoices(languageCode);
                 } else if (selectedService === 'ElevenLabs') {
-                    voices = await audioManager.loadElevenLabsVoices();
+                    voices = await audioManager.loadElevenLabsVoices(languageCode);
                 }
                 
                 populateVoiceDropdown(voices, selectedService);
-                showStatus(`Loaded ${voices.length} ${selectedService} voices`, 'success');
+                showStatus(`Loaded ${voices.length} ${selectedService} voices for ${languageCode}`, 'success');
             } catch (error) {
                 console.error(`Error loading ${selectedService} voices:`, error);
                 showStatus(`Failed to load ${selectedService} voices`, 'error');
