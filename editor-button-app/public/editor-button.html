@@ -4,62 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Levante Audio Test</title>
+    <script src="https://cdn.crowdin.com/apps/dist/iframe.js"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            min-height: 200px;
+            height: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
         }
         
         .container {
             background: rgba(255, 255, 255, 0.95);
             -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
             text-align: center;
-            max-width: 500px;
+            max-width: 400px;
             width: 100%;
+            min-height: 160px;
+            height: auto;
         }
         
         h1 {
             color: #333;
-            margin-bottom: 20px;
-            font-size: 18px;
+            margin-bottom: 12px;
+            font-size: 16px;
+            font-weight: 600;
         }
-        
-
         
         .button-group {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
         
         button {
             background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 50px;
-            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
         
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
         
         button:active {
@@ -72,13 +75,12 @@
             transform: none;
         }
         
-
-        
         .status {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 8px;
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 6px;
             font-weight: 500;
+            font-size: 11px;
         }
         
         .status.success {
@@ -100,81 +102,82 @@
         }
         
         .audio-section {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid #eee;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #eee;
         }
         
         .audio-buttons {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 6px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
         }
         
         .audio-btn {
             flex: 1;
+            min-width: 110px;
             background: linear-gradient(45deg, #9C27B0, #673AB7);
         }
         
         .audio-generation {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 10px;
+            background: rgba(108, 117, 125, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 8px;
+            border: 1px solid rgba(108, 117, 125, 0.2);
         }
         
-        .service-selection, .voice-selection {
-            margin-bottom: 15px;
+        .service-selection,
+        .voice-selection {
+            margin-bottom: 8px;
         }
         
-        .service-selection label, .voice-selection label {
+        .service-selection label,
+        .voice-selection label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
             font-weight: 600;
             color: #333;
+            font-size: 11px;
         }
         
-        .service-selection select, .voice-selection select {
+        select {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            background: white;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 11px;
+            background-color: white;
         }
         
-        .service-selection select:focus, .voice-selection select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .audio-actions {
+        .generate-controls {
             display: flex;
-            gap: 10px;
-        }
-        
-        .audio-actions button {
-            flex: 1;
-            padding: 12px;
-            font-size: 14px;
-        }
-        
-        .cancel-btn {
-            background: linear-gradient(45deg, #757575, #616161) !important;
+            gap: 6px;
+            margin-top: 8px;
+            align-items: center;
         }
         
         .settings-btn {
-            background: linear-gradient(45deg, #FF9800, #F57C00) !important;
+            background: linear-gradient(45deg, #6c757d, #495057);
+            font-size: 10px;
+            padding: 6px 12px;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            flex: 1;
         }
         
         .loading-spinner {
-            width: 12px;
-            height: 12px;
-            border: 2px solid #ffffff;
-            border-top: 2px solid transparent;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
             border-radius: 50%;
+            width: 16px;
+            height: 16px;
             animation: spin 1s linear infinite;
             display: inline-block;
+            margin-left: 5px;
         }
         
         @keyframes spin {
@@ -197,13 +200,13 @@
         
         .modal-content {
             background-color: #fefefe;
-            margin: 5% auto;
+            margin: 2% auto;
             padding: 0;
             border: none;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border-radius: 12px;
+            width: 85%;
+            max-width: 450px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
             animation: modalSlideIn 0.3s ease-out;
         }
         
@@ -213,34 +216,99 @@
         }
         
         .modal-header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
-            border-radius: 15px 15px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 12px 20px;
+            border-radius: 12px 12px 0 0;
+            position: relative;
         }
         
         .modal-header h2 {
             margin: 0;
-            font-size: 1.5em;
+            font-size: 16px;
+            font-weight: 600;
         }
         
         .close {
             color: white;
             float: right;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
+            position: absolute;
+            right: 15px;
+            top: 8px;
             cursor: pointer;
-            border: none;
-            background: none;
-            padding: 0;
-            line-height: 1;
         }
         
         .close:hover {
             opacity: 0.7;
+        }
+        
+        .modal-body {
+            padding: 15px 20px;
+        }
+        
+        .credential-section {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .credential-section h3 {
+            margin: 0 0 8px 0;
+            color: #333;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .credential-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        
+        .credential-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .credential-row label {
+            min-width: 80px;
+            font-weight: 500;
+            color: #666;
+            font-size: 11px;
+        }
+        
+        .credential-row input {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .password-toggle {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+            font-size: 11px;
+        }
+        
+        .modal-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #eee;
+            text-align: right;
+            border-radius: 0 0 12px 12px;
+        }
+        
+        .modal-footer button {
+            margin-left: 8px;
+            font-size: 11px;
+            padding: 6px 12px;
         }
         
         .credentials-form {
@@ -368,11 +436,14 @@
         <div class="button-group">
             <div class="audio-section">
                 <div class="audio-buttons">
-                    <button onclick="playCurrentAudio()" id="playAudioBtn" class="audio-btn">
+                    <button id="playAudioBtn" class="audio-btn">
                         🎵 Play Current Audio
                     </button>
-                    <button onclick="showAudioGeneration()" id="generateAudioBtn" class="audio-btn">
+                    <button id="generateAudioBtn" class="audio-btn">
                         🎤 Generate New Audio
+                    </button>
+                    <button id="refreshBtn" class="audio-btn" style="background: #007bff;">
+                        🔄 Refresh Context
                     </button>
                 </div>
                 <div id="audioGeneration" class="audio-generation" style="display: none;">
@@ -464,12 +535,12 @@
     </div>
 
     <script>
-        // Enhanced context detection
+        // Enhanced context detection using Crowdin AP API
         function getCrowdinContext() {
             const urlParams = new URLSearchParams(window.location.search);
             const context = {};
             
-            // Standard Crowdin parameters
+            // Standard Crowdin parameters from URL
             const crowdinParams = [
                 'projectId', 'fileId', 'stringId', 'languageId', 'userId', 'mode',
                 'stringKey', 'identifier', 'key', 'sourceString', 'targetString',
@@ -483,49 +554,54 @@
                 }
             });
             
-            // Try to get context from parent window if in iframe
-            if (window.parent && window.parent !== window) {
-                try {
-                    // Try to access parent URL parameters
-                    const parentParams = new URLSearchParams(window.parent.location.search);
-                    crowdinParams.forEach(param => {
-                        const value = parentParams.get(param);
-                        if (value && !context[param]) {
-                            context[param] = value;
+            // Use Crowdin AP API if available (proper way to access context)
+            if (typeof AP !== 'undefined') {
+                console.log('🎯 Crowdin AP API is available, requesting context...');
+                
+                // Request current string context
+                if (AP.editor && AP.editor.getCurrentString) {
+                    AP.editor.getCurrentString(function(stringData) {
+                        console.log('🎯 AP.editor.getCurrentString result:', stringData);
+                        if (stringData) {
+                            receivedContext = { ...receivedContext, ...stringData };
                         }
                     });
-                } catch (e) {
-                    console.log('Cannot access parent window parameters (cross-origin)');
                 }
                 
-                // Request context from parent via postMessage
-                try {
-                    window.parent.postMessage({
-                        type: 'request-context',
-                        source: 'crowdin-app'
-                    }, '*');
-                } catch (e) {
-                    console.log('Cannot send postMessage to parent');
+                // Request general context
+                if (AP.context && AP.context.getContext) {
+                    AP.context.getContext(function(contextData) {
+                        console.log('🎯 AP.context.getContext result:', contextData);
+                        if (contextData) {
+                            receivedContext = { ...receivedContext, ...contextData };
+                        }
+                    });
                 }
-            }
-            
-            // Try to get context from Crowdin API if available
-            if (window.crowdin && window.crowdin.getContext) {
-                try {
-                    const crowdinContext = window.crowdin.getContext();
-                    Object.assign(context, crowdinContext);
-                } catch (e) {
-                    console.log('Crowdin API not available');
+                
+                // Request current translation
+                if (AP.editor && AP.editor.getCurrentTranslation) {
+                    AP.editor.getCurrentTranslation(function(translationData) {
+                        console.log('🎯 AP.editor.getCurrentTranslation result:', translationData);
+                        if (translationData) {
+                            receivedContext = { ...receivedContext, ...translationData };
+                        }
+                    });
                 }
-            }
-            
-            // Try to get context from global variables that Crowdin might set
-            if (window.CROWDIN_CONTEXT) {
-                Object.assign(context, window.CROWDIN_CONTEXT);
-            }
-            
-            if (window.crowdinContext) {
-                Object.assign(context, window.crowdinContext);
+            } else {
+                console.log('🎯 Crowdin AP API not available, using fallback methods...');
+                
+                // Fallback: Try to get context from parent window if in iframe (without accessing cross-origin properties)
+                if (window.parent && window.parent !== window) {
+                    try {
+                        // Request context from parent via postMessage (safe cross-origin method)
+                        window.parent.postMessage({
+                            type: 'request-context',
+                            source: 'crowdin-app'
+                        }, '*');
+                    } catch (e) {
+                        console.log('Cannot send postMessage to parent');
+                    }
+                }
             }
             
             return context;
@@ -570,61 +646,301 @@
                     }
                 });
             }
-            
-            // Also try to access Crowdin's global objects
-            setTimeout(() => {
-                if (window.parent && window.parent.crowdin) {
-                    try {
-                        const context = window.parent.crowdin.getContext();
-                        if (context) {
-                            receivedContext = { ...receivedContext, ...context };
-                        }
-                    } catch (e) {
-                        console.log('Cannot access parent crowdin object');
-                    }
-                }
-            }, 1000);
         }
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            // Request context immediately
-            requestCrowdinContext();
-            
-            // Request context again after a short delay
-            setTimeout(requestCrowdinContext, 500);
-            setTimeout(requestCrowdinContext, 2000);
+            // Initialize Crowdin context detection
+            initializeContext();
         });
         
         // Store received context data
         let receivedContext = {};
         
-        // Listen for messages from parent window (if in iframe)
-        window.addEventListener('message', function(event) {
-            console.log('Received message from parent:', event.data);
+        // Enhanced message handler for Crowdin context
+        function enhancedMessageHandler(event) {
+            // Only process messages from Crowdin origins
+            if (!event.origin || !event.origin.includes('crowdin.com')) {
+                return;
+            }
+            
+            // Throttle message processing to prevent overload
+            if (window.lastMessageTime && Date.now() - window.lastMessageTime < 50) {
+                return;
+            }
+            window.lastMessageTime = Date.now();
+            
+            console.log('📨 Received message from Crowdin:', JSON.stringify({
+                origin: event.origin,
+                type: event.data?.type,
+                data: event.data
+            }, null, 2));
             
             // Handle different types of messages from Crowdin
             if (event.data) {
+                console.log('🔍 Checking event data:', {
+                    type: event.data.type,
+                    etyp: event.data.etyp,
+                    hasEvnt: !!event.data.evnt
+                });
+                
+                // Handle string.selected and string.change events directly
+                if (event.data.type === 'evt') {
+                    if (event.data.etyp === 'string.selected' && event.data.evnt && event.data.evnt.length > 0) {
+                        console.log('🎯 PROCESSING string.selected event');
+                        const stringInfo = event.data.evnt[0];
+                        const stringData = stringInfo.string;
+                        const translations = stringInfo.translations;
+                        
+                        receivedContext.stringId = stringData.id;
+                        receivedContext.stringKey = stringData.text;
+                        receivedContext.sourceString = stringData.text;
+                        receivedContext.targetString = stringData.text;
+                        receivedContext.identifier = stringData.identifier;
+                        receivedContext.fileId = stringData.file?.id;
+                        
+                        // Use translation if available and not empty
+                        if (translations && typeof translations === 'object') {
+                            let foundTranslation = false;
+                            for (const [langCode, translationArray] of Object.entries(translations)) {
+                                if (translationArray && Array.isArray(translationArray) && translationArray.length > 0) {
+                                    const translation = translationArray[0];
+                                    if (translation && translation.text) {
+                                        receivedContext.targetString = translation.text;
+                                        receivedContext.targetLanguageId = langCode;
+                                        console.log(`🎯 Using ${langCode} translation: ${translation.text}`);
+                                        foundTranslation = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!foundTranslation) {
+                                console.log('🎯 No translations found, using source text:', stringData.text);
+                                receivedContext.targetLanguageId = 'en'; // Default to English if no translation
+                            }
+                        } else {
+                            console.log('🎯 No translations object, using source text:', stringData.text);
+                            receivedContext.targetLanguageId = 'en'; // Default to English if no translations
+                        }
+                        
+                        console.log('🎯 STORED CONTEXT:', receivedContext);
+                    }
+                    
+                    if (event.data.etyp === 'string.change') {
+                        console.log('🎯 PROCESSING string.change event');
+                        const stringData = event.data.evnt;
+                        console.log('🎯 String change data:', stringData);
+                        
+                        if (stringData) {
+                            receivedContext.stringId = stringData.id;
+                            receivedContext.stringKey = stringData.text;
+                            receivedContext.sourceString = stringData.text;
+                            receivedContext.targetString = stringData.text;
+                            receivedContext.identifier = stringData.identifier;
+                            receivedContext.fileId = stringData.file?.id;
+                            
+                            console.log('🎯 STORED CONTEXT from string.change:', receivedContext);
+                        }
+                    }
+                }
+                
+                // Direct context updates
                 if (event.data.type === 'crowdin-context' || event.data.type === 'context') {
+                    console.log('🎯 Received context update:', event.data.context);
                     receivedContext = { ...receivedContext, ...event.data.context };
                 }
                 
-                // Handle direct context data
-                if (event.data.stringId || event.data.stringKey || event.data.projectId) {
+                // String data in various forms
+                if (event.data.stringId || event.data.stringKey || event.data.sourceString || event.data.targetString) {
+                    console.log('🎯 Received string data:', event.data);
                     receivedContext = { ...receivedContext, ...event.data };
                 }
                 
-                // Handle Crowdin app framework messages
+                // Editor context updates
                 if (event.data.type === 'app-context' || event.data.type === 'editor-context') {
+                    console.log('🎯 Received editor context:', event.data);
                     receivedContext = { ...receivedContext, ...event.data };
                 }
+                
+                // Current string updates (when user selects different strings)
+                if (event.data.type === 'current-string' || event.data.type === 'string-selected') {
+                    console.log('🎯 Received current string update:', event.data);
+                    receivedContext = { ...receivedContext, ...event.data };
+                }
+                
+                // Any other data that might contain useful context
+                if (event.data.projectId || event.data.fileId || event.data.languageId) {
+                    console.log('🎯 Received project context:', event.data);
+                    receivedContext = { ...receivedContext, ...event.data };
+                }
+                
+                console.log('🎯 Updated receivedContext:', receivedContext);
             }
-        });
+        }
+        
+        // Listen for messages from parent window (if in iframe)
+        window.addEventListener('message', enhancedMessageHandler);
         
         // Enhanced context getter that includes received messages
         function getEnhancedCrowdinContext() {
             const urlContext = getCrowdinContext();
             return { ...urlContext, ...receivedContext };
+        }
+        
+        // Function to manually refresh context from Crowdin
+        function refreshContext() {
+            console.log('🔄 Manually refreshing context...');
+            receivedContext = {}; // Clear existing context
+            
+            // Try to get context using AP API if available
+            if (typeof AP !== 'undefined') {
+                console.log('🎯 Using AP API to refresh context...');
+                
+                if (AP.editor && AP.editor.getCurrentString) {
+                    AP.editor.getCurrentString(function(stringData) {
+                        console.log('🎯 Refresh: AP.editor.getCurrentString result:', stringData);
+                        if (stringData) {
+                            receivedContext = { ...receivedContext, ...stringData };
+                        }
+                    });
+                }
+                
+                if (AP.context && AP.context.getContext) {
+                    AP.context.getContext(function(contextData) {
+                        console.log('🎯 Refresh: AP.context.getContext result:', contextData);
+                        if (contextData) {
+                            receivedContext = { ...receivedContext, ...contextData };
+                        }
+                    });
+                }
+                
+                if (AP.editor && AP.editor.getCurrentTranslation) {
+                    AP.editor.getCurrentTranslation(function(translationData) {
+                        console.log('🎯 Refresh: AP.editor.getCurrentTranslation result:', translationData);
+                        if (translationData) {
+                            receivedContext = { ...receivedContext, ...translationData };
+                        }
+                    });
+                }
+            } else {
+                console.log('🎯 AP API not available, using fallback methods...');
+                requestCrowdinContext();
+            }
+            
+            // Show updated context after a short delay
+            setTimeout(() => {
+                const context = getEnhancedCrowdinContext();
+                console.log('🔄 Context after refresh:', context);
+                showStatus('Context refreshed. Check console for details.', 'success');
+            }, 1000);
+        }
+        
+        // Initialize context on page load
+        function initializeContext() {
+            console.log('🚀 Initializing Crowdin context...');
+            
+            // Wait a bit for AP API to load if it's going to
+            setTimeout(() => {
+                if (typeof AP !== 'undefined') {
+                    console.log('✅ AP API is available, requesting initial context...');
+                    refreshContext();
+                } else {
+                    console.log('⚠️ AP API not available, using fallback methods...');
+                    requestCrowdinContext();
+                }
+            }, 500);
+            
+            // Try again after a longer delay in case AP loads slowly
+            setTimeout(() => {
+                if (typeof AP !== 'undefined' && Object.keys(receivedContext).length === 0) {
+                    console.log('🔄 Second attempt to get context with AP API...');
+                    refreshContext();
+                }
+            }, 2000);
+        }
+
+        // Enhanced function to detect the target language from Crowdin context
+        function detectTargetLanguage(context) {
+            console.log('🌍 LANGUAGE DETECTION DEBUG:', JSON.stringify(context, null, 2));
+            
+            // First try direct language IDs from context
+            let detectedLanguage = context.targetLanguageId || context.sourceLanguageId || context.languageId;
+            console.log('🌍 Direct language from context:', detectedLanguage);
+            
+            // If no direct language, try URL detection
+            if (!detectedLanguage) {
+                console.log('🌍 No direct language found, trying URL detection...');
+                
+                // Try current window URL parameters first
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlLang = urlParams.get('language') || urlParams.get('lang') || urlParams.get('target_language');
+                if (urlLang) {
+                    console.log('🌍 Found language in current URL:', urlLang);
+                    detectedLanguage = urlLang;
+                }
+                
+                // Try to detect from parent window location
+                if (!detectedLanguage) {
+                    try {
+                        if (window.parent && window.parent.location) {
+                            const parentUrl = window.parent.location.href;
+                            console.log('🌍 Analyzing parent URL for language:', parentUrl);
+                            
+                            // Multiple patterns to match different Crowdin URL formats
+                            const patterns = [
+                                /\/enus-([a-z]{2})(?:[-_][A-Z]{2})?(?:\/|#|$)/,  // enus-fr format
+                                /\/([a-z]{2})(?:[-_][A-Z]{2})?-enus(?:\/|#|$)/,  // fr-enus format  
+                                /editor\/[^\/]+\/\d+\/enus-([a-z]{2})(?:[-_][A-Z]{2})?/,  // editor/project/83/enus-frca
+                                /\/([a-z]{2})(?:[-_][A-Z]{2})?(?:\/|#|$)/,       // generic /fr/ format
+                                /target_language=([a-z]{2})/,                    // URL parameter
+                                /lang=([a-z]{2})/                               // URL parameter
+                            ];
+                            
+                            for (const pattern of patterns) {
+                                const match = parentUrl.match(pattern);
+                                if (match && match[1] && match[1] !== 'en') {
+                                    console.log('🌍 ✅ Detected language from parent URL pattern:', match[1]);
+                                    detectedLanguage = match[1];
+                                    break;
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.log('🌍 Could not access parent URL due to cross-origin restrictions');
+                    }
+                }
+            }
+            
+            // Map language codes (from audio-previewer logic)
+            function mapLanguageCode(languageId) {
+                if (!languageId) return null;
+                
+                const langId = String(languageId).toLowerCase().trim();
+                console.log('🌍 Mapping language code:', langId);
+                
+                const languageMappings = {
+                    'en': 'en', 'en-us': 'en', 'english': 'en',
+                    'es': 'es', 'es-co': 'es', 'spanish': 'es', 'español': 'es',
+                    'fr': 'fr', 'fr-ca': 'fr', 'french': 'fr', 'français': 'fr', 'frca': 'fr',
+                    'pt': 'pt', 'pt-br': 'pt', 'portuguese': 'pt', 'português': 'pt',
+                    'de': 'de', 'de-de': 'de', 'german': 'de', 'deutsch': 'de',
+                    'nl': 'nl', 'nl-nl': 'nl', 'nl-be': 'nl', 'dutch': 'nl', 'nederlands': 'nl',
+                    'it': 'it', 'it-it': 'it', 'italian': 'it', 'italiano': 'it'
+                };
+                
+                const mapped = languageMappings[langId];
+                console.log('🌍 Language mapping result:', langId, '->', mapped);
+                return mapped || null;
+            }
+            
+            const mappedLanguage = mapLanguageCode(detectedLanguage);
+            console.log('🌍 Final language detection result:', {
+                original: detectedLanguage,
+                mapped: mappedLanguage,
+                fallback: mappedLanguage || 'en'
+            });
+            
+            return mappedLanguage || 'en'; // Default to English if nothing detected
         }
 
         // Audio Generation Functionality
@@ -730,7 +1046,7 @@
                     }
                     
                     const csvText = await response.text();
-                    console.log('�� PlayHT CSV loaded, first 500 chars:', csvText.substring(0, 500));
+                    console.log(' PlayHT CSV loaded, first 500 chars:', csvText.substring(0, 500));
                     
                     // Parse CSV properly - handle quoted values and commas within quotes
                     const lines = csvText.split('\n');
@@ -1043,15 +1359,29 @@
 
         // Audio UI Functions
         function showAudioGeneration() {
+            console.log('🎤 Show audio generation called');
             document.getElementById('audioGeneration').style.display = 'block';
-            document.getElementById('generateAudioBtn').textContent = '🔽 Hide Audio Generation';
-            document.getElementById('generateAudioBtn').onclick = hideAudioGeneration;
+            
+            // Trigger frame resize to accommodate the new content
+            setTimeout(() => {
+                if (typeof AP !== 'undefined' && AP.resize) {
+                    AP.resize();
+                    console.log('🎤 Frame resized for audio generation');
+                }
+            }, 100);
         }
 
         function hideAudioGeneration() {
+            console.log('🎤 Hide audio generation called');
             document.getElementById('audioGeneration').style.display = 'none';
-            document.getElementById('generateAudioBtn').textContent = '🎤 Generate New Audio';
-            document.getElementById('generateAudioBtn').onclick = showAudioGeneration;
+            
+            // Trigger frame resize to shrink back to original size
+            setTimeout(() => {
+                if (typeof AP !== 'undefined' && AP.resize) {
+                    AP.resize();
+                    console.log('🎤 Frame resized back to original');
+                }
+            }, 100);
         }
 
         async function onServiceChange() {
@@ -1161,12 +1491,228 @@
         }
 
         async function playCurrentAudio() {
-            // This would integrate with existing Crowdin audio functionality
-            showStatus('Playing current audio... (placeholder)', 'loading');
-            
-            setTimeout(() => {
-                showStatus('Current audio playback complete', 'success');
-            }, 2000);
+            try {
+                showStatus('Looking for existing audio...', 'loading');
+                
+                // Get current Crowdin context with detailed debugging
+                const context = getEnhancedCrowdinContext();
+                console.log('🎵 FULL CONTEXT DEBUG:', JSON.stringify(context, null, 2));
+                console.log('🎵 Context keys:', Object.keys(context));
+                
+                // Try multiple ways to get the string text with detailed logging
+                console.log('🎵 STRING EXTRACTION DEBUG:');
+                console.log('  - context.targetString:', context.targetString);
+                console.log('  - context.sourceString:', context.sourceString);
+                console.log('  - context.stringKey:', context.stringKey);
+                console.log('  - context.key:', context.key);
+                console.log('  - context.identifier:', context.identifier);
+                console.log('  - context.text:', context.text);
+                
+                // Use identifier as primary source for filename, fallback to text for display
+                const stringKey = context.identifier || context.targetString || context.sourceString || context.stringKey || context.key || context.text;
+                const displayText = context.targetString || context.sourceString || context.stringKey || context.key || context.text || context.identifier;
+                
+                // Use enhanced language detection
+                const languageCode = detectTargetLanguage(context);
+                
+                console.log('🎵 SELECTED VALUES:');
+                console.log('  - stringKey (for filename):', JSON.stringify(stringKey));
+                console.log('  - displayText (for reference):', JSON.stringify(displayText));
+                console.log('  - languageCode (detected):', JSON.stringify(languageCode));
+                console.log('  - stringKey type:', typeof stringKey);
+                console.log('  - stringKey length:', stringKey ? stringKey.length : 'null');
+                
+                if (!stringKey) {
+                    console.log('🎵 No string found in context. Full context:', context);
+                    showStatus('No text found to play audio for. Try selecting a string in the editor first.', 'error');
+                    return;
+                }
+                
+                console.log('🎵 Looking for audio:', { stringKey, displayText, languageCode });
+                
+                // Enhanced label detection (from audio-previewer logic)
+                let labelName = 'general'; // Default fallback
+                
+                // Try to detect label from various context sources
+                if (context.labels && context.labels.length > 0) {
+                    labelName = context.labels[0];
+                } else if (context.identifier) {
+                    // Extract label from string identifier patterns
+                    const labelPatterns = [
+                        /^([^_]+)_/,  // prefix_something
+                        /([a-z]+)[-_]/i,  // label-something or label_something
+                    ];
+                    
+                    for (const pattern of labelPatterns) {
+                        const match = context.identifier.match(pattern);
+                        if (match) {
+                            const extractedLabel = match[1].toLowerCase();
+                            
+                            // Map common variations to standard directory names (from audio-previewer)
+                            const labelMappings = {
+                                'egma': 'egma-math',
+                                'math': 'egma-math',
+                                'matrix': 'matrix-reasoning',
+                                'mental': 'mental-rotation',
+                                'same': 'same-different-selection',
+                                'theory': 'theory-of-mind',
+                                'tom': 'theory-of-mind',
+                                'trog': 'trog',
+                                'vocab': 'vocab',
+                                'vocabulary': 'vocab',
+                                'survey': 'survey',
+                                'general': 'general'
+                            };
+                            
+                            // Check for exact match first
+                            if (labelMappings[extractedLabel]) {
+                                labelName = labelMappings[extractedLabel];
+                                console.log('🎵 Found exact label mapping:', extractedLabel, '->', labelName);
+                                break;
+                            }
+                            
+                            // Check for partial matches
+                            for (const [key, value] of Object.entries(labelMappings)) {
+                                if (extractedLabel.includes(key) || key.includes(extractedLabel)) {
+                                    labelName = value;
+                                    console.log('🎵 Found partial label mapping:', extractedLabel, '->', labelName);
+                                    break;
+                                }
+                            }
+                            
+                            // If no mapping found but we have a clean name, use it directly
+                            if (labelName === 'general' && extractedLabel && extractedLabel !== 'general') {
+                                labelName = extractedLabel;
+                                console.log('🎵 Using direct label name:', labelName);
+                            }
+                            break;
+                        }
+                    }
+                }
+                
+                console.log('🎵 Final label name selected:', labelName);
+                
+                // Clean up the string key for URL (from audio-previewer logic)
+                console.log('🎵 STRING CLEANING DEBUG:');
+                console.log('  - Original stringKey:', JSON.stringify(stringKey));
+                console.log('  - Is identifier?:', stringKey === context.identifier);
+                
+                let cleanStringKey;
+                if (stringKey === context.identifier) {
+                    // If using identifier, it's probably already clean (like "ToM-scene-16-q4-reference")
+                    // Just convert to lowercase and replace underscores with hyphens for consistency
+                    cleanStringKey = stringKey.toLowerCase().replace(/_/g, '-');
+                    console.log('  - Using identifier format (minimal cleaning)');
+                } else {
+                    // If using text content, apply full cleaning
+                    cleanStringKey = stringKey
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/g, '-')
+                        .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+                    console.log('  - Using text content (full cleaning)');
+                }
+                
+                console.log('  - After cleaning processing:', cleanStringKey);
+                console.log('  - Final cleanStringKey:', JSON.stringify(cleanStringKey));
+                console.log('  - cleanStringKey length:', cleanStringKey.length);
+                
+                // Build multiple URL patterns to try (exact logic from audio-previewer)
+                const baseUrl = 'https://raw.githubusercontent.com/levante-framework/levante_translations/main/audio_files';
+                const urlPatterns = [];
+                
+                // Helper function to get language variants (from audio-previewer)
+                function getLanguageVariants(lang) {
+                    const variants = {
+                        'es': ['es', 'es-CO'], // Spanish: try both generic and Colombian
+                        'en': ['en', 'en-US'],
+                        'fr': ['fr', 'fr-CA'], // French: try both generic and Canadian
+                        'pt': ['pt', 'pt-BR'],
+                        'de': ['de', 'de-DE'], // German: try both generic and German-Germany
+                        'nl': ['nl', 'nl-NL', 'nl-BE'] // Dutch: try generic, Netherlands, and Belgium
+                    };
+                    return variants[lang] || [lang];
+                }
+                
+                const languageVariants = getLanguageVariants(languageCode);
+                console.log('🎵 Will try language variants:', languageVariants);
+                
+                // Try each language variant
+                for (const langVariant of languageVariants) {
+                    // Primary patterns with detected label (highest priority)
+                    if (labelName && labelName !== 'general') {
+                        urlPatterns.push(`${baseUrl}/${labelName}/${langVariant}/shared/${cleanStringKey}.mp3`);
+                        urlPatterns.push(`${baseUrl}/${labelName}/${langVariant}/shared/${stringKey.toLowerCase().replace(/\s+/g, '-')}.mp3`);
+                        urlPatterns.push(`${baseUrl}/${labelName}/${langVariant}/shared/${stringKey.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.mp3`);
+                    }
+                    
+                    // Fallback patterns with 'general' (lower priority)
+                    urlPatterns.push(`${baseUrl}/general/${langVariant}/shared/${cleanStringKey}.mp3`);
+                    urlPatterns.push(`${baseUrl}/general/${langVariant}/shared/${stringKey.toLowerCase().replace(/\s+/g, '-')}.mp3`);
+                    
+                    // Try without label subdirectory (even lower priority)
+                    urlPatterns.push(`${baseUrl}/${langVariant}/shared/${cleanStringKey}.mp3`);
+                    
+                    // Last resort patterns
+                    if (labelName && labelName !== 'general') {
+                        urlPatterns.push(`${baseUrl}/${labelName}/${langVariant}/shared/${stringKey}.mp3`);
+                    }
+                    urlPatterns.push(`${baseUrl}/general/${langVariant}/shared/${stringKey}.mp3`);
+                }
+                
+                console.log('🎵 Will try audio URLs:', urlPatterns);
+                console.log('🎵 URL components:', { labelName, languageCode, cleanStringKey, originalStringKey: stringKey });
+                
+                // Try each URL pattern until one works (from audio-previewer logic)
+                for (let i = 0; i < urlPatterns.length; i++) {
+                    const audioUrl = urlPatterns[i];
+                    console.log(`🎵 Trying URL ${i + 1}/${urlPatterns.length}:`, audioUrl);
+                    
+                    try {
+                        const audio = new Audio(audioUrl);
+                        
+                        // Test if the audio file can be loaded
+                        await new Promise((resolve, reject) => {
+                            const timeout = setTimeout(() => reject(new Error('Timeout')), 5000);
+                            
+                            audio.addEventListener('loadeddata', () => {
+                                clearTimeout(timeout);
+                                resolve();
+                            });
+                            
+                            audio.addEventListener('error', () => {
+                                clearTimeout(timeout);
+                                reject(new Error('Audio load failed'));
+                            });
+                            
+                            audio.load();
+                        });
+                        
+                        console.log('✅ Found audio file:', audioUrl);
+                        
+                        // Play the audio
+                        await new Promise((resolve, reject) => {
+                            audio.addEventListener('ended', resolve);
+                            audio.addEventListener('error', reject);
+                            audio.play().catch(reject);
+                        });
+                        
+                        showStatus('Audio playback complete', 'success');
+                        return; // Success, exit the function
+                        
+                    } catch (error) {
+                        console.log(`❌ URL ${i + 1} failed:`, error.message);
+                        continue; // Try the next URL
+                    }
+                }
+                
+                // If we get here, no audio files were found
+                showStatus('No existing audio file found for this text', 'error');
+                console.log('❌ No audio files found for:', { stringKey, languageCode, labelName, cleanStringKey });
+                
+            } catch (error) {
+                console.error('Error in playCurrentAudio:', error);
+                showStatus(`Error playing audio: ${error.message}`, 'error');
+            }
         }
 
         // Credential Management Functions (based on levante_translations/dashboard.js)
@@ -1180,10 +1726,13 @@
             // Save to localStorage with multiple backup keys (same as dashboard.js)
             localStorage.setItem('PLAY_DOT_HT_API_KEY', credentials.playhtApiKey);
             localStorage.setItem('playht_api_key', credentials.playhtApiKey);
+            localStorage.setItem('PLAYHT_API_KEY', credentials.playhtApiKey);
             localStorage.setItem('PLAY_DOT_HT_USER_ID', credentials.playhtUserId);
             localStorage.setItem('playht_user_id', credentials.playhtUserId);
+            localStorage.setItem('PLAYHT_USER_ID', credentials.playhtUserId);
             localStorage.setItem('ELEVENLABS_API_KEY', credentials.elevenlabsApiKey);
             localStorage.setItem('elevenlabs_api_key', credentials.elevenlabsApiKey);
+            localStorage.setItem('ELEVEN_LABS_API_KEY', credentials.elevenlabsApiKey);
 
             // Also save to sessionStorage as backup
             sessionStorage.setItem('PLAY_DOT_HT_API_KEY', credentials.playhtApiKey);
@@ -1307,11 +1856,14 @@
         }
 
         function showCredentialsModal() {
+            console.log('🔧 MODAL: showCredentialsModal() called');
+            console.trace('🔧 MODAL: Call stack for showCredentialsModal');
             loadCredentials(); // Load current credentials
             document.getElementById('credentialsModal').style.display = 'block';
         }
 
         function closeCredentialsModal() {
+            console.log('🔧 MODAL: closeCredentialsModal() called');
             document.getElementById('credentialsModal').style.display = 'none';
         }
 
@@ -1365,8 +1917,43 @@
             console.log('=== END MANUAL TEST ===');
         };
 
-        // Initialize credentials on page load
+        // Manual debug function for testing context extraction
+        window.debugContext = function() {
+            console.log('=== CONTEXT DEBUG ===');
+            console.log('📋 receivedContext:', JSON.stringify(receivedContext, null, 2));
+            console.log('📋 getEnhancedCrowdinContext():', JSON.stringify(getEnhancedCrowdinContext(), null, 2));
+            console.log('📋 URL params:', Object.fromEntries(new URLSearchParams(window.location.search)));
+            
+            // Test the playCurrentAudio logic manually
+            const context = getEnhancedCrowdinContext();
+            const stringKey = context.targetString || context.sourceString || context.stringKey || context.key || context.identifier;
+            const languageCode = context.targetLanguageId || context.sourceLanguageId || context.languageId || 'en';
+            
+            console.log('📋 Extracted for audio:', { stringKey, languageCode });
+            console.log('=== END DEBUG ===');
+        };
+        
+        // Simple debug function for testing context
+        window.checkContext = function() {
+            console.log('=== CONTEXT CHECK ===');
+            console.log('receivedContext:', receivedContext);
+            const enhanced = getEnhancedCrowdinContext();
+            console.log('getEnhancedCrowdinContext():', enhanced);
+            const stringKey = enhanced.targetString || enhanced.sourceString || enhanced.stringKey;
+            console.log('Extracted text for audio:', stringKey);
+            console.log('=== END CHECK ===');
+        };
+        
+        console.log('💡 To debug context manually, run: debugContext()');
+        console.log('🚀 App loaded at:', new Date().toISOString());
+
+        // Initialize credentials and context on page load
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM Content Loaded - Initializing app...');
+            
+            // Initialize Crowdin context detection
+            initializeContext();
+            
             // Force reload credentials from storage
             audioManager.loadCredentials();
             loadCredentials();
@@ -1379,9 +1966,96 @@
                 elevenlabs: audioManager.apiConfig.elevenlabs.apiKey ? 'Present' : 'Missing'
             });
             
+            // Add click event listeners with debugging
+            const playBtn = document.getElementById('playAudioBtn');
+            const generateBtn = document.getElementById('generateAudioBtn');
+            const refreshBtn = document.getElementById('refreshBtn');
+            
+            if (playBtn) {
+                playBtn.addEventListener('click', function() {
+                    console.log('🎵 Play button clicked!');
+                    playCurrentAudio();
+                });
+                console.log('✅ Play button event listener added');
+            } else {
+                console.error('❌ Play button not found!');
+            }
+            
+            if (generateBtn) {
+                generateBtn.addEventListener('click', function() {
+                    console.log('🎤 Generate button clicked!');
+                    showAudioGeneration();
+                });
+                console.log('✅ Generate button event listener added');
+            } else {
+                console.error('❌ Generate button not found!');
+            }
+            
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    console.log('🔄 Refresh button clicked!');
+                    refreshContext();
+                });
+                console.log('✅ Refresh button event listener added');
+            } else {
+                console.error('❌ Refresh button not found!');
+            }
+            
             // Show instruction for manual testing
             console.log('💡 To manually test credentials, run: testCredentials()');
+            console.log('🎯 App initialization complete!');
+            
+            // Trigger initial frame resize to fit content
+            setTimeout(() => {
+                if (typeof AP !== 'undefined' && AP.resize) {
+                    AP.resize();
+                    console.log('🎯 Initial frame resize completed');
+                }
+            }, 500);
         });
+
+        // Debug function to check and force close modal
+        window.debugModal = function() {
+            const modal = document.getElementById('credentialsModal');
+            const audioGen = document.getElementById('audioGeneration');
+            const status = document.getElementById('status');
+            
+            console.log('🔧 MODAL DEBUG:', {
+                modal_display: modal ? modal.style.display : 'not found',
+                audioGen_display: audioGen ? audioGen.style.display : 'not found',
+                status_display: status ? status.style.display : 'not found',
+                modal_visible: modal ? getComputedStyle(modal).display : 'not found'
+            });
+            
+            return {
+                modal: modal ? modal.style.display : 'not found',
+                audioGen: audioGen ? audioGen.style.display : 'not found',
+                status: status ? status.style.display : 'not found'
+            };
+        };
+        
+        // Force close all overlays
+        window.forceCloseAll = function() {
+            console.log('🔧 FORCE CLOSING all overlays...');
+            const modal = document.getElementById('credentialsModal');
+            const audioGen = document.getElementById('audioGeneration');
+            const status = document.getElementById('status');
+            
+            if (modal) {
+                modal.style.display = 'none';
+                console.log('🔧 Closed credentials modal');
+            }
+            if (audioGen) {
+                audioGen.style.display = 'none';
+                console.log('🔧 Closed audio generation');
+            }
+            if (status) {
+                status.style.display = 'none';
+                console.log('🔧 Closed status');
+            }
+            
+            console.log('🔧 All overlays closed');
+        };
     </script>
 </body>
 </html> 

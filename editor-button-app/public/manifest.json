@@ -1,9 +1,9 @@
 {
-  "identifier": "levante-audio-previewer-v2",
-  "name": "Levante Audio Previewer",
-  "description": "Select a string to preview its audio",
+  "identifier": "levante-audio-generator-v1",
+  "name": "Levante Audio Generator",
+  "description": "Generate audio for translations using PlayHT and ElevenLabs",
   "logo": "/favicon.svg",
-  "baseUrl": "https://editor-button-2urx7sqws-digitalpros-projects.vercel.app",
+  "baseUrl": "https://levante-audio-test.vercel.app",
   "authentication": {
     "type": "none"
   },
@@ -11,10 +11,10 @@
   "modules": {
     "editor-translations-panel": [
       {
-        "key": "levante-audio-previewer-translations",
-        "name": "🎵 Audio Preview",
+        "key": "levante-audio-generator-translations",
+        "name": "🎤 Audio Generator",
         "modes": ["translate", "comfortable", "side-by-side", "multilingual"],
-        "url": "/audio-previewer",
+        "url": "/editor-button",
         "environments": ["crowdin"]
       }
     ]
