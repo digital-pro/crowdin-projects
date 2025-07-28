@@ -12,7 +12,7 @@
     "editor-translations-panel": [
       {
         "key": "levante-audio-generator-translations",
-        "name": "🎤 Audio Generator",
+        "name": "🎤 Levante Audio Test",
         "modes": ["translate", "comfortable", "side-by-side", "multilingual"],
         "url": "/editor-button",
         "environments": ["crowdin"]

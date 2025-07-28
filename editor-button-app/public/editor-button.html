@@ -270,18 +270,13 @@
             <div class="credentials-form">
                 <div class="credential-group">
                     <label for="playhtApiKey">PlayHT API Key:</label>
-                    <input type="password" id="playhtApiKey" placeholder="Enter PlayHT API Key">
-                    <button type="button" class="toggle-visibility" onclick="togglePasswordVisibility('playhtApiKey')">👁️</button>
-                </div>
-                <div class="credential-group">
+                    <input type="text" id="playhtApiKey" placeholder="Enter PlayHT API Key">
+                    
                     <label for="playhtUserId">PlayHT User ID:</label>
-                    <input type="password" id="playhtUserId" placeholder="Enter PlayHT User ID">
-                    <button type="button" class="toggle-visibility" onclick="togglePasswordVisibility('playhtUserId')">👁️</button>
-                </div>
-                <div class="credential-group">
+                    <input type="text" id="playhtUserId" placeholder="Enter PlayHT User ID">
+                    
                     <label for="elevenlabsApiKey">ElevenLabs API Key:</label>
-                    <input type="password" id="elevenlabsApiKey" placeholder="Enter ElevenLabs API Key">
-                    <button type="button" class="toggle-visibility" onclick="togglePasswordVisibility('elevenlabsApiKey')">👁️</button>
+                    <input type="text" id="elevenlabsApiKey" placeholder="Enter ElevenLabs API Key">
                 </div>
                 <div class="credentials-buttons">
                     <button onclick="saveCredentials()" class="btn btn-primary">
@@ -513,12 +508,23 @@
                         console.log('🎯 String change data:', stringData);
                         
                         if (stringData) {
+                            // Store basic info, but DON'T overwrite targetString if we have a translation
+                            const hadTranslation = receivedContext.targetString && 
+                                                   receivedContext.targetString !== receivedContext.sourceString;
+                            
                             receivedContext.stringId = stringData.id;
                             receivedContext.stringKey = stringData.text;
                             receivedContext.sourceString = stringData.text;
-                            receivedContext.targetString = stringData.text;
                             receivedContext.identifier = stringData.identifier;
                             receivedContext.fileId = stringData.file?.id;
+                            
+                            // Only update targetString if we didn't have a translation before
+                            if (!hadTranslation) {
+                                receivedContext.targetString = stringData.text;
+                                console.log('🎯 Updated targetString to source (no previous translation)');
+                            } else {
+                                console.log('🎯 Preserved existing translation in targetString:', receivedContext.targetString);
+                            }
                             
                             console.log('🎯 STORED CONTEXT from string.change:', receivedContext);
                         }
@@ -1062,6 +1068,9 @@
             }
 
             async generatePlayHTAudio(voiceId, text) {
+                console.log(`🎤 Generating audio with PlayHT, voice: ${voiceId}, text: "${text.substring(0, 50)}..."`);
+                showStatus('Generating PlayHT audio...', 'info');
+                
                 const requestData = {
                     text: text,
                     voice: voiceId,
@@ -1084,10 +1093,17 @@
                     throw new Error(`PlayHT API error: ${response.status}`);
                 }
 
-                return await response.arrayBuffer();
+                const audioData = await response.arrayBuffer();
+                showStatus('Playing PlayHT audio...', 'success');
+                await this.playAudioData(audioData);
+                showStatus('PlayHT audio completed!', 'success');
+                return audioData;
             }
 
             async generateElevenLabsAudio(voiceId, text) {
+                console.log(`🎤 Generating audio with ElevenLabs, voice: ${voiceId}, text: "${text.substring(0, 50)}..."`);
+                showStatus('Generating ElevenLabs audio...', 'info');
+                
                 const requestData = {
                     text: text,
                     model_id: 'eleven_multilingual_v2',
@@ -1099,7 +1115,7 @@
                     }
                 };
 
-                const response = await fetch(`${this.apiConfig.elevenlabs.apiUrl}/${voiceId}`, {
+                const response = await fetch(`/api/elevenlabs-proxy/${voiceId}`, {
                     method: 'POST',
                     headers: {
                         'xi-api-key': this.apiConfig.elevenlabs.apiKey,
@@ -1113,7 +1129,11 @@
                     throw new Error(`ElevenLabs API error: ${response.status}`);
                 }
 
-                return await response.arrayBuffer();
+                const audioData = await response.arrayBuffer();
+                showStatus('Playing ElevenLabs audio...', 'success');
+                await this.playAudioData(audioData);
+                showStatus('ElevenLabs audio completed!', 'success');
+                return audioData;
             }
 
             async playAudioData(audioData) {
@@ -1221,42 +1241,50 @@
         }
 
         async function generateAudio() {
-            if (!audioManager.currentService || !audioManager.currentVoice) {
-                showStatus('Please select a service and voice', 'error');
+            const selectedService = document.getElementById('audioService').value;
+            const selectedVoice = document.getElementById('voiceSelect').value;
+            
+            if (!selectedService || !selectedVoice) {
+                showStatus('Please select both service and voice', 'error');
                 return;
             }
 
-            // Refresh credentials before generating audio
-            audioManager.loadCredentials();
+            // Get the current context with detailed debugging
+            console.log('🎤 === GENERATE AUDIO DEBUG ===');
+            console.log('🎤 receivedContext:', JSON.stringify(receivedContext, null, 2));
+            
+            // Use receivedContext directly - don't call getEnhancedCrowdinContext() as it overwrites the translation
+            let textToGenerate;
+            if (receivedContext && receivedContext.targetString && receivedContext.targetString.trim()) {
+                textToGenerate = receivedContext.targetString;
+                console.log('🎤 ✅ Using TRANSLATED text from receivedContext:', textToGenerate);
+            } else if (receivedContext && receivedContext.sourceString && receivedContext.sourceString.trim()) {
+                textToGenerate = receivedContext.sourceString;
+                console.log('🎤 ⚠️ Using SOURCE text from receivedContext (no translation):', textToGenerate);
+            } else {
+                textToGenerate = 'Test audio generation for the selected string.';
+                console.log('🎤 ❌ Using fallback text (no context available):', textToGenerate);
+            }
 
-            const generateBtn = document.getElementById('generateBtn');
-            const originalText = generateBtn.textContent;
-            
-            generateBtn.disabled = true;
-            generateBtn.innerHTML = '<div class="loading-spinner"></div> Generating...';
-            
+            if (!textToGenerate || textToGenerate.trim() === '') {
+                showStatus('No text available for audio generation', 'error');
+                return;
+            }
+
+            console.log('🎤 Final text to generate:', JSON.stringify(textToGenerate));
+            console.log('🎤 Text length:', textToGenerate.length);
+
+            showStatus('Generating audio...', 'info');
+
             try {
-                // Get current string text from context
-                const context = getEnhancedCrowdinContext();
-                const text = context.targetString || context.sourceString || 'Hello, this is a test audio generation.';
-                
-                showStatus(`Generating audio with ${audioManager.currentService}...`, 'loading');
-                
-                const audioData = await audioManager.generateAudio(
-                    audioManager.currentService,
-                    audioManager.currentVoice,
-                    text
-                );
-                
-                await audioManager.playAudioData(audioData);
-                showStatus('Audio generated and played successfully!', 'success');
-                
+                if (selectedService === 'PlayHT') {
+                    await audioManager.generatePlayHTAudio(selectedVoice, textToGenerate);
+                } else if (selectedService === 'ElevenLabs') {
+                    await audioManager.generateElevenLabsAudio(selectedVoice, textToGenerate);
+                }
             } catch (error) {
-                console.error('Error generating audio:', error);
-                showStatus(`Error: ${error.message}`, 'error');
-            } finally {
-                generateBtn.disabled = false;
-                generateBtn.textContent = originalText;
+                console.error('🚨 Audio generation failed:', error);
+                showStatus(`Audio generation failed: ${error.message}`, 'error');
             }
         }
 
@@ -1635,19 +1663,6 @@
         function closeCredentialsModal() {
             console.log('🔧 MODAL: closeCredentialsModal() called');
             document.getElementById('credentialsModal').style.display = 'none';
-        }
-
-        function togglePasswordVisibility(inputId) {
-            const input = document.getElementById(inputId);
-            const toggleBtn = input.nextElementSibling;
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                toggleBtn.textContent = '🙈';
-            } else {
-                input.type = 'password';
-                toggleBtn.textContent = '👁️';
-            }
         }
 
         // Manual credential testing function (call from browser console)
