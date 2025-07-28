@@ -9,175 +9,136 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
-            padding: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 200px;
+            padding: 5px;
+            background: #f8f9fa;
+            color: #333;
+            font-size: 12px;
+            line-height: 1.3;
+            min-height: 150px;
             height: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
+            overflow-y: auto;
         }
         
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            -webkit-backdrop-filter: blur(10px);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-            min-height: 160px;
+            background: white;
+            border-radius: 6px;
+            padding: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 120px;
             height: auto;
         }
         
         h1 {
-            color: #333;
-            margin-bottom: 12px;
-            font-size: 16px;
+            margin: 0 0 6px 0;
+            font-size: 14px;
+            color: #2c5aa0;
             font-weight: 600;
         }
         
         .button-group {
             display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 6px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
         }
         
         button {
-            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            background: #007bff;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 25px;
-            font-size: 12px;
-            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            font-size: 11px;
+            transition: background-color 0.2s;
+            flex: 1;
+            min-width: 90px;
         }
         
         button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        button:active {
-            transform: translateY(0);
+            background: #0056b3;
         }
         
         button:disabled {
-            opacity: 0.6;
+            background: #6c757d;
             cursor: not-allowed;
-            transform: none;
+        }
+        
+        .audio-section {
+            margin-top: 6px;
+            padding: 6px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .audio-buttons {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+        
+        .audio-btn {
+            font-size: 10px;
+            padding: 4px 8px;
+            min-width: 70px;
+            flex: 1;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        label {
+            font-weight: 500;
+            font-size: 10px;
+            color: #495057;
+            white-space: nowrap;
+        }
+        
+        select {
+            flex: 1;
+            padding: 3px 6px;
+            border: 1px solid #ced4da;
+            border-radius: 3px;
+            font-size: 10px;
+            min-width: 80px;
         }
         
         .status {
-            margin-top: 10px;
-            padding: 8px;
-            border-radius: 6px;
-            font-weight: 500;
-            font-size: 11px;
+            margin-top: 6px;
+            padding: 4px 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            font-size: 10px;
+            word-wrap: break-word;
         }
         
         .status.success {
             background: #d4edda;
             color: #155724;
-            border: 1px solid #c3e6cb;
         }
         
         .status.error {
             background: #f8d7da;
             color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .status.loading {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        
-        .audio-section {
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid #eee;
-        }
-        
-        .audio-buttons {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .audio-btn {
-            flex: 1;
-            min-width: 110px;
-            background: linear-gradient(45deg, #9C27B0, #673AB7);
-        }
-        
-        .audio-generation {
-            background: rgba(108, 117, 125, 0.1);
-            border-radius: 8px;
-            padding: 10px;
-            margin-top: 8px;
-            border: 1px solid rgba(108, 117, 125, 0.2);
-        }
-        
-        .service-selection,
-        .voice-selection {
-            margin-bottom: 8px;
-        }
-        
-        .service-selection label,
-        .voice-selection label {
-            display: block;
-            margin-bottom: 3px;
-            font-weight: 600;
-            color: #333;
-            font-size: 11px;
-        }
-        
-        select {
-            width: 100%;
-            padding: 6px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 11px;
-            background-color: white;
-        }
-        
-        .generate-controls {
-            display: flex;
-            gap: 6px;
-            margin-top: 8px;
-            align-items: center;
-        }
-        
-        .settings-btn {
-            background: linear-gradient(45deg, #6c757d, #495057);
-            font-size: 10px;
-            padding: 6px 12px;
-        }
-        
-        .generate-btn {
-            background: linear-gradient(45deg, #28a745, #20c997);
-            flex: 1;
         }
         
         .loading-spinner {
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 1s linear infinite;
             display: inline-block;
-            margin-left: 5px;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 4px;
+            vertical-align: middle;
         }
         
         @keyframes spin {
@@ -185,247 +146,67 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* Modal Styles */
+        /* Modal Styles - Compact */
         .modal {
+            display: none;
             position: fixed;
             z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
             background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
         }
         
         .modal-content {
-            background-color: #fefefe;
-            margin: 2% auto;
-            padding: 0;
-            border: none;
-            border-radius: 12px;
-            width: 85%;
-            max-width: 450px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-            animation: modalSlideIn 0.3s ease-out;
+            background-color: white;
+            margin: 5% auto;
+            padding: 12px;
+            border-radius: 6px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
         }
         
-        @keyframes modalSlideIn {
-            from { opacity: 0; transform: translateY(-50px); }
-            to { opacity: 1; transform: translateY(0); }
+        .modal h2 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: #2c5aa0;
         }
         
-        .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 12px 12px 0 0;
-            position: relative;
+        .modal label {
+            display: block;
+            margin: 6px 0 3px 0;
+            font-size: 11px;
         }
         
-        .modal-header h2 {
-            margin: 0;
-            font-size: 16px;
-            font-weight: 600;
+        .modal input {
+            width: 100%;
+            padding: 4px 6px;
+            border: 1px solid #ced4da;
+            border-radius: 3px;
+            font-size: 11px;
+            box-sizing: border-box;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 6px;
+            margin-top: 12px;
         }
         
         .close {
-            color: white;
+            color: #aaa;
             float: right;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
-            position: absolute;
-            right: 15px;
-            top: 8px;
             cursor: pointer;
+            line-height: 1;
         }
         
         .close:hover {
-            opacity: 0.7;
-        }
-        
-        .modal-body {
-            padding: 15px 20px;
-        }
-        
-        .credential-section {
-            margin-bottom: 15px;
-            padding: 12px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .credential-section h3 {
-            margin: 0 0 8px 0;
-            color: #333;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        
-        .credential-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-            align-items: center;
-        }
-        
-        .credential-row:last-child {
-            margin-bottom: 0;
-        }
-        
-        .credential-row label {
-            min-width: 80px;
-            font-weight: 500;
-            color: #666;
-            font-size: 11px;
-        }
-        
-        .credential-row input {
-            flex: 1;
-            padding: 6px 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 11px;
-        }
-        
-        .password-toggle {
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            padding: 4px;
-            font-size: 11px;
-        }
-        
-        .modal-footer {
-            padding: 12px 20px;
-            border-top: 1px solid #eee;
-            text-align: right;
-            border-radius: 0 0 12px 12px;
-        }
-        
-        .modal-footer button {
-            margin-left: 8px;
-            font-size: 11px;
-            padding: 6px 12px;
-        }
-        
-        .credentials-form {
-            padding: 30px;
-        }
-        
-        .credential-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-        
-        .credential-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
-        }
-        
-        .credential-group input {
-            width: 100%;
-            padding: 12px 45px 12px 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: monospace;
-            background: #f9f9f9;
-            transition: border-color 0.3s, background-color 0.3s;
-        }
-        
-        .credential-group input:focus {
-            outline: none;
-            border-color: #4facfe;
-            background: white;
-        }
-        
-        .toggle-visibility {
-            position: absolute;
-            right: 10px;
-            top: 35px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            padding: 5px;
-        }
-        
-        .toggle-visibility:hover {
-            opacity: 0.7;
-        }
-        
-        .credentials-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        
-        .credentials-buttons .btn {
-            flex: 1;
-            min-width: 120px;
-            padding: 12px 16px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(45deg, #4facfe, #00f2fe);
-        }
-        
-        .btn-success {
-            background: linear-gradient(45deg, #43e97b, #38f9d7);
-        }
-        
-        .credential-status {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            border: 1px solid #e0e0e0;
-        }
-        
-        .credential-status p {
-            margin: 0 0 15px 0;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .status-grid {
-            display: grid;
-            gap: 10px;
-        }
-        
-        .status-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-        }
-        
-        .status-label {
-            font-weight: 500;
-            color: #555;
-        }
-        
-        .status-indicator {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .status-indicator.present {
-            color: #28a745;
-        }
-        
-        .status-indicator.missing {
-            color: #dc3545;
+            color: #000;
         }
     </style>
 </head>
@@ -1358,30 +1139,19 @@
         const audioManager = new AudioManager();
 
         // Audio UI Functions
+        function resizeFrame() {
+            // Removed complex resizing - let Crowdin handle the iframe size
+            console.log('🎯 Crowdin will handle iframe sizing automatically');
+        }
+        
         function showAudioGeneration() {
             console.log('🎤 Show audio generation called');
             document.getElementById('audioGeneration').style.display = 'block';
-            
-            // Trigger frame resize to accommodate the new content
-            setTimeout(() => {
-                if (typeof AP !== 'undefined' && AP.resize) {
-                    AP.resize();
-                    console.log('🎤 Frame resized for audio generation');
-                }
-            }, 100);
         }
 
         function hideAudioGeneration() {
             console.log('🎤 Hide audio generation called');
             document.getElementById('audioGeneration').style.display = 'none';
-            
-            // Trigger frame resize to shrink back to original size
-            setTimeout(() => {
-                if (typeof AP !== 'undefined' && AP.resize) {
-                    AP.resize();
-                    console.log('🎤 Frame resized back to original');
-                }
-            }, 100);
         }
 
         async function onServiceChange() {
@@ -2005,13 +1775,7 @@
             console.log('💡 To manually test credentials, run: testCredentials()');
             console.log('🎯 App initialization complete!');
             
-            // Trigger initial frame resize to fit content
-            setTimeout(() => {
-                if (typeof AP !== 'undefined' && AP.resize) {
-                    AP.resize();
-                    console.log('🎯 Initial frame resize completed');
-                }
-            }, 500);
+            // Let Crowdin handle iframe sizing automatically
         });
 
         // Debug function to check and force close modal
