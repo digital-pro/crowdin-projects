@@ -1,6 +1,6 @@
 {
   "identifier": "levante-audio-generator-v1",
-  "name": "Levante Audio Generator",
+  "name": "Levante Audio Test",
   "description": "Generate audio for translations using PlayHT and ElevenLabs",
   "logo": "/favicon.svg",
   "baseUrl": "https://levante-audio-test.vercel.app",

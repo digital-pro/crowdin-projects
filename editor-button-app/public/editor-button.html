@@ -65,11 +65,39 @@
         }
         
         .audio-section {
-            margin-top: 6px;
-            padding: 6px;
-            background: #f8f9fa;
+            margin-top: 8px;
+            padding: 8px;
+            border: 1px solid #ddd;
             border-radius: 4px;
-            border: 1px solid #e9ecef;
+            background: #fafafa;
+        }
+        
+        .dropdowns-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+            align-items: end;
+        }
+        
+        .dropdown-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .dropdown-group label {
+            font-size: 10px;
+            margin-bottom: 2px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .dropdown-group select {
+            padding: 4px 6px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 11px;
+            background: white;
         }
         
         .audio-buttons {
@@ -227,31 +255,29 @@
                         🔄 Refresh Context
                     </button>
                 </div>
-                <div id="audioGeneration" class="audio-generation" style="display: none;">
-                    <div class="service-selection">
-                        <label for="audioService">Service:</label>
-                        <select id="audioService" onchange="onServiceChange()">
-                            <option value="">Select Service...</option>
-                            <option value="PlayHT">PlayHT</option>
-                            <option value="ElevenLabs">ElevenLabs</option>
-                        </select>
-                    </div>
-                    <div class="voice-selection">
-                        <label for="voiceSelect">Voice:</label>
-                        <select id="voiceSelect" onchange="onVoiceChange()">
-                            <option value="">Select Voice...</option>
-                        </select>
-                    </div>
-                    <div class="audio-actions">
-                        <button onclick="generateAudio()" id="generateBtn" disabled>
-                            Generate Audio
-                        </button>
-                        <button onclick="showCredentialsModal()" class="settings-btn">
-                            ⚙️ API Settings
-                        </button>
-                        <button onclick="hideAudioGeneration()" class="cancel-btn">
-                            Cancel
-                        </button>
+                <div id="audioGeneration" style="display: none;">
+                    <div class="audio-section">
+                        <div class="dropdowns-row">
+                            <div class="dropdown-group">
+                                <label for="serviceSelect">Service:</label>
+                                <select id="serviceSelect" onchange="onServiceChange()">
+                                    <option value="">Select Service</option>
+                                    <option value="PlayHT">PlayHT</option>
+                                    <option value="ElevenLabs">ElevenLabs</option>
+                                </select>
+                            </div>
+                            <div class="dropdown-group">
+                                <label for="voiceSelect">Voice:</label>
+                                <select id="voiceSelect" onchange="onVoiceChange()">
+                                    <option value="">Select Voice</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="audio-buttons">
+                            <button id="generateBtn" onclick="generateAudio()" class="audio-btn" disabled>Generate</button>
+                            <button onclick="hideAudioGeneration()" class="audio-btn">Close</button>
+                            <button onclick="showCredentialsModal()" class="audio-btn">API Settings</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -932,18 +958,18 @@
             }
 
             async loadElevenLabsVoices(languageCode = 'en') {
-                console.log('🎙️ Loading ElevenLabs voices for language:', languageCode);
+                console.log('🎙️ Loading ElevenLabs Voice Library for language:', languageCode);
                 
                 if (!this.apiConfig.elevenlabs.apiKey) {
-                    console.log('  ❌ ElevenLabs API key missing, falling back to CSV');
-                    return await this.loadElevenLabsVoicesFromCSV(languageCode);
+                    console.log('  ❌ ElevenLabs API key missing, cannot load personal voice library');
+                    return [];
                 }
                 
-                console.log('✅ ElevenLabs API key found, trying API first...');
+                console.log('✅ ElevenLabs API key found, loading your personal voice library...');
                 
                 try {
-                    // Try API first
-                    const response = await fetch('https://api.elevenlabs.io/v1/voices?show_legacy=false', {
+                    const response = await fetch('/api/elevenlabs-voices-proxy', {
+                        method: 'GET',
                         headers: {
                             'xi-api-key': this.apiConfig.elevenlabs.apiKey
                         }
@@ -958,29 +984,38 @@
                     const data = await response.json();
                     const allVoices = data.voices || [];
                     
-                    // Filter to only personal/cloned voices (exclude public voices)
-                    const personalVoices = allVoices.filter(voice => {
+                    // Only show your personal voice library - exclude all public/premade voices
+                    const voiceLibrary = allVoices.filter(voice => {
                         const category = voice.category || '';
-                        const isPersonal = category === 'cloned' || 
-                                         category === 'professional' || 
-                                         category === 'generated' ||
-                                         category === 'instant';
-                        return isPersonal;
+                        // Only include voices from your personal library
+                        const isPersonalLibrary = category === 'cloned' || 
+                                                category === 'professional' || 
+                                                category === 'generated' ||
+                                                category === 'instant';
+                        return isPersonalLibrary;
                     });
                     
-                    console.log(`🎯 ElevenLabs Personal voices: ${personalVoices.length} personal, ${allVoices.length - personalVoices.length} public (excluded)`);
+                    const publicCount = allVoices.length - voiceLibrary.length;
+                    console.log(`🎯 ElevenLabs Voice Library: ${voiceLibrary.length} personal voices loaded, ${publicCount} public voices excluded`);
                     
-                    if (personalVoices.length > 0) {
-                        console.log('🎵 Using personal ElevenLabs voices from API');
-                        return personalVoices;
+                    if (voiceLibrary.length > 0) {
+                        console.log('🎵 Using your personal ElevenLabs voice library');
+                        return voiceLibrary.map(voice => ({
+                            id: voice.voice_id,
+                            name: voice.name,
+                            category: voice.category,
+                            language: 'English',
+                            language_code: 'en',
+                            description: voice.description || ''
+                        }));
                     } else {
-                        console.log('⚠️ No personal voices found in API, falling back to CSV');
-                        return await this.loadElevenLabsVoicesFromCSV(languageCode);
+                        console.log('⚠️ No personal voices found in your ElevenLabs voice library');
+                        return [];
                     }
                     
                 } catch (error) {
-                    console.error('ElevenLabs API failed, falling back to CSV:', error);
-                    return await this.loadElevenLabsVoicesFromCSV(languageCode);
+                    console.error('🚨 ElevenLabs Voice Library loading failed:', error);
+                    return [];
                 }
             }
 
@@ -1158,10 +1193,21 @@
         // Initialize audio manager
         const audioManager = new AudioManager();
 
-        // Audio UI Functions
-        function resizeFrame() {
-            // Removed complex resizing - let Crowdin handle the iframe size
-            console.log('🎯 Crowdin will handle iframe sizing automatically');
+        // Voice Dropdown Helper Function
+        function populateVoiceDropdown(voices, serviceName) {
+            const voiceSelect = document.getElementById('voiceSelect');
+            voiceSelect.innerHTML = '<option value="">Select Voice</option>';
+            
+            console.log(`📋 Populating ${serviceName} dropdown with ${voices.length} voices`);
+            
+            voices.forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice.id;
+                option.textContent = voice.name || 'Unnamed Voice';
+                voiceSelect.appendChild(option);
+            });
+            
+            console.log(`✅ ${serviceName} dropdown populated successfully`);
         }
         
         function showAudioGeneration() {
@@ -1175,13 +1221,13 @@
         }
 
         async function onServiceChange() {
-            const serviceSelect = document.getElementById('audioService');
+            const serviceSelect = document.getElementById('serviceSelect');
             const voiceSelect = document.getElementById('voiceSelect');
             const generateBtn = document.getElementById('generateBtn');
             
             // Clear voice dropdown
-            voiceSelect.innerHTML = '<option value="">Select Voice...</option>';
-            generateBtn.disabled = true;
+            voiceSelect.innerHTML = '<option value="">Select Voice</option>';
+            if (generateBtn) generateBtn.disabled = true;
             
             const selectedService = serviceSelect.value;
             console.log('🔄 Service changed to:', selectedService);
@@ -1194,41 +1240,21 @@
             // Set the current service in audioManager
             audioManager.currentService = selectedService;
             
-            // Reload credentials to ensure they're fresh
-            audioManager.loadCredentials();
-            
+            // Load voices for the selected service
+            showStatus('Loading voices...', 'info');
             try {
                 let voices = [];
-                
                 if (selectedService === 'PlayHT') {
                     voices = await audioManager.loadPlayHTVoices();
                 } else if (selectedService === 'ElevenLabs') {
                     voices = await audioManager.loadElevenLabsVoices();
                 }
                 
-                console.log(`📋 Populating ${selectedService} dropdown with ${voices.length} voices`);
-                
-                // Populate voice dropdown
-                voices.forEach(voice => {
-                    const option = document.createElement('option');
-                    option.value = voice.id || voice.voice_id;
-                    option.textContent = voice.name;
-                    voiceSelect.appendChild(option);
-                });
-                
-                if (voices.length === 0) {
-                    const option = document.createElement('option');
-                    option.value = '';
-                    option.textContent = `No ${selectedService} voices available`;
-                    voiceSelect.appendChild(option);
-                }
-                
+                populateVoiceDropdown(voices, selectedService);
+                showStatus(`Loaded ${voices.length} ${selectedService} voices`, 'success');
             } catch (error) {
                 console.error(`Error loading ${selectedService} voices:`, error);
-                const option = document.createElement('option');
-                option.value = '';
-                option.textContent = `Error loading ${selectedService} voices`;
-                voiceSelect.appendChild(option);
+                showStatus(`Failed to load ${selectedService} voices`, 'error');
             }
         }
 
@@ -1237,11 +1263,13 @@
             const generateBtn = document.getElementById('generateBtn');
             
             audioManager.currentVoice = voiceSelect.value;
-            generateBtn.disabled = !voiceSelect.value;
+            if (generateBtn) generateBtn.disabled = !voiceSelect.value;
+            
+            console.log('🎵 Voice changed:', voiceSelect.value, 'Generate button enabled:', !!voiceSelect.value);
         }
 
         async function generateAudio() {
-            const selectedService = document.getElementById('audioService').value;
+            const selectedService = document.getElementById('serviceSelect').value;
             const selectedVoice = document.getElementById('voiceSelect').value;
             
             if (!selectedService || !selectedVoice) {

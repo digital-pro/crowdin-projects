@@ -1422,6 +1422,40 @@ app.post('/api/playht-voices-proxy', async (req, res) => {
   }
 });
 
+// ElevenLabs Voices Proxy (to fetch available voices)
+app.get('/api/elevenlabs-voices-proxy', async (req, res) => {
+  try {
+    const apiKey = req.headers['xi-api-key'];
+
+    if (!apiKey) {
+      return res.status(400).json({ error: 'Missing ElevenLabs API key' });
+    }
+
+    const response = await fetch('https://api.elevenlabs.io/v1/voices?show_legacy=false', {
+      method: 'GET',
+      headers: {
+        'xi-api-key': apiKey,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return res.status(response.status).json({ 
+        error: 'ElevenLabs Voices API error', 
+        details: errorText 
+      });
+    }
+
+    const voicesData = await response.json();
+    res.json(voicesData);
+    
+  } catch (error) {
+    console.error('ElevenLabs voices proxy error:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
 // ElevenLabs Proxy (if needed for CORS issues)
 app.post('/api/elevenlabs-proxy/:voiceId', async (req, res) => {
   try {
