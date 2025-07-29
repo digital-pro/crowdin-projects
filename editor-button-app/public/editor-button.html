@@ -1383,7 +1383,7 @@
                 console.log('🎵 FULL CONTEXT DEBUG:', JSON.stringify(context, null, 2));
                 console.log('🎵 Context keys:', Object.keys(context));
                 
-                // Try multiple ways to get the string text with detailed logging
+                // Try multiple ways to get the string ID/key with detailed logging
                 console.log('🎵 STRING EXTRACTION DEBUG:');
                 console.log('  - context.targetString:', context.targetString);
                 console.log('  - context.sourceString:', context.sourceString);
@@ -1391,211 +1391,82 @@
                 console.log('  - context.key:', context.key);
                 console.log('  - context.identifier:', context.identifier);
                 console.log('  - context.text:', context.text);
+                console.log('  - context.stringId:', context.stringId);
                 
-                // Use identifier as primary source for filename, fallback to text for display
-                const stringKey = context.identifier || context.targetString || context.sourceString || context.stringKey || context.key || context.text;
-                const displayText = context.targetString || context.sourceString || context.stringKey || context.key || context.text || context.identifier;
+                // For GCP bucket, we need the item ID (identifier/stringKey)
+                const itemId = context.identifier || context.stringKey || context.key || context.stringId;
+                const displayText = context.targetString || context.sourceString || context.text;
                 
                 // Use enhanced language detection
                 const languageCode = detectTargetLanguage(context);
                 
                 console.log('🎵 SELECTED VALUES:');
-                console.log('  - stringKey (for filename):', JSON.stringify(stringKey));
+                console.log('  - itemId (for GCP bucket):', JSON.stringify(itemId));
                 console.log('  - displayText (for reference):', JSON.stringify(displayText));
                 console.log('  - languageCode (detected):', JSON.stringify(languageCode));
-                console.log('  - stringKey type:', typeof stringKey);
-                console.log('  - stringKey length:', stringKey ? stringKey.length : 'null');
+                console.log('  - itemId type:', typeof itemId);
+                console.log('  - itemId length:', itemId ? itemId.length : 'null');
                 
-                if (!stringKey) {
-                    console.log('🎵 No string found in context. Full context:', context);
-                    showStatus('No text found to play audio for. Try selecting a string in the editor first.', 'error');
+                if (!itemId) {
+                    console.log('🎵 No item ID found in context. Full context:', context);
+                    showStatus('No item ID found to play audio for. Try selecting a string in the editor first.', 'error');
                     return;
                 }
                 
-                console.log('🎵 Looking for audio:', { stringKey, displayText, languageCode });
+                console.log('🎵 Looking for audio:', { itemId, displayText, languageCode });
                 
-                // Enhanced label detection (from audio-previewer logic)
-                let labelName = 'general'; // Default fallback
-                
-                // Try to detect label from various context sources
-                if (context.labels && context.labels.length > 0) {
-                    labelName = context.labels[0];
-                } else if (context.identifier) {
-                    // Extract label from string identifier patterns
-                    const labelPatterns = [
-                        /^([^_]+)_/,  // prefix_something
-                        /([a-z]+)[-_]/i,  // label-something or label_something
-                    ];
-                    
-                    for (const pattern of labelPatterns) {
-                        const match = context.identifier.match(pattern);
-                        if (match) {
-                            const extractedLabel = match[1].toLowerCase();
-                            
-                            // Map common variations to standard directory names (from audio-previewer)
-                            const labelMappings = {
-                                'egma': 'egma-math',
-                                'math': 'egma-math',
-                                'matrix': 'matrix-reasoning',
-                                'mental': 'mental-rotation',
-                                'same': 'same-different-selection',
-                                'theory': 'theory-of-mind',
-                                'tom': 'theory-of-mind',
-                                'trog': 'trog',
-                                'vocab': 'vocab',
-                                'vocabulary': 'vocab',
-                                'survey': 'survey',
-                                'general': 'general'
-                            };
-                            
-                            // Check for exact match first
-                            if (labelMappings[extractedLabel]) {
-                                labelName = labelMappings[extractedLabel];
-                                console.log('🎵 Found exact label mapping:', extractedLabel, '->', labelName);
-                                break;
-                            }
-                            
-                            // Check for partial matches
-                            for (const [key, value] of Object.entries(labelMappings)) {
-                                if (extractedLabel.includes(key) || key.includes(extractedLabel)) {
-                                    labelName = value;
-                                    console.log('🎵 Found partial label mapping:', extractedLabel, '->', labelName);
-                                    break;
-                                }
-                            }
-                            
-                            // If no mapping found but we have a clean name, use it directly
-                            if (labelName === 'general' && extractedLabel && extractedLabel !== 'general') {
-                                labelName = extractedLabel;
-                                console.log('🎵 Using direct label name:', labelName);
-                            }
-                            break;
-                        }
-                    }
-                }
-                
-                console.log('🎵 Final label name selected:', labelName);
-                
-                // Clean up the string key for URL (from audio-previewer logic)
-                console.log('🎵 STRING CLEANING DEBUG:');
-                console.log('  - Original stringKey:', JSON.stringify(stringKey));
-                console.log('  - Is identifier?:', stringKey === context.identifier);
-                
-                let cleanStringKey;
-                if (stringKey === context.identifier) {
-                    // If using identifier, it's probably already clean (like "ToM-scene-16-q4-reference")
-                    // Just convert to lowercase and replace underscores with hyphens for consistency
-                    cleanStringKey = stringKey.toLowerCase().replace(/_/g, '-');
-                    console.log('  - Using identifier format (minimal cleaning)');
-                } else {
-                    // If using text content, apply full cleaning
-                    cleanStringKey = stringKey
-                        .toLowerCase()
-                        .replace(/[^a-z0-9]+/g, '-')
-                        .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
-                    console.log('  - Using text content (full cleaning)');
-                }
-                
-                console.log('  - After cleaning processing:', cleanStringKey);
-                console.log('  - Final cleanStringKey:', JSON.stringify(cleanStringKey));
-                console.log('  - cleanStringKey length:', cleanStringKey.length);
-                
-                // Build multiple URL patterns to try (exact logic from audio-previewer)
-                const baseUrl = 'https://raw.githubusercontent.com/levante-framework/levante_translations/main/audio_files';
-                const urlPatterns = [];
-                
-                // Helper function to get language variants (from audio-previewer)
-                function getLanguageVariants(lang) {
-                    const variants = {
-                        'es': ['es', 'es-CO'], // Spanish: try both generic and Colombian
-                        'en': ['en', 'en-US'],
-                        'fr': ['fr', 'fr-CA'], // French: try both generic and Canadian
-                        'pt': ['pt', 'pt-BR'],
-                        'de': ['de', 'de-DE'], // German: try both generic and German-Germany
-                        'nl': ['nl', 'nl-NL', 'nl-BE'] // Dutch: try generic, Netherlands, and Belgium
-                    };
-                    return variants[lang] || [lang];
-                }
-                
-                const languageVariants = getLanguageVariants(languageCode);
-                console.log('🎵 Will try language variants:', languageVariants);
-                
-                // Try each language variant
-                for (const langVariant of languageVariants) {
-                    // Primary patterns with detected label (highest priority)
-                    if (labelName && labelName !== 'general') {
-                        urlPatterns.push(`${baseUrl}/${labelName}/${langVariant}/shared/${cleanStringKey}.mp3`);
-                        urlPatterns.push(`${baseUrl}/${labelName}/${langVariant}/shared/${stringKey.toLowerCase().replace(/\s+/g, '-')}.mp3`);
-                        urlPatterns.push(`${baseUrl}/${labelName}/${langVariant}/shared/${stringKey.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.mp3`);
-                    }
-                    
-                    // Fallback patterns with 'general' (lower priority)
-                    urlPatterns.push(`${baseUrl}/general/${langVariant}/shared/${cleanStringKey}.mp3`);
-                    urlPatterns.push(`${baseUrl}/general/${langVariant}/shared/${stringKey.toLowerCase().replace(/\s+/g, '-')}.mp3`);
-                    
-                    // Try without label subdirectory (even lower priority)
-                    urlPatterns.push(`${baseUrl}/${langVariant}/shared/${cleanStringKey}.mp3`);
-                    
-                    // Last resort patterns
-                    if (labelName && labelName !== 'general') {
-                        urlPatterns.push(`${baseUrl}/${labelName}/${langVariant}/shared/${stringKey}.mp3`);
-                    }
-                    urlPatterns.push(`${baseUrl}/general/${langVariant}/shared/${stringKey}.mp3`);
-                }
-                
-                console.log('🎵 Will try audio URLs:', urlPatterns);
-                console.log('🎵 URL components:', { labelName, languageCode, cleanStringKey, originalStringKey: stringKey });
-                
-                // Try each URL pattern until one works (from audio-previewer logic)
-                for (let i = 0; i < urlPatterns.length; i++) {
-                    const audioUrl = urlPatterns[i];
-                    console.log(`🎵 Trying URL ${i + 1}/${urlPatterns.length}:`, audioUrl);
-                    
-                    try {
-                        const audio = new Audio(audioUrl);
-                        
-                        // Test if the audio file can be loaded
-                        await new Promise((resolve, reject) => {
-                            const timeout = setTimeout(() => reject(new Error('Timeout')), 5000);
-                            
-                            audio.addEventListener('loadeddata', () => {
-                                clearTimeout(timeout);
-                                resolve();
-                            });
-                            
-                            audio.addEventListener('error', () => {
-                                clearTimeout(timeout);
-                                reject(new Error('Audio load failed'));
-                            });
-                            
-                            audio.load();
-                        });
-                        
-                        console.log('✅ Found audio file:', audioUrl);
-                        
-                        // Play the audio
-                        await new Promise((resolve, reject) => {
-                            audio.addEventListener('ended', resolve);
-                            audio.addEventListener('error', reject);
-                            audio.play().catch(reject);
-                        });
-                        
-                        showStatus('Audio playback complete', 'success');
-                        return; // Success, exit the function
-                        
-                    } catch (error) {
-                        console.log(`❌ URL ${i + 1} failed:`, error.message);
-                        continue; // Try the next URL
-                    }
-                }
-                
-                // If we get here, no audio files were found
-                showStatus('No existing audio file found for this text', 'error');
-                console.log('❌ No audio files found for:', { stringKey, languageCode, labelName, cleanStringKey });
+                // Use GCP bucket logic (adapted from source_dashboard.js)
+                await playExistingAudioFromGCP(itemId, languageCode);
                 
             } catch (error) {
                 console.error('Error in playCurrentAudio:', error);
                 showStatus(`Error playing audio: ${error.message}`, 'error');
+            }
+        }
+
+        // GCP bucket audio player (based on source_dashboard.js logic)
+        async function playExistingAudioFromGCP(itemId, langCode) {
+            try {
+                // Construct GCS bucket URL for audio file using simplified structure
+                const audioUrl = `https://storage.googleapis.com/levante-audio-dev/${langCode}/${itemId}.mp3`;
+                
+                console.log('🎵 Trying GCP bucket URL:', audioUrl);
+                showStatus(`Loading existing audio for ${itemId} (${langCode})...`, 'loading');
+                
+                // Try to load and play the audio
+                const audio = new Audio(audioUrl);
+                
+                audio.addEventListener('loadstart', () => {
+                    console.log('🎵 Audio loading started');
+                    showStatus(`Loading audio: ${itemId}`, 'info');
+                });
+                
+                audio.addEventListener('canplaythrough', () => {
+                    console.log('🎵 Audio can play through, starting playback');
+                    showStatus(`Playing existing audio: ${itemId}`, 'success');
+                    audio.play().catch(error => {
+                        console.error('Error starting playback:', error);
+                        showStatus(`Error starting playback: ${error.message}`, 'error');
+                    });
+                });
+                
+                audio.addEventListener('error', (e) => {
+                    console.warn('Audio file not found in GCP bucket:', audioUrl);
+                    console.warn('Audio error details:', e);
+                    showStatus(`No existing audio found for ${itemId}. Try generating with PlayHT or ElevenLabs.`, 'warning');
+                });
+                
+                audio.addEventListener('ended', () => {
+                    console.log('🎵 Audio playback finished');
+                    showStatus(`Finished playing ${itemId}`, 'success');
+                });
+                
+                // Load the audio file
+                audio.load();
+                
+            } catch (error) {
+                console.error('Error playing existing audio from GCP:', error);
+                showStatus(`Error playing existing audio: ${error.message}`, 'error');
             }
         }
 
