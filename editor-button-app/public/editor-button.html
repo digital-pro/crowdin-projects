@@ -85,6 +85,8 @@
             flex-direction: column;
         }
         
+
+        
         .dropdown-group label {
             font-size: 10px;
             margin-bottom: 2px;
@@ -268,6 +270,7 @@
                                     <option value="">Select Voice</option>
                                 </select>
                             </div>
+
                         </div>
                         <div class="audio-buttons">
                             <button id="generateBtn" onclick="generateAudio()" class="audio-btn" disabled>Generate</button>
@@ -1224,14 +1227,23 @@
             
             console.log(`📋 Populating ${serviceName} dropdown with ${voices.length} voices`);
             
-            voices.forEach(voice => {
+            // Sort voices alphabetically by name
+            const sortedVoices = voices.sort((a, b) => {
+                const nameA = (a.name || 'Unnamed Voice').toLowerCase();
+                const nameB = (b.name || 'Unnamed Voice').toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+            
+            console.log(`🔤 Voices sorted alphabetically for ${serviceName}`);
+            
+            sortedVoices.forEach(voice => {
                 const option = document.createElement('option');
                 option.value = voice.id;
                 option.textContent = voice.name || 'Unnamed Voice';
                 voiceSelect.appendChild(option);
             });
             
-            console.log(`✅ ${serviceName} dropdown populated successfully`);
+            console.log(`✅ ${serviceName} dropdown populated successfully with ${sortedVoices.length} sorted voices`);
         }
         
         function showAudioGeneration() {
@@ -1325,6 +1337,8 @@
             
             console.log('🎵 Voice changed:', voiceSelect.value, 'Generate button enabled:', !!voiceSelect.value);
         }
+
+
 
         async function generateAudio() {
             const selectedService = document.getElementById('serviceSelect').value;
