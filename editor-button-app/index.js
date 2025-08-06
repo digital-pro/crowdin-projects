@@ -745,6 +745,64 @@ app.post('/api/crowdin/discover-projects', async (req, res) => {
   }
 });
 
+// Fetch string details from Crowdin API to get identifier when missing
+app.get('/api/crowdin/projects/:projectId/strings/:stringId', async (req, res) => {
+  console.log('\n=== CROWDIN STRING DETAILS FETCH ===');
+  
+  try {
+    const { projectId, stringId } = req.params;
+    const token = extractAuthToken(req);
+    
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: 'No authentication token provided'
+      });
+    }
+    
+    if (!projectId || !stringId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Project ID and String ID are required'
+      });
+    }
+    
+    console.log(`🔍 Fetching string ${stringId} from project ${projectId}`);
+    
+    // Fetch string details from Crowdin API
+    const stringData = await makeCrowdinAPICall(`/projects/${projectId}/strings/${stringId}`, token);
+    
+    if (stringData && stringData.data) {
+      console.log('✅ Successfully fetched string details:', {
+        id: stringData.data.id,
+        identifier: stringData.data.identifier,
+        text: stringData.data.text?.substring(0, 50) + '...'
+      });
+      
+      res.json({
+        success: true,
+        string: stringData.data,
+        identifier: stringData.data.identifier,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: 'String not found',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+  } catch (error) {
+    console.error('❌ Error fetching string details:', error.message);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Main editor button route (legacy)
 app.get('/editor-button', (req, res) => {
   try {

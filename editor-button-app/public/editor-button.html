@@ -247,13 +247,13 @@
                 <div class="audio-buttons">
                     <button id="playAudioBtn" class="audio-btn">
                         🎵 Play Current Audio
-                    </button>
+            </button>
                     <button id="generateAudioBtn" class="audio-btn">
                         🎤 Generate New Audio
-                    </button>
+            </button>
                     <button id="refreshBtn" class="audio-btn" style="background: #007bff;">
                         🔄 Refresh Context
-                    </button>
+            </button>
                 </div>
                 <div id="audioGeneration" style="display: none;">
                     <div class="audio-section">
@@ -395,14 +395,14 @@
                 if (window.parent && window.parent !== window) {
                     try {
                         // Request context from parent via postMessage (safe cross-origin method)
-                        window.parent.postMessage({
-                            type: 'request-context',
-                            source: 'crowdin-app'
-                        }, '*');
-                    } catch (e) {
-                        console.log('Cannot send postMessage to parent');
-                    }
+                    window.parent.postMessage({
+                        type: 'request-context',
+                        source: 'crowdin-app'
+                    }, '*');
+                } catch (e) {
+                    console.log('Cannot send postMessage to parent');
                 }
+            }
             }
             
             return context;
@@ -458,8 +458,71 @@
         // Store received context data
         let receivedContext = {};
         
+        // Fetch string details from Crowdin API when identifier is missing
+        async function fetchStringIdentifierFromAPI(stringId, projectId) {
+            console.log('🔍 Attempting to fetch string identifier from Crowdin API:', { stringId, projectId });
+            
+            if (!stringId) {
+                console.warn('⚠️ No stringId provided for API fetch');
+                return null;
+            }
+            
+            try {
+                // We'll need to implement a proxy endpoint for this since we can't make direct API calls from the browser
+                // This is what the API call would look like:
+                console.log('📋 API call needed: GET /api/v2/projects/{projectId}/strings/{stringId}');
+                console.log('📋 With proper authentication headers');
+                console.log('📋 Expected response: { "data": { "id": 123, "identifier": "welcome_message", "text": "..." } }');
+                
+                // For now, we'll log what we need to implement
+                console.warn('⚠️ Crowdin API proxy not yet implemented');
+                console.log('💡 To implement: Create /api/crowdin-proxy endpoint that makes authenticated requests to Crowdin API');
+                
+                // Try to make the actual API call to fetch string details
+                try {
+                    // First, we need to get the Crowdin API token from credentials
+                    const credentials = JSON.parse(localStorage.getItem('crowdin_credentials') || '{}');
+                    const crowdinToken = credentials.crowdinApiToken || credentials.crowdin_api_token;
+                    
+                    if (!crowdinToken) {
+                        console.warn('⚠️ No Crowdin API token found in credentials');
+                        return null;
+                    }
+                    
+                    const response = await fetch(`/api/crowdin/projects/${projectId}/strings/${stringId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${crowdinToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`API call failed: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    if (result.success && result.identifier) {
+                        console.log('✅ Successfully fetched identifier from Crowdin API:', result.identifier);
+                        return result.identifier;
+                    } else {
+                        console.warn('⚠️ API call succeeded but no identifier found');
+                        return null;
+                    }
+                } catch (apiError) {
+                    console.warn('⚠️ API call failed, will use fallback:', apiError.message);
+                    // Fall through to return null and use fallback
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('❌ Failed to fetch string identifier from API:', error);
+                return null;
+            }
+        }
+
         // Enhanced message handler for Crowdin context
-        function enhancedMessageHandler(event) {
+        async function enhancedMessageHandler(event) {
             // Only process messages from Crowdin origins
             if (!event.origin || !event.origin.includes('crowdin.com')) {
                 return;
@@ -493,12 +556,84 @@
                         const stringData = stringInfo.string;
                         const translations = stringInfo.translations;
                         
+                        // Check if this is a different string (different ID)
+                        const isDifferentString = receivedContext.stringId !== stringData.id;
+                        
+                        console.log('🔄 String selection analysis:', {
+                            oldStringId: receivedContext.stringId,
+                            newStringId: stringData.id,
+                            isDifferentString: isDifferentString,
+                            oldIdentifier: receivedContext.identifier,
+                            newIdentifier: stringData.identifier
+                        });
+                        
+                        // If it's a different string, reset the context completely
+                        if (isDifferentString) {
+                            console.log('🆕 Different string selected, resetting context completely');
+                            receivedContext = { origin: receivedContext.origin }; // Clear everything but preserve origin
+                        }
+                        
                         receivedContext.stringId = stringData.id;
                         receivedContext.stringKey = stringData.text;
                         receivedContext.sourceString = stringData.text;
                         receivedContext.targetString = stringData.text;
                         receivedContext.identifier = stringData.identifier;
                         receivedContext.fileId = stringData.file?.id;
+                        
+                        // Extract additional context that might contain project info
+                        if (stringInfo.context) {
+                            receivedContext.projectId = stringInfo.context.projectId;
+                        }
+                        
+                        // Try to extract project ID from various sources
+                        if (!receivedContext.projectId) {
+                            // Try to get from URL if we're in an iframe
+                            try {
+                                const parentUrl = window.parent?.location?.href || window.location.href;
+                                const projectIdMatch = parentUrl.match(/\/project\/(\d+)/);
+                                if (projectIdMatch) {
+                                    receivedContext.projectId = projectIdMatch[1];
+                                    console.log('🔍 Extracted project ID from URL:', receivedContext.projectId);
+                        }
+                    } catch (e) {
+                                console.log('🔍 Could not access parent URL for project ID extraction');
+                            }
+                            
+                            // Try to get from AP API context if available
+                            if (typeof AP !== 'undefined' && AP.context) {
+                                AP.context.getContext(function(contextData) {
+                                    if (contextData && contextData.projectId) {
+                                        receivedContext.projectId = contextData.projectId;
+                                        console.log('🔍 Got project ID from AP context:', receivedContext.projectId);
+                                    }
+                                });
+                            }
+                        }
+                        
+                        console.log('🔍 String data extracted:', {
+                            id: stringData.id,
+                            identifier: stringData.identifier,
+                            text: stringData.text,
+                            fileId: stringData.file?.id,
+                            hasIdentifier: !!stringData.identifier
+                        });
+                        
+                        // If identifier is missing but we have stringId, try to fetch it from API
+                        if (!stringData.identifier && stringData.id) {
+                            console.log('🔍 Identifier missing in comfortable mode, logging for future API implementation');
+                            console.log('📋 Would need to call Crowdin API to get identifier for string ID:', stringData.id);
+                            
+                            // For now, use the string ID as a fallback identifier
+                            receivedContext.identifier = `string_${stringData.id}`;
+                            console.log('🔧 Using fallback identifier:', receivedContext.identifier);
+                            
+                            // Attempt to fetch from API (currently just logs what's needed)
+                            const fetchedIdentifier = await fetchStringIdentifierFromAPI(stringData.id, receivedContext.projectId);
+                            if (fetchedIdentifier) {
+                                receivedContext.identifier = fetchedIdentifier;
+                                console.log('✅ Successfully fetched identifier from API:', fetchedIdentifier);
+                            }
+                        }
                         
                         // Use translation if available and not empty
                         if (translations && typeof translations === 'object') {
@@ -525,6 +660,15 @@
                         }
                         
                         console.log('🎯 STORED CONTEXT:', receivedContext);
+                        
+                        // Set a timeout to check if context persists
+                        setTimeout(() => {
+                            console.log('⏰ Context check after 2 seconds:', {
+                                stringId: receivedContext.stringId,
+                                identifier: receivedContext.identifier,
+                                targetString: receivedContext.targetString
+                            });
+                        }, 2000);
                     }
                     
                     if (event.data.etyp === 'string.change') {
@@ -533,25 +677,98 @@
                         console.log('🎯 String change data:', stringData);
                         
                         if (stringData) {
-                            // Store basic info, but DON'T overwrite targetString if we have a translation
-                            const hadTranslation = receivedContext.targetString && 
-                                                   receivedContext.targetString !== receivedContext.sourceString;
+                            // Check if this is actually a different string (different ID)
+                            const isDifferentString = receivedContext.stringId !== stringData.id;
                             
+                            console.log('🔄 String change analysis:', {
+                                oldStringId: receivedContext.stringId,
+                                newStringId: stringData.id,
+                                isDifferentString: isDifferentString,
+                                oldIdentifier: receivedContext.identifier,
+                                newIdentifier: stringData.identifier
+                            });
+                            
+                            // If it's a different string, reset the context completely
+                            if (isDifferentString) {
+                                console.log('🆕 Different string detected, resetting context completely');
+                                receivedContext = { origin: receivedContext.origin }; // Clear everything but preserve origin
+                            }
+                            
+                            // Update with new string data
+                            receivedContext.stringId = stringData.id;
+                            receivedContext.stringKey = stringData.text;
+                            receivedContext.sourceString = stringData.text;
+                            receivedContext.targetString = stringData.text; // Start fresh with source text
+                            receivedContext.identifier = stringData.identifier;
+                            receivedContext.fileId = stringData.file?.id;
+                            
+                            // If identifier is missing and we have string ID, try to fetch it
+                            if (!stringData.identifier && stringData.id) {
+                                console.log('🔍 Identifier missing in string.change, will attempt API fetch');
+                                receivedContext.identifier = `string_${stringData.id}`;
+                                
+                                // Attempt to fetch from API (async operation)
+                                fetchStringIdentifierFromAPI(stringData.id, receivedContext.projectId).then(fetchedIdentifier => {
+                                    if (fetchedIdentifier) {
+                                        receivedContext.identifier = fetchedIdentifier;
+                                        console.log('✅ Updated identifier from API in string.change:', fetchedIdentifier);
+                                    }
+                                });
+                            }
+                            
+                            console.log('🎯 STORED CONTEXT from string.change:', receivedContext);
+                        }
+                    }
+                    
+                    // Handle textarea.edited events - these indicate the current string being edited
+                    if (event.data.etyp === 'textarea.edited') {
+                        console.log('🎯 PROCESSING textarea.edited event');
+                        const stringData = event.data.evnt;
+                        console.log('🎯 Textarea edited data:', stringData);
+                        
+                        if (stringData && stringData.id) {
+                            // This is the CURRENT string being edited - always update context
+                            console.log('✨ TEXTAREA EDITED - This is the currently active string!');
+                            
+                            // Check if this is a different string
+                            const isDifferentString = receivedContext.stringId !== stringData.id;
+                            console.log('🔄 Textarea edit analysis:', {
+                                oldStringId: receivedContext.stringId,
+                                newStringId: stringData.id,
+                                isDifferentString: isDifferentString,
+                                oldIdentifier: receivedContext.identifier,
+                                newIdentifier: stringData.identifier,
+                                oldText: stringData.oldText,
+                                newText: stringData.newText
+                            });
+                            
+                            // Always reset context for textarea.edited as this is the active string
+                            console.log('🆕 Textarea edited detected, updating to current active string');
+                            receivedContext = { origin: receivedContext.origin }; // Clear but preserve origin
+                            
+                            // Update with current string data
                             receivedContext.stringId = stringData.id;
                             receivedContext.stringKey = stringData.text;
                             receivedContext.sourceString = stringData.text;
                             receivedContext.identifier = stringData.identifier;
                             receivedContext.fileId = stringData.file?.id;
                             
-                            // Only update targetString if we didn't have a translation before
-                            if (!hadTranslation) {
-                                receivedContext.targetString = stringData.text;
-                                console.log('🎯 Updated targetString to source (no previous translation)');
+                            // For textarea.edited, the newText is the translated text being edited
+                            if (stringData.newText && stringData.newText.trim()) {
+                                receivedContext.targetString = stringData.newText;
+                                receivedContext.targetLanguageId = detectLanguageFromText(stringData.newText);
+                                console.log('🎯 Found translated text in textarea.edited:', stringData.newText);
+                            } else if (stringData.oldText && stringData.oldText.trim()) {
+                                receivedContext.targetString = stringData.oldText;
+                                receivedContext.targetLanguageId = detectLanguageFromText(stringData.oldText);
+                                console.log('🎯 Using old text as target from textarea.edited:', stringData.oldText);
                             } else {
-                                console.log('🎯 Preserved existing translation in targetString:', receivedContext.targetString);
+                                receivedContext.targetString = stringData.text;
+                                receivedContext.targetLanguageId = 'en'; // Fallback to English for source text
+                                console.log('🎯 Using source text as target from textarea.edited');
                             }
                             
-                            console.log('🎯 STORED CONTEXT from string.change:', receivedContext);
+                            console.log('✨ STORED CONTEXT from textarea.edited (CURRENT ACTIVE):', receivedContext);
                         }
                     }
                 }
@@ -602,7 +819,8 @@
         // Function to manually refresh context from Crowdin
         function refreshContext() {
             console.log('🔄 Manually refreshing context...');
-            receivedContext = {}; // Clear existing context
+            console.log('🔄 Current context before refresh:', Object.keys(receivedContext));
+            // Don't clear existing context - just try to enhance it
             
             // Try to get context using AP API if available
             if (typeof AP !== 'undefined') {
@@ -671,13 +889,70 @@
             }, 2000);
         }
 
+        // Simple language detection from text content
+        function detectLanguageFromText(text) {
+            if (!text || typeof text !== 'string') return null;
+            
+            console.log('🌍 Detecting language from text:', text.substring(0, 50) + '...');
+            
+            // Simple keyword-based detection for common languages
+            const lowerText = text.toLowerCase();
+            
+            // French indicators - enhanced detection
+            if (lowerText.includes('votre') || lowerText.includes('pour') || lowerText.includes('des') || 
+                lowerText.includes('activités') || lowerText.includes('français') || lowerText.includes('pivoter') ||
+                lowerText.includes('papa') || lowerText.includes('est-il') || lowerText.includes('fâché') ||
+                lowerText.includes('contre') || lowerText.includes('comment') || lowerText.includes('sophie') ||
+                lowerText.includes('se sent-elle') || lowerText.includes('après') || lowerText.includes('avoir') ||
+                lowerText.includes('perdu') || lowerText.includes('chaussure') || lowerText.includes('faites') ||
+                lowerText.includes('meilleure') || lowerText.includes('appareil')) {
+                console.log('🌍 Detected French from text content');
+                return 'fr';
+            }
+            
+            // Spanish indicators
+            if (lowerText.includes('para') || lowerText.includes('actividades') || lowerText.includes('español') ||
+                lowerText.includes('dispositivo') || lowerText.includes('mejor') || lowerText.includes('vista')) {
+                console.log('🌍 Detected Spanish from text content');
+                return 'es';
+            }
+            
+            // Spanish Colombian specific
+            if (lowerText.includes('sofía') || lowerText.includes('papá') || lowerText.includes('enfade') ||
+                lowerText.includes('zapato') || lowerText.includes('jaime')) {
+                console.log('🌍 Detected Spanish (Colombian) from text content');
+                return 'es-CO';
+            }
+            
+            // Portuguese indicators
+            if (lowerText.includes('para') || lowerText.includes('atividades') || lowerText.includes('dispositivo') ||
+                lowerText.includes('melhor') || lowerText.includes('português')) {
+                console.log('🌍 Detected Portuguese from text content');
+                return 'pt';
+            }
+            
+            console.log('🌍 Could not detect language from text, defaulting to null');
+            return null;
+        }
+
         // Enhanced function to detect the target language from Crowdin context
         function detectTargetLanguage(context) {
             console.log('🌍 LANGUAGE DETECTION DEBUG:', JSON.stringify(context, null, 2));
             
-            // First try direct language IDs from context
+            // PRIORITY 1: Try text-based detection first (most reliable)
+            if (context.targetString && typeof context.targetString === 'string') {
+                console.log('🌍 PRIORITY 1: Trying text-based detection from:', context.targetString.substring(0, 50) + '...');
+                
+                const detectedFromText = detectLanguageFromText(context.targetString);
+                if (detectedFromText) {
+                    console.log('🌍 ✅ DETECTED language from text content:', detectedFromText);
+                    return detectedFromText; // Return immediately if text detection works
+                }
+            }
+            
+            // PRIORITY 2: Try direct language IDs from context
             let detectedLanguage = context.targetLanguageId || context.sourceLanguageId || context.languageId;
-            console.log('🌍 Direct language from context:', detectedLanguage);
+            console.log('🌍 PRIORITY 2: Direct language from context:', detectedLanguage);
             
             // If no direct language, try URL detection
             if (!detectedLanguage) {
@@ -1392,8 +1667,34 @@
             try {
                 showStatus('Looking for existing audio...', 'loading');
                 
+                // Stop any currently playing audio and clear references
+                if (window.currentAudio) {
+                    window.currentAudio.pause();
+                    window.currentAudio.currentTime = 0;
+                    window.currentAudio.src = '';
+                    window.currentAudio = null;
+                    console.log('🛑 Stopped and cleared previous audio');
+                }
+                
+                // Also stop any other audio elements that might be playing
+                const audioElements = document.querySelectorAll('audio');
+                audioElements.forEach(audio => {
+                    if (!audio.paused) {
+                        audio.pause();
+                        audio.currentTime = 0;
+                        console.log('🛑 Stopped lingering audio element');
+                    }
+                });
+                
+                // Force refresh context before playing
+                console.log('🔄 Forcing context refresh before play...');
+                await refreshContext();
+                
                 // Get current Crowdin context with detailed debugging
                 const context = getEnhancedCrowdinContext();
+                console.log('🎵 === PLAY CURRENT AUDIO DEBUG ===');
+                console.log('🎵 Timestamp:', new Date().toISOString());
+                console.log('🎵 receivedContext (raw):', JSON.stringify(receivedContext, null, 2));
                 console.log('🎵 FULL CONTEXT DEBUG:', JSON.stringify(context, null, 2));
                 console.log('🎵 Context keys:', Object.keys(context));
                 
@@ -1407,12 +1708,24 @@
                 console.log('  - context.text:', context.text);
                 console.log('  - context.stringId:', context.stringId);
                 
-                // For GCP bucket, we need the item ID (identifier/stringKey)
-                const itemId = context.identifier || context.stringKey || context.key || context.stringId;
-                const displayText = context.targetString || context.sourceString || context.text;
+                // Also check receivedContext directly
+                console.log('🎵 RECEIVED CONTEXT DIRECT CHECK:');
+                console.log('  - receivedContext.targetString:', receivedContext.targetString);
+                console.log('  - receivedContext.sourceString:', receivedContext.sourceString);
+                console.log('  - receivedContext.stringKey:', receivedContext.stringKey);
+                console.log('  - receivedContext.identifier:', receivedContext.identifier);
+                console.log('  - receivedContext.stringId:', receivedContext.stringId);
                 
-                // Use enhanced language detection
-                const languageCode = detectTargetLanguage(context);
+                // For GCP bucket, we need the item ID (identifier/stringKey) - try both contexts
+                const itemId = context.identifier || context.stringKey || context.key || context.stringId ||
+                              receivedContext.identifier || receivedContext.stringKey || receivedContext.stringId;
+                const displayText = context.targetString || context.sourceString || context.text ||
+                                  receivedContext.targetString || receivedContext.sourceString;
+                
+                // Use enhanced language detection - prioritize receivedContext
+                const enhancedContext = { ...context, ...receivedContext };
+                console.log('🌍 Enhanced context for language detection:', enhancedContext);
+                const languageCode = detectTargetLanguage(enhancedContext);
                 
                 console.log('🎵 SELECTED VALUES:');
                 console.log('  - itemId (for GCP bucket):', JSON.stringify(itemId));
@@ -1420,14 +1733,24 @@
                 console.log('  - languageCode (detected):', JSON.stringify(languageCode));
                 console.log('  - itemId type:', typeof itemId);
                 console.log('  - itemId length:', itemId ? itemId.length : 'null');
+                console.log('🎵 === END DEBUG ===');
                 
                 if (!itemId) {
-                    console.log('🎵 No item ID found in context. Full context:', context);
+                    console.log('🎵 No item ID found in either context. Contexts:', {
+                        enhancedContext: context,
+                        receivedContext: receivedContext
+                    });
                     showStatus('No item ID found to play audio for. Try selecting a string in the editor first.', 'error');
                     return;
                 }
                 
-                console.log('🎵 Looking for audio:', { itemId, displayText, languageCode });
+                console.log('🎵 === AUDIO PLAYBACK ATTEMPT ===');
+                console.log('🎵 Looking for audio with:', { 
+                    itemId, 
+                    displayText, 
+                    languageCode,
+                    timestamp: new Date().toISOString()
+                });
                 
                 // Use GCP bucket logic (adapted from source_dashboard.js)
                 await playExistingAudioFromGCP(itemId, languageCode);
@@ -1438,17 +1761,53 @@
             }
         }
 
+        // Map language codes specifically for GCP bucket structure
+        function mapLanguageCodeForGCP(langCode) {
+            if (!langCode) return 'en';
+            
+            const lang = langCode.toLowerCase();
+            console.log('🌍 Mapping language code for GCP bucket:', lang);
+            
+            // Map regional language codes to match GCP bucket folder structure
+            const gcpLanguageMappings = {
+                'en': 'en', 'en-us': 'en', 'en-gb': 'en', 'en-ca': 'en',
+                'es': 'es-CO', 'es-co': 'es-CO', 'es-mx': 'es-CO', 'es-es': 'es-CO',  // Spanish uses es-CO folder
+                'fr': 'fr', 'fr-ca': 'fr', 'fr-fr': 'fr', 'frca': 'fr',
+                'pt': 'pt', 'pt-br': 'pt', 'pt-pt': 'pt',
+                'de': 'de', 'de-de': 'de',
+                'nl': 'nl', 'nl-nl': 'nl', 'nl-be': 'nl',
+                'it': 'it', 'it-it': 'it'
+            };
+            
+            const mappedLang = gcpLanguageMappings[lang] || lang.split('-')[0] || 'en';
+            console.log('🌍 GCP language mapping result:', lang, '->', mappedLang);
+            return mappedLang;
+        }
+
         // GCP bucket audio player (based on source_dashboard.js logic)
         async function playExistingAudioFromGCP(itemId, langCode) {
             try {
+                // Map the language code for GCP bucket structure
+                const gcpLangCode = mapLanguageCodeForGCP(langCode);
+                
                 // Construct GCS bucket URL for audio file using simplified structure
-                const audioUrl = `https://storage.googleapis.com/levante-audio-dev/${langCode}/${itemId}.mp3`;
+                const audioUrl = `https://storage.googleapis.com/levante-audio-dev/${gcpLangCode}/${itemId}.mp3`;
                 
-                console.log('🎵 Trying GCP bucket URL:', audioUrl);
-                showStatus(`Loading existing audio for ${itemId} (${langCode})...`, 'loading');
+                console.log('🎵 === GCP AUDIO ATTEMPT ===');
+                console.log('🎵 GCP bucket URL construction:');
+                console.log('  - Original langCode:', langCode);
+                console.log('  - Mapped GCP langCode:', gcpLangCode);
+                console.log('  - itemId:', itemId);
+                console.log('  - Final URL:', audioUrl);
+                console.log('  - Timestamp:', new Date().toISOString());
                 
-                // Try to load and play the audio
-                const audio = new Audio(audioUrl);
+                showStatus(`Loading existing audio for ${itemId} (${gcpLangCode})...`, 'loading');
+                
+                // Try to load and play the audio with cache busting
+                const cacheBustUrl = `${audioUrl}?t=${Date.now()}`;
+                console.log('🎵 Cache-busted URL:', cacheBustUrl);
+                const audio = new Audio(cacheBustUrl);
+                audio.id = `audio_${itemId}_${Date.now()}`;
                 
                 audio.addEventListener('loadstart', () => {
                     console.log('🎵 Audio loading started');
@@ -1458,6 +1817,10 @@
                 audio.addEventListener('canplaythrough', () => {
                     console.log('🎵 Audio can play through, starting playback');
                     showStatus(`Playing existing audio: ${itemId}`, 'success');
+                    
+                    // Store reference to current audio for stopping later
+                    window.currentAudio = audio;
+                    
                     audio.play().catch(error => {
                         console.error('Error starting playback:', error);
                         showStatus(`Error starting playback: ${error.message}`, 'error');
@@ -1467,7 +1830,29 @@
                 audio.addEventListener('error', (e) => {
                     console.warn('Audio file not found in GCP bucket:', audioUrl);
                     console.warn('Audio error details:', e);
-                    showStatus(`No existing audio found for ${itemId}. Try generating with PlayHT or ElevenLabs.`, 'warning');
+                    
+                    // Try alternative language mappings if the first one fails
+                    if (gcpLangCode !== langCode && gcpLangCode !== 'en') {
+                        console.log('🎵 Trying fallback to English...');
+                        const fallbackUrl = `https://storage.googleapis.com/levante-audio-dev/en/${itemId}.mp3`;
+                        console.log('🎵 Fallback URL:', fallbackUrl);
+                        
+                        const fallbackAudio = new Audio(fallbackUrl);
+                        fallbackAudio.addEventListener('canplaythrough', () => {
+                            console.log('🎵 Fallback audio found, playing English version');
+                            showStatus(`Playing English audio for ${itemId} (no ${gcpLangCode} version found)`, 'warning');
+                            
+                            // Store reference to current audio for stopping later
+                            window.currentAudio = fallbackAudio;
+                            
+                            fallbackAudio.play();
+                        });
+                        fallbackAudio.addEventListener('error', () => {
+                            showStatus(`No existing audio found for ${itemId} in ${gcpLangCode} or English. Try generating with PlayHT or ElevenLabs.`, 'warning');
+                        });
+                    } else {
+                        showStatus(`No existing audio found for ${itemId}. Try generating with PlayHT or ElevenLabs.`, 'warning');
+                    }
                 });
                 
                 audio.addEventListener('ended', () => {
@@ -1674,20 +2059,32 @@
         };
 
         // Manual debug function for testing context extraction
-        window.debugContext = function() {
-            console.log('=== CONTEXT DEBUG ===');
-            console.log('📋 receivedContext:', JSON.stringify(receivedContext, null, 2));
-            console.log('📋 getEnhancedCrowdinContext():', JSON.stringify(getEnhancedCrowdinContext(), null, 2));
-            console.log('📋 URL params:', Object.fromEntries(new URLSearchParams(window.location.search)));
-            
-            // Test the playCurrentAudio logic manually
-            const context = getEnhancedCrowdinContext();
-            const stringKey = context.targetString || context.sourceString || context.stringKey || context.key || context.identifier;
-            const languageCode = context.targetLanguageId || context.sourceLanguageId || context.languageId || 'en';
-            
-            console.log('📋 Extracted for audio:', { stringKey, languageCode });
-            console.log('=== END DEBUG ===');
-        };
+        try {
+            window.debugContext = function() {
+                try {
+                    console.log('=== CONTEXT DEBUG ===');
+                    console.log('📋 receivedContext:', JSON.stringify(receivedContext, null, 2));
+                    console.log('📋 getEnhancedCrowdinContext():', JSON.stringify(getEnhancedCrowdinContext(), null, 2));
+                    console.log('📋 URL params:', Object.fromEntries(new URLSearchParams(window.location.search)));
+                    
+                    // Test the playCurrentAudio logic manually
+                    const context = getEnhancedCrowdinContext();
+                    const stringKey = context.targetString || context.sourceString || context.stringKey || context.key || context.identifier;
+                    const languageCode = context.targetLanguageId || context.sourceLanguageId || context.languageId || 'en';
+                    
+                    console.log('📋 Extracted for audio:', { stringKey, languageCode });
+                    console.log('=== END DEBUG ===');
+                    
+                    return { receivedContext, context, stringKey, languageCode };
+                } catch (error) {
+                    console.error('Error in debugContext:', error);
+                    return { error: error.message };
+                }
+            };
+            console.log('✅ debugContext function defined successfully');
+        } catch (error) {
+            console.error('❌ Failed to define debugContext function:', error);
+        }
         
         // Simple debug function for testing context
         window.checkContext = function() {
@@ -1700,8 +2097,101 @@
             console.log('=== END CHECK ===');
         };
         
+        // Debug function to show what would be used for audio
+        try {
+            window.debugAudio = function() {
+                try {
+                    const context = getEnhancedCrowdinContext();
+                    const itemId = context.identifier || context.stringKey || context.key || context.stringId ||
+                                  receivedContext.identifier || receivedContext.stringKey || receivedContext.stringId;
+                    const displayText = context.targetString || context.sourceString || context.text ||
+                                      receivedContext.targetString || receivedContext.sourceString;
+                    const languageCode = detectTargetLanguage(context);
+                    
+                    console.log('🎵 AUDIO DEBUG SUMMARY:');
+                    console.log('  - itemId that would be used:', itemId);
+                    console.log('  - displayText that would be used:', displayText);
+                    console.log('  - languageCode that would be used:', languageCode);
+                    console.log('  - receivedContext snapshot:', JSON.stringify(receivedContext, null, 2));
+                    
+                    return { itemId, displayText, languageCode, receivedContext };
+                } catch (error) {
+                    console.error('Error in debugAudio:', error);
+                    return { error: error.message };
+                }
+            };
+            console.log('✅ debugAudio function defined successfully');
+        } catch (error) {
+            console.error('❌ Failed to define debugAudio function:', error);
+        }
+        
         console.log('💡 To debug context manually, run: debugContext()');
+        console.log('💡 To debug audio extraction, run: debugAudio()');
         console.log('🚀 App loaded at:', new Date().toISOString());
+        console.log('🔧 Syntax fix deployment v2');
+        
+        // Test if functions are properly defined
+        console.log('🔧 Debug functions status:');
+        console.log('  - debugContext:', typeof window.debugContext);
+        console.log('  - debugAudio:', typeof window.debugAudio);
+        console.log('  - receivedContext:', typeof receivedContext);
+        console.log('  - getEnhancedCrowdinContext:', typeof getEnhancedCrowdinContext);
+        
+        // Add a manual context injection function for testing
+        try {
+            window.injectTestContext = function() {
+                window.receivedContext = {
+                    stringId: 52615,
+                    identifier: "ToM-scene-15-q3-false_belief",
+                    targetString: "¿Es justo que papá se enfade con Sofía por haber perdido su zapato?",
+                    sourceString: "Is it fair that Dad is mad at Sophie for losing her shoe?",
+                    stringKey: "Is it fair that Dad is mad at Sophie for losing her shoe?",
+                    targetLanguageId: "es-CO",
+                    fileId: 83
+                };
+                console.log('🧪 Test context injected:', window.receivedContext);
+                console.log('🧪 Now try: debugAudio() or click the play button');
+                return window.receivedContext;
+            };
+            console.log('✅ injectTestContext function defined successfully');
+            console.log('💡 To inject test context, run: injectTestContext()');
+        } catch (error) {
+            console.error('❌ Failed to define injectTestContext function:', error);
+        }
+        
+        // Add immediate context check function
+        try {
+            window.quickContext = function() {
+                console.log('⚡ QUICK CONTEXT CHECK:');
+                console.log('  receivedContext keys:', Object.keys(receivedContext));
+                console.log('  receivedContext.stringId:', receivedContext.stringId);
+                console.log('  receivedContext.identifier:', receivedContext.identifier);
+                console.log('  receivedContext.targetString:', receivedContext.targetString);
+                return receivedContext;
+            };
+            console.log('✅ quickContext function defined successfully');
+            console.log('💡 For quick context check, run: quickContext()');
+        
+        // Add manual language override function for testing
+        try {
+            window.setLanguage = function(langCode) {
+                if (receivedContext) {
+                    receivedContext.targetLanguageId = langCode;
+                    console.log(`🌍 Manually set target language to: ${langCode}`);
+                    console.log('🌍 Updated context:', receivedContext);
+                } else {
+                    console.log('❌ No receivedContext available to update');
+                }
+                return langCode;
+            };
+            console.log('✅ setLanguage function defined successfully');
+            console.log('💡 To manually set language, run: setLanguage("es-CO") or setLanguage("fr")');
+        } catch (error) {
+            console.error('❌ Failed to define setLanguage function:', error);
+        }
+        } catch (error) {
+            console.error('❌ Failed to define quickContext function:', error);
+        }
 
         // Initialize credentials and context on page load
         document.addEventListener('DOMContentLoaded', function() {
