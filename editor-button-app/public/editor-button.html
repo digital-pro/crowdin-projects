@@ -2093,13 +2093,16 @@
         }
         
         function getDefaultVoiceForLanguage(languageCode) {
-            // Default voices for different languages
+            // Updated default voices based on language configuration
             const defaultVoices = {
-                'en': { id: 's3://voice-cloning-zero-shot/d9ff78ba-d016-47f6-b0ef-dd630f59414e/female-cs/manifest.json', name: 'Female English', service: 'PlayHT' },
-                'es': { id: 's3://voice-cloning-zero-shot/e85a7c4e-e2e5-4b8e-a7c8-4e7b9a8c5d2f/female-es/manifest.json', name: 'Female Spanish', service: 'PlayHT' },
-                'es-CO': { id: 's3://voice-cloning-zero-shot/e85a7c4e-e2e5-4b8e-a7c8-4e7b9a8c5d2f/female-es/manifest.json', name: 'Female Spanish', service: 'PlayHT' },
-                'fr': { id: 's3://voice-cloning-zero-shot/f2a8c3d7-b1e9-4c6f-a5d8-7e9b2c4f6a1d/female-fr/manifest.json', name: 'Female French', service: 'PlayHT' },
-                'de': { id: 's3://voice-cloning-zero-shot/g3b9d4e8-c2f0-5d7g-b6e9-8f0c3d5g7b2e/female-de/manifest.json', name: 'Female German', service: 'PlayHT' }
+                'en': { name: 'Clara', service: 'ElevenLabs', language_code: 'en' },
+                'es': { name: 'Malena Tango', service: 'ElevenLabs', language_code: 'es-CO' },
+                'es-CO': { name: 'Malena Tango', service: 'ElevenLabs', language_code: 'es-CO' },
+                'de': { name: 'Julia', service: 'ElevenLabs', language_code: 'de' },
+                'de-CH': { name: 'Julia', service: 'ElevenLabs', language_code: 'de-CH' },
+                'fr': { name: 'Caroline', service: 'ElevenLabs', language_code: 'fr-CA' },
+                'fr-CA': { name: 'Caroline', service: 'ElevenLabs', language_code: 'fr-CA' },
+                'nl': { name: 'Emma', service: 'ElevenLabs', language_code: 'nl' }
             };
             
             const normalizedLang = languageCode.toLowerCase();
@@ -2107,8 +2110,8 @@
         }
         
         function getDefaultServiceForLanguage(languageCode) {
-            // For now, use PlayHT for all languages since it has better multilingual support
-            return 'PlayHT';
+            // Use ElevenLabs as default service for all languages based on language configuration
+            return 'ElevenLabs';
         }
 
         async function playCurrentAudio() {
