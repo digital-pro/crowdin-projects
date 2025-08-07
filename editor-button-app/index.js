@@ -1589,6 +1589,7 @@ app.use((req, res) => {
       '/api/button-action',
       '/api/playht-proxy',
       '/api/playht-voices-proxy',
+      '/api/elevenlabs-voices-proxy',
       '/api/elevenlabs-proxy/:voiceId'
     ]
   });
