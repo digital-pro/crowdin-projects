@@ -1436,7 +1436,9 @@
                 if (!elevenlabsApiKey) {
                     elevenlabsApiKey = localStorage.getItem('elevenlabs_api_key') ||
                                        localStorage.getItem('ELEVENLABS_KEY') ||
-                                       sessionStorage.getItem('ELEVENLABS_API_KEY') || '';
+                                       localStorage.getItem('ELEVENLABS_API_KEY') ||
+                                       sessionStorage.getItem('ELEVENLABS_API_KEY') ||
+                                       sessionStorage.getItem('elevenlabs_api_key') || '';
                 }
 
                 console.log('🔍 Credential loading results:', {
@@ -2426,7 +2428,7 @@
             const allKeys = [
                 'PLAY_DOT_HT_API_KEY', 'playht_api_key', 'PLAYHT_API_KEY',
                 'PLAY_DOT_HT_USER_ID', 'playht_user_id', 'PLAYHT_USER_ID',
-                'ELEVENLABS_API_KEY', 'elevenlabs_api_key', 'ELEVEN_LABS_API_KEY'
+                'ELEVENLABS_API_KEY', 'elevenlabs_api_key', 'ELEVEN_LABS_API_KEY', 'ELEVENLABS_KEY'
             ];
             
             console.log('Testing localStorage:');
@@ -2453,6 +2455,28 @@
                 elevenlabs: audioManager.apiConfig.elevenlabs.apiKey ? `Present (${audioManager.apiConfig.elevenlabs.apiKey.length} chars)` : 'Missing'
             });
             console.log('=== END MANUAL TEST ===');
+        };
+        
+        // Debug function specifically for ElevenLabs
+        window.debugElevenLabs = function() {
+            console.log('=== ELEVENLABS DEBUG ===');
+            const possibleKeys = [
+                'ELEVENLABS_API_KEY', 'elevenlabs_api_key', 'ELEVEN_LABS_API_KEY', 'ELEVENLABS_KEY'
+            ];
+            
+            console.log('Checking all possible ElevenLabs key names:');
+            possibleKeys.forEach(key => {
+                const localStorage_val = localStorage.getItem(key);
+                const sessionStorage_val = sessionStorage.getItem(key);
+                console.log(`  ${key}:`);
+                console.log(`    localStorage: ${localStorage_val ? `Present (${localStorage_val.length} chars)` : 'Missing'}`);
+                console.log(`    sessionStorage: ${sessionStorage_val ? `Present (${sessionStorage_val.length} chars)` : 'Missing'}`);
+            });
+            
+            console.log('Current audioManager elevenlabs config:', {
+                apiKey: audioManager.apiConfig.elevenlabs.apiKey ? `Present (${audioManager.apiConfig.elevenlabs.apiKey.length} chars)` : 'Missing'
+            });
+            console.log('=== END ELEVENLABS DEBUG ===');
         };
 
         // Manual debug function for testing context extraction
