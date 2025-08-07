@@ -2710,6 +2710,11 @@
                                     const itemId = stringInfo.string.identifier;
                                     
                                     if (itemId) {
+                                        // Check if user has interacted first
+                                        if (!userHasInteracted) {
+                                            console.log('🎵 WEBHOOK: Waiting for user interaction before autoplay');
+                                            return;
+                                        }
                                         // Play immediately
                                         playExistingAudioFromGCP(itemId, gcpLangCode);
                                         return; // Exit early, don't process as normal context
@@ -2733,6 +2738,20 @@
         // Add event listener for webhook-style message handling
         window.addEventListener('message', enhancedMessageHandler);
         console.log('✅ Webhook-style message handler registered');
+        
+        // Enable autoplay after any user interaction
+        let userHasInteracted = false;
+        function enableAutoplay() {
+            if (!userHasInteracted) {
+                userHasInteracted = true;
+                console.log('✅ User interaction detected, autoplay enabled');
+            }
+        }
+        
+        // Listen for any user interaction to enable autoplay
+        document.addEventListener('click', enableAutoplay, { once: true });
+        document.addEventListener('keydown', enableAutoplay, { once: true });
+        document.addEventListener('touchstart', enableAutoplay, { once: true });
         
         // Update deployment timestamp
         console.log('🔧 Webhook deployment v3 - ' + new Date().toISOString());
