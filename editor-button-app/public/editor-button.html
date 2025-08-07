@@ -248,10 +248,13 @@
                     <button id="playAudioBtn" class="audio-btn">
                         🎵 Play Current Audio
             </button>
-                    <button id="generateAudioBtn" class="audio-btn">
+                    <button id="previewBtn" class="audio-btn" style="background: #28a745;">
+                        🎧 Preview Translation
+            </button>
+                    <button id="generateAudioBtn" class="audio-btn" style="display: none;">
                         🎤 Generate New Audio
             </button>
-                    <button id="refreshBtn" class="audio-btn" style="background: #007bff;">
+                    <button id="refreshBtn" class="audio-btn" style="display: none;">
                         🔄 Refresh Context
             </button>
                 </div>
@@ -2042,6 +2045,72 @@
             }
         }
 
+        async function previewTranslation() {
+            console.log('🎧 === PREVIEW TRANSLATION ===');
+            
+            // Get the current context 
+            const context = getEnhancedCrowdinContext();
+            
+            // Get the text to preview (prioritize target translation)
+            const textToPreview = context.targetString || receivedContext.targetString || 
+                                 context.sourceString || receivedContext.sourceString ||
+                                 context.stringKey || receivedContext.stringKey;
+            
+            if (!textToPreview) {
+                console.error('🎧 No text found to preview');
+                showStatus('No text found to preview', 'error');
+                return;
+            }
+            
+            // Detect the language of the text
+            const detectedLanguage = detectTargetLanguage(context) || 
+                                   detectLanguageFromText(textToPreview) || 'en';
+            
+            console.log(`🎧 Previewing text: "${textToPreview.substring(0, 50)}..."`);
+            console.log(`🎧 Detected language: ${detectedLanguage}`);
+            
+            // Get default voice for the language
+            const defaultVoice = getDefaultVoiceForLanguage(detectedLanguage);
+            const service = getDefaultServiceForLanguage(detectedLanguage);
+            
+            if (!defaultVoice || !service) {
+                console.error(`🎧 No default voice/service found for language: ${detectedLanguage}`);
+                showStatus(`No default voice found for ${detectedLanguage}`, 'error');
+                return;
+            }
+            
+            console.log(`🎧 Using ${service} voice: ${defaultVoice.name || defaultVoice.id}`);
+            showStatus(`Generating preview with ${service}...`, 'info');
+            
+            try {
+                // Generate and play audio using the audio manager
+                await audioManager.generateAudio(service, defaultVoice.id, textToPreview);
+                showStatus('Preview completed!', 'success');
+            } catch (error) {
+                console.error('🎧 Preview failed:', error);
+                showStatus('Preview failed: ' + error.message, 'error');
+            }
+        }
+        
+        function getDefaultVoiceForLanguage(languageCode) {
+            // Default voices for different languages
+            const defaultVoices = {
+                'en': { id: 's3://voice-cloning-zero-shot/d9ff78ba-d016-47f6-b0ef-dd630f59414e/female-cs/manifest.json', name: 'Female English', service: 'PlayHT' },
+                'es': { id: 's3://voice-cloning-zero-shot/e85a7c4e-e2e5-4b8e-a7c8-4e7b9a8c5d2f/female-es/manifest.json', name: 'Female Spanish', service: 'PlayHT' },
+                'es-CO': { id: 's3://voice-cloning-zero-shot/e85a7c4e-e2e5-4b8e-a7c8-4e7b9a8c5d2f/female-es/manifest.json', name: 'Female Spanish', service: 'PlayHT' },
+                'fr': { id: 's3://voice-cloning-zero-shot/f2a8c3d7-b1e9-4c6f-a5d8-7e9b2c4f6a1d/female-fr/manifest.json', name: 'Female French', service: 'PlayHT' },
+                'de': { id: 's3://voice-cloning-zero-shot/g3b9d4e8-c2f0-5d7g-b6e9-8f0c3d5g7b2e/female-de/manifest.json', name: 'Female German', service: 'PlayHT' }
+            };
+            
+            const normalizedLang = languageCode.toLowerCase();
+            return defaultVoices[normalizedLang] || defaultVoices['en'];
+        }
+        
+        function getDefaultServiceForLanguage(languageCode) {
+            // For now, use PlayHT for all languages since it has better multilingual support
+            return 'PlayHT';
+        }
+
         async function playCurrentAudio() {
             try {
                 showStatus('Looking for existing audio...', 'loading');
@@ -2635,6 +2704,7 @@
             
             // Add click event listeners with debugging
             const playBtn = document.getElementById('playAudioBtn');
+            const previewBtn = document.getElementById('previewBtn');
             const generateBtn = document.getElementById('generateAudioBtn');
             const refreshBtn = document.getElementById('refreshBtn');
             
@@ -2646,6 +2716,16 @@
                 console.log('✅ Play button event listener added');
             } else {
                 console.error('❌ Play button not found!');
+            }
+            
+            if (previewBtn) {
+                previewBtn.addEventListener('click', function() {
+                    console.log('🎧 Preview button clicked!');
+                    previewTranslation();
+                });
+                console.log('✅ Preview button event listener added');
+            } else {
+                console.error('❌ Preview button not found!');
             }
             
             if (generateBtn) {
