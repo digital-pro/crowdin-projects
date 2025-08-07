@@ -255,6 +255,12 @@
                         🔄 Refresh Context
             </button>
                 </div>
+                <div style="margin-top: 8px; padding: 6px; background: #f8f9fa; border-radius: 4px;">
+                    <label style="color: #555; font-size: 12px; display: flex; align-items: center; gap: 6px;">
+                        <input type="checkbox" id="autoPlayCheckbox" checked> 
+                        <span>🎵 Auto-play on string selection</span>
+                    </label>
+                </div>
                 <div id="audioGeneration" style="display: none;">
                     <div class="audio-section">
                         <div class="dropdowns-row">
@@ -359,6 +365,30 @@
             if (typeof AP !== 'undefined') {
                 console.log('🎯 Crowdin AP API is available, requesting context...');
                 
+                // PRIORITY METHOD: Get current language directly (most reliable for comfortable view)
+                if (AP.context && AP.context.getCurrentLanguage) {
+                    AP.context.getCurrentLanguage(function(languageData) {
+                        console.log('🌍 === CURRENT LANGUAGE API DEBUG ===');
+                        console.log('🌍 AP.context.getCurrentLanguage result:', languageData);
+                        console.log('🌍 Raw languageData object:', JSON.stringify(languageData, null, 2));
+                        
+                        if (languageData && languageData.id) {
+                            receivedContext.targetLanguageId = languageData.id;
+                            receivedContext.targetLanguageName = languageData.name;
+                            receivedContext.languageCode = languageData.locale || languageData.id;
+                            
+                            console.log('🌍 ✅ DIRECT LANGUAGE DETECTION SUCCESS:');
+                            console.log('  - Language ID:', languageData.id);
+                            console.log('  - Language Name:', languageData.name);
+                            console.log('  - Language Locale:', languageData.locale);
+                            console.log('  - Full languageData:', languageData);
+                            console.log('🌍 === END CURRENT LANGUAGE API DEBUG ===');
+                        } else {
+                            console.log('🌍 ❌ No valid language data received from getCurrentLanguage API');
+                        }
+                    });
+                }
+                
                 // Request current string context
                 if (AP.editor && AP.editor.getCurrentString) {
                     AP.editor.getCurrentString(function(stringData) {
@@ -372,20 +402,102 @@
                 // Request general context
                 if (AP.context && AP.context.getContext) {
                     AP.context.getContext(function(contextData) {
+                        console.log('🎯 === CONTEXT API DEBUG ===');
                         console.log('🎯 AP.context.getContext result:', contextData);
+                        console.log('🎯 Raw context object:', JSON.stringify(contextData, null, 2));
+                        
                         if (contextData) {
                             receivedContext = { ...receivedContext, ...contextData };
+                            
+                            // Extract language info from context if available
+                            if (contextData.languageId) {
+                                receivedContext.targetLanguageId = contextData.languageId;
+                                receivedContext.languageCode = contextData.languageId;
+                                console.log('🌍 ✅ LANGUAGE FROM CONTEXT:', contextData.languageId);
+                            }
+                            
+                            // Check for other language-related fields
+                            if (contextData.targetLanguageId) {
+                                receivedContext.targetLanguageId = contextData.targetLanguageId;
+                                receivedContext.languageCode = contextData.targetLanguageId;
+                                console.log('🌍 ✅ TARGET LANGUAGE FROM CONTEXT:', contextData.targetLanguageId);
+                            }
+                            
+                            if (contextData.language) {
+                                console.log('🌍 ✅ LANGUAGE OBJECT FROM CONTEXT:', contextData.language);
+                                if (contextData.language.id) {
+                                    receivedContext.targetLanguageId = contextData.language.id;
+                                    receivedContext.languageCode = contextData.language.id;
+                                }
+                            }
                         }
+                        console.log('🎯 === END CONTEXT API DEBUG ===');
                     });
                 }
                 
                 // Request current translation
                 if (AP.editor && AP.editor.getCurrentTranslation) {
                     AP.editor.getCurrentTranslation(function(translationData) {
+                        console.log('🎯 === TRANSLATION API DEBUG ===');
                         console.log('🎯 AP.editor.getCurrentTranslation result:', translationData);
+                        console.log('🎯 Raw translation object:', JSON.stringify(translationData, null, 2));
+                        
                         if (translationData) {
                             receivedContext = { ...receivedContext, ...translationData };
+                            
+                            // Extract language from translation data
+                            if (translationData.languageId) {
+                                receivedContext.targetLanguageId = translationData.languageId;
+                                receivedContext.languageCode = translationData.languageId;
+                                console.log('🌍 ✅ LANGUAGE FROM TRANSLATION:', translationData.languageId);
+                            }
+                            
+                            if (translationData.targetLanguageId) {
+                                receivedContext.targetLanguageId = translationData.targetLanguageId;
+                                receivedContext.languageCode = translationData.targetLanguageId;
+                                console.log('🌍 ✅ TARGET LANGUAGE FROM TRANSLATION:', translationData.targetLanguageId);
+                            }
                         }
+                        console.log('🎯 === END TRANSLATION API DEBUG ===');
+                    });
+                }
+                
+                // Try additional API methods for language detection
+                if (AP.editor && AP.editor.getLanguage) {
+                    AP.editor.getLanguage(function(langData) {
+                        console.log('🎯 === EDITOR LANGUAGE API DEBUG ===');
+                        console.log('🎯 AP.editor.getLanguage result:', langData);
+                        console.log('🎯 Raw editor language object:', JSON.stringify(langData, null, 2));
+                        
+                        if (langData) {
+                            if (langData.id) {
+                                receivedContext.targetLanguageId = langData.id;
+                                receivedContext.languageCode = langData.id;
+                                console.log('🌍 ✅ LANGUAGE FROM EDITOR:', langData.id);
+                            }
+                        }
+                        console.log('🎯 === END EDITOR LANGUAGE API DEBUG ===');
+                    });
+                }
+                
+                // Try to get project info which may contain language data
+                if (AP.context && AP.context.getProject) {
+                    AP.context.getProject(function(projectData) {
+                        console.log('🎯 === PROJECT API DEBUG ===');
+                        console.log('🎯 AP.context.getProject result:', projectData);
+                        console.log('🎯 Raw project object:', JSON.stringify(projectData, null, 2));
+                        
+                        if (projectData) {
+                            if (projectData.targetLanguages) {
+                                console.log('🌍 ✅ TARGET LANGUAGES FROM PROJECT:', projectData.targetLanguages);
+                            }
+                            if (projectData.currentLanguage) {
+                                receivedContext.targetLanguageId = projectData.currentLanguage;
+                                receivedContext.languageCode = projectData.currentLanguage;
+                                console.log('🌍 ✅ CURRENT LANGUAGE FROM PROJECT:', projectData.currentLanguage);
+                            }
+                        }
+                        console.log('🎯 === END PROJECT API DEBUG ===');
                     });
                 }
             } else {
@@ -425,8 +537,10 @@
         
 
         
-        // Function to actively request context from Crowdin
+        // Function to actively request context from Crowdin - ENHANCED for side-by-side mode
         function requestCrowdinContext() {
+            console.log('🔄 REQUESTING CONTEXT from Crowdin...');
+            
             if (window.parent && window.parent !== window) {
                 // Try multiple message types that Crowdin might respond to
                 const messages = [
@@ -435,17 +549,46 @@
                     { type: 'app-ready' },
                     { type: 'get-editor-context' },
                     { type: 'get-string-context' },
+                    { type: 'get-current-string' },
+                    { type: 'request-current-string' },
+                    { type: 'get-translation-context' },
                     { action: 'getContext' },
-                    { action: 'getCurrentString' }
+                    { action: 'getCurrentString' },
+                    { action: 'getTranslationContext' },
+                    { action: 'requestContext' },
+                    // Try some side-by-side specific requests
+                    { type: 'get-active-string' },
+                    { type: 'request-active-string' },
+                    { action: 'getActiveString' }
                 ];
                 
-                messages.forEach(message => {
+                console.log(`🔄 Sending ${messages.length} context request messages...`);
+                messages.forEach((message, index) => {
                     try {
                         window.parent.postMessage(message, '*');
+                        console.log(`📤 Sent message ${index + 1}:`, message);
                     } catch (e) {
-                        console.log('Failed to send message:', message);
+                        console.log('Failed to send message:', message, e);
                     }
                 });
+                
+                // Also try to trigger events that might cause Crowdin to send us data
+                setTimeout(() => {
+                    console.log('🔄 Sending follow-up context requests...');
+                    const followUpMessages = [
+                        { type: 'ping' },
+                        { type: 'ready' },
+                        { type: 'request-state' }
+                    ];
+                    
+                    followUpMessages.forEach(message => {
+                        try {
+                            window.parent.postMessage(message, '*');
+                        } catch (e) {
+                            console.log('Failed to send follow-up message:', message);
+                        }
+                    });
+                }, 500);
             }
         }
         
@@ -521,26 +664,58 @@
             }
         }
 
-        // Enhanced message handler for Crowdin context
+        // Simple webhook-style message handler for immediate audio playback
         async function enhancedMessageHandler(event) {
             // Only process messages from Crowdin origins
             if (!event.origin || !event.origin.includes('crowdin.com')) {
                 return;
             }
             
-            // Throttle message processing to prevent overload
-            if (window.lastMessageTime && Date.now() - window.lastMessageTime < 50) {
-                return;
-            }
-            window.lastMessageTime = Date.now();
-            
             console.log('📨 Received message from Crowdin:', JSON.stringify({
                 origin: event.origin,
                 type: event.data?.type,
-                data: event.data
+                etyp: event.data?.etyp
             }, null, 2));
             
-            // Handle different types of messages from Crowdin
+            // WEBHOOK-STYLE: Auto-play when string.selected with translation
+            if (event.data && event.data.type === 'evt' && event.data.etyp === 'string.selected' && 
+                event.data.evnt && event.data.evnt.length > 0) {
+                
+                // Check if auto-play is enabled
+                const autoPlayCheckbox = document.getElementById('autoPlayCheckbox');
+                if (!autoPlayCheckbox || !autoPlayCheckbox.checked) {
+                    console.log('🎵 WEBHOOK: Auto-play disabled, storing context for manual play');
+                    // Fall through to normal context processing
+                } else {
+                    const stringInfo = event.data.evnt[0];
+                    if (stringInfo.translations && Object.keys(stringInfo.translations).length > 0) {
+                        console.log('🎵 WEBHOOK: Auto-playing audio for selected string with translations');
+                    
+                    // Find the first available translation
+                    for (const [langCode, translationArray] of Object.entries(stringInfo.translations)) {
+                        if (translationArray && Array.isArray(translationArray) && translationArray.length > 0) {
+                            const translation = translationArray[0];
+                            if (translation && translation.text) {
+                                console.log(`🎵 WEBHOOK: Found ${langCode} translation, playing audio`);
+                                
+                                // Map language for GCP bucket
+                                const gcpLangCode = mapLanguageCodeForGCP(langCode);
+                                const itemId = stringInfo.string.identifier;
+                                
+                                if (itemId) {
+                                    // Play immediately
+                                    playExistingAudioFromGCP(itemId, gcpLangCode);
+                                    return; // Exit early, don't process as normal context
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                }
+            }
+            
+            // Handle different types of messages from Crowdin for fallback context
             if (event.data) {
                 console.log('🔍 Checking event data:', {
                     type: event.data.type,
@@ -550,6 +725,7 @@
                 
                 // Handle string.selected and string.change events directly
                 if (event.data.type === 'evt') {
+                    // Handle string selection (primary method)
                     if (event.data.etyp === 'string.selected' && event.data.evnt && event.data.evnt.length > 0) {
                         console.log('🎯 PROCESSING string.selected event');
                         const stringInfo = event.data.evnt[0];
@@ -635,25 +811,55 @@
                             }
                         }
                         
-                        // Use translation if available and not empty
+                        // Use translation if available and not empty - PRIORITIZE SPANISH
                         if (translations && typeof translations === 'object') {
                             let foundTranslation = false;
-                            for (const [langCode, translationArray] of Object.entries(translations)) {
-                                if (translationArray && Array.isArray(translationArray) && translationArray.length > 0) {
-                                    const translation = translationArray[0];
+                            
+                            console.log('🌍 === TRANSLATION PRIORITY SELECTION ===');
+                            console.log('🌍 Available translations:', Object.keys(translations));
+                            
+                            // Priority order for language selection (Spanish first!)
+                            const languagePriority = ['es-CO', 'es', 'fr-CA', 'fr', 'de', 'pt', 'nl', 'it'];
+                            
+                            // Try to find translation in priority order
+                            for (const priorityLang of languagePriority) {
+                                if (translations[priorityLang] && Array.isArray(translations[priorityLang]) && translations[priorityLang].length > 0) {
+                                    const translation = translations[priorityLang][0];
                                     if (translation && translation.text) {
                                         receivedContext.targetString = translation.text;
-                                        receivedContext.targetLanguageId = langCode;
-                                        console.log(`🎯 Using ${langCode} translation: ${translation.text}`);
+                                        receivedContext.targetLanguageId = priorityLang;
+                                        receivedContext.languageCode = priorityLang;
+                                        console.log(`🎯 ✅ PRIORITY MATCH - Using ${priorityLang} translation: ${translation.text.substring(0, 50)}...`);
                                         foundTranslation = true;
                                         break;
                                     }
                                 }
                             }
+                            
+                            // If no priority language found, fall back to any available translation
                             if (!foundTranslation) {
-                                console.log('🎯 No translations found, using source text:', stringData.text);
-                                receivedContext.targetLanguageId = 'en'; // Default to English if no translation
+                                for (const [langCode, translationArray] of Object.entries(translations)) {
+                                    if (translationArray && Array.isArray(translationArray) && translationArray.length > 0) {
+                                        const translation = translationArray[0];
+                                        if (translation && translation.text) {
+                                            receivedContext.targetString = translation.text;
+                                            receivedContext.targetLanguageId = langCode;
+                                            receivedContext.languageCode = langCode;
+                                            console.log(`🎯 📋 FALLBACK - Using ${langCode} translation: ${translation.text.substring(0, 50)}...`);
+                                            foundTranslation = true;
+                                            break;
+                                        }
+                                    }
+                                }
                             }
+                            
+                            if (!foundTranslation) {
+                                console.log('🎯 ❌ No translations found, using source text:', stringData.text);
+                                receivedContext.targetLanguageId = 'en'; // Default to English if no translation
+                                receivedContext.languageCode = 'en';
+                            }
+                            
+                            console.log('🌍 === END TRANSLATION PRIORITY SELECTION ===');
                         } else {
                             console.log('🎯 No translations object, using source text:', stringData.text);
                             receivedContext.targetLanguageId = 'en'; // Default to English if no translations
@@ -685,22 +891,77 @@
                                 newStringId: stringData.id,
                                 isDifferentString: isDifferentString,
                                 oldIdentifier: receivedContext.identifier,
-                                newIdentifier: stringData.identifier
+                                newIdentifier: stringData.identifier,
+                                hasExistingTranslation: !!receivedContext.targetLanguageId && receivedContext.targetLanguageId !== 'en'
                             });
                             
                             // If it's a different string, reset the context completely
                             if (isDifferentString) {
                                 console.log('🆕 Different string detected, resetting context completely');
                                 receivedContext = { origin: receivedContext.origin }; // Clear everything but preserve origin
+                                
+                                // Update with new string data
+                                receivedContext.stringId = stringData.id;
+                                receivedContext.stringKey = stringData.text;
+                                receivedContext.sourceString = stringData.text;
+                                receivedContext.targetString = stringData.text; // Start fresh with source text
+                                receivedContext.identifier = stringData.identifier;
+                                receivedContext.fileId = stringData.file?.id;
+                                receivedContext.targetLanguageId = 'en'; // Default to English since no translation data
+                                receivedContext.languageCode = 'en';
+                            } else {
+                                console.log('🔄 Same string, checking for translation preservation...');
+                                
+                                // Check if we have a valid translation that's different from source
+                                const hasValidTranslation = receivedContext.targetString && 
+                                                           receivedContext.targetString !== stringData.text &&
+                                                           receivedContext.targetLanguageId &&
+                                                           receivedContext.targetLanguageId !== 'en';
+                                
+                                // Check if we have recently protected translation data (within 30 seconds)
+                                const hasProtectedTranslation = receivedContext.hasActiveTranslation && 
+                                                               receivedContext.translationTimestamp &&
+                                                               (Date.now() - receivedContext.translationTimestamp) < 30000;
+                                
+                                console.log('🔍 Translation preservation check:', {
+                                    hasTargetString: !!receivedContext.targetString,
+                                    targetStringDifferent: receivedContext.targetString !== stringData.text,
+                                    hasTargetLanguageId: !!receivedContext.targetLanguageId,
+                                    isNotEnglish: receivedContext.targetLanguageId !== 'en',
+                                    hasValidTranslation: hasValidTranslation,
+                                    hasProtectedTranslation: hasProtectedTranslation,
+                                    timeSinceTranslation: receivedContext.translationTimestamp ? (Date.now() - receivedContext.translationTimestamp) + 'ms' : 'none',
+                                    currentTarget: receivedContext.targetString?.substring(0, 50) + '...',
+                                    newSource: stringData.text?.substring(0, 50) + '...'
+                                });
+                                
+                                if (hasValidTranslation || hasProtectedTranslation) {
+                                    console.log('🎯 ✅ PRESERVING TRANSLATION DATA - Same string with existing translation');
+                                    console.log('🛡️ Reason for preservation:', hasProtectedTranslation ? 'PROTECTED (recent textarea.edited)' : 'VALID TRANSLATION');
+                                    console.log('🎯 Translation being preserved:', {
+                                        targetLanguageId: receivedContext.targetLanguageId,
+                                        targetString: receivedContext.targetString?.substring(0, 50) + '...',
+                                        sourceString: stringData.text?.substring(0, 50) + '...'
+                                    });
+                                    
+                                    // Only update basic string info, preserve translation
+                                    receivedContext.stringKey = stringData.text;
+                                    receivedContext.sourceString = stringData.text;
+                                    receivedContext.identifier = stringData.identifier;
+                                    receivedContext.fileId = stringData.file?.id;
+                                    // Keep existing targetString, targetLanguageId, languageCode
+                                } else {
+                                    console.log('🔄 No valid translation to preserve, updating with source text');
+                                    // No translation to preserve, update normally
+                                    receivedContext.stringKey = stringData.text;
+                                    receivedContext.sourceString = stringData.text;
+                                    receivedContext.targetString = stringData.text;
+                                    receivedContext.identifier = stringData.identifier;
+                                    receivedContext.fileId = stringData.file?.id;
+                                    receivedContext.targetLanguageId = 'en';
+                                    receivedContext.languageCode = 'en';
+                                }
                             }
-                            
-                            // Update with new string data
-                            receivedContext.stringId = stringData.id;
-                            receivedContext.stringKey = stringData.text;
-                            receivedContext.sourceString = stringData.text;
-                            receivedContext.targetString = stringData.text; // Start fresh with source text
-                            receivedContext.identifier = stringData.identifier;
-                            receivedContext.fileId = stringData.file?.id;
                             
                             // If identifier is missing and we have string ID, try to fetch it
                             if (!stringData.identifier && stringData.id) {
@@ -757,14 +1018,24 @@
                             if (stringData.newText && stringData.newText.trim()) {
                                 receivedContext.targetString = stringData.newText;
                                 receivedContext.targetLanguageId = detectLanguageFromText(stringData.newText);
+                                receivedContext.languageCode = receivedContext.targetLanguageId;
+                                receivedContext.hasActiveTranslation = true; // Flag to protect this data
+                                receivedContext.translationTimestamp = Date.now(); // Timestamp for freshness
                                 console.log('🎯 Found translated text in textarea.edited:', stringData.newText);
+                                console.log('🛡️ Protected translation data set - expires in 30 seconds');
                             } else if (stringData.oldText && stringData.oldText.trim()) {
                                 receivedContext.targetString = stringData.oldText;
                                 receivedContext.targetLanguageId = detectLanguageFromText(stringData.oldText);
+                                receivedContext.languageCode = receivedContext.targetLanguageId;
+                                receivedContext.hasActiveTranslation = true;
+                                receivedContext.translationTimestamp = Date.now();
                                 console.log('🎯 Using old text as target from textarea.edited:', stringData.oldText);
+                                console.log('🛡️ Protected translation data set - expires in 30 seconds');
                             } else {
                                 receivedContext.targetString = stringData.text;
                                 receivedContext.targetLanguageId = 'en'; // Fallback to English for source text
+                                receivedContext.languageCode = 'en';
+                                receivedContext.hasActiveTranslation = false;
                                 console.log('🎯 Using source text as target from textarea.edited');
                             }
                             
@@ -801,6 +1072,51 @@
                 if (event.data.projectId || event.data.fileId || event.data.languageId) {
                     console.log('🎯 Received project context:', event.data);
                     receivedContext = { ...receivedContext, ...event.data };
+                }
+                
+                // AGGRESSIVE EVENT CAPTURE: Try to catch any string-related events in side-by-side mode
+                console.log('🔍 EVENT SCAN - Checking for any useful data in event:', {
+                    etyp: event.data.etyp,
+                    hasEvnt: !!event.data.evnt,
+                    hasString: !!(event.data.evnt && (event.data.evnt.string || event.data.evnt.id)),
+                    eventKeys: event.data.evnt ? Object.keys(event.data.evnt) : []
+                });
+                
+                // Catch any event with string data if we don't have context yet
+                if (!receivedContext.stringId && event.data.evnt) {
+                    const eventData = event.data.evnt;
+                    
+                    // Look for string data in various formats
+                    if (eventData.string && eventData.string.id) {
+                        console.log('🎯 AGGRESSIVE CAPTURE - Found string in nested format');
+                        const stringData = eventData.string;
+                        receivedContext.stringId = stringData.id;
+                        receivedContext.stringKey = stringData.text;
+                        receivedContext.sourceString = stringData.text;
+                        receivedContext.targetString = stringData.text;
+                        receivedContext.identifier = stringData.identifier;
+                        receivedContext.fileId = stringData.file?.id;
+                    } else if (eventData.id && eventData.text) {
+                        console.log('🎯 AGGRESSIVE CAPTURE - Found string in direct format');
+                        receivedContext.stringId = eventData.id;
+                        receivedContext.stringKey = eventData.text;
+                        receivedContext.sourceString = eventData.text;
+                        receivedContext.targetString = eventData.text;
+                        receivedContext.identifier = eventData.identifier;
+                        receivedContext.fileId = eventData.file?.id;
+                    }
+                    
+                    // Look for language data
+                    if (eventData.language) {
+                        receivedContext.targetLanguageId = eventData.language.id || eventData.language;
+                        receivedContext.languageCode = eventData.language.id || eventData.language;
+                        console.log('🌍 AGGRESSIVE CAPTURE - Found language:', receivedContext.targetLanguageId);
+                    }
+                    
+                    if (receivedContext.stringId) {
+                        console.log('🎯 AGGRESSIVE CAPTURE SUCCESS - Got string data from event:', event.data.etyp);
+                        console.log('🎯 CAPTURED CONTEXT:', receivedContext);
+                    }
                 }
                 
                 console.log('🎯 Updated receivedContext:', receivedContext);
@@ -898,6 +1214,26 @@
             // Simple keyword-based detection for common languages
             const lowerText = text.toLowerCase();
             
+            // German indicators - detecting common German words and patterns
+            if (lowerText.includes('zuerst') || lowerText.includes('kannst') || lowerText.includes('einen') ||
+                lowerText.includes('spielpartner') || lowerText.includes('auswählen') || lowerText.includes('spiele') ||
+                lowerText.includes('zusammen') || lowerText.includes('jedem') || lowerText.includes('darfst') ||
+                lowerText.includes('beispiel') || lowerText.includes('brille') || lowerText.includes('aufsetzen') ||
+                lowerText.includes('anziehen') || lowerText.includes('deutsch') || lowerText.includes('aktivitäten') ||
+                lowerText.includes(' der ') || lowerText.includes(' die ') || lowerText.includes(' das ') ||
+                lowerText.includes(' den ') || lowerText.includes(' dem ') || lowerText.includes(' des ') ||
+                lowerText.includes(' ein ') || lowerText.includes(' eine ') || lowerText.includes(' einen ') ||
+                lowerText.includes(' mit ') || lowerText.includes(' für ') || lowerText.includes(' auf ') ||
+                lowerText.includes(' von ') || lowerText.includes(' zu ') || lowerText.includes(' und ') ||
+                lowerText.includes(' oder ') || lowerText.includes(' aber ') || lowerText.includes(' auch ') ||
+                lowerText.includes(' nicht ') || lowerText.includes(' sich ') || lowerText.includes(' werden ') ||
+                lowerText.includes('können') || lowerText.includes('müssen') || lowerText.includes('sollen') ||
+                lowerText.includes('wollen') || lowerText.includes('dürfen') || lowerText.includes('hallo') ||
+                lowerText.includes('danke') || lowerText.includes('bitte') || lowerText.includes('entschuldigung')) {
+                console.log('🌍 Detected German from text content');
+                return 'de';
+            }
+            
             // French indicators - enhanced detection
             if (lowerText.includes('votre') || lowerText.includes('pour') || lowerText.includes('des') || 
                 lowerText.includes('activités') || lowerText.includes('français') || lowerText.includes('pivoter') ||
@@ -937,22 +1273,43 @@
 
         // Enhanced function to detect the target language from Crowdin context
         function detectTargetLanguage(context) {
-            console.log('🌍 LANGUAGE DETECTION DEBUG:', JSON.stringify(context, null, 2));
+            console.log('🌍 === LANGUAGE DETECTION DEBUG ===');
+            console.log('🌍 Input context:', JSON.stringify(context, null, 2));
             
-            // PRIORITY 1: Try text-based detection first (most reliable)
+            // PRIORITY 1: Use direct language API results (most reliable)
+            if (context.targetLanguageId && context.targetLanguageId !== 'en') {
+                console.log('🌍 ✅ PRIORITY 1: Using targetLanguageId from API:', context.targetLanguageId);
+                console.log('🌍 Language detection complete - returning:', context.targetLanguageId);
+                return context.targetLanguageId;
+            }
+            
+            if (context.languageCode && context.languageCode !== 'en') {
+                console.log('🌍 ✅ PRIORITY 1b: Using languageCode from API:', context.languageCode);
+                console.log('🌍 Language detection complete - returning:', context.languageCode);
+                return context.languageCode;
+            }
+            
+            // PRIORITY 1c: Check for language ID from various API sources
+            if (context.languageId && context.languageId !== 'en') {
+                console.log('🌍 ✅ PRIORITY 1c: Using languageId from API:', context.languageId);
+                console.log('🌍 Language detection complete - returning:', context.languageId);
+                return context.languageId;
+            }
+            
+            // PRIORITY 2: Try text-based detection (reliable for translation content)
             if (context.targetString && typeof context.targetString === 'string') {
-                console.log('🌍 PRIORITY 1: Trying text-based detection from:', context.targetString.substring(0, 50) + '...');
+                console.log('🌍 PRIORITY 2: Trying text-based detection from:', context.targetString.substring(0, 50) + '...');
                 
                 const detectedFromText = detectLanguageFromText(context.targetString);
                 if (detectedFromText) {
                     console.log('🌍 ✅ DETECTED language from text content:', detectedFromText);
-                    return detectedFromText; // Return immediately if text detection works
+                    return detectedFromText;
                 }
             }
             
-            // PRIORITY 2: Try direct language IDs from context
-            let detectedLanguage = context.targetLanguageId || context.sourceLanguageId || context.languageId;
-            console.log('🌍 PRIORITY 2: Direct language from context:', detectedLanguage);
+            // PRIORITY 3: Try other language IDs from context
+            let detectedLanguage = context.sourceLanguageId || context.languageId;
+            console.log('🌍 PRIORITY 3: Other language from context:', detectedLanguage);
             
             // If no direct language, try URL detection
             if (!detectedLanguage) {
@@ -1690,6 +2047,16 @@
                 console.log('🔄 Forcing context refresh before play...');
                 await refreshContext();
                 
+                // If no context yet, aggressively request it from Crowdin
+                if (!receivedContext.stringId && !receivedContext.targetString) {
+                    console.log('⚠️ No context available, requesting from Crowdin...');
+                    requestCrowdinContext();
+                    
+                    // Wait a moment for response
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    console.log('🔄 Context after request:', receivedContext);
+                }
+                
                 // Get current Crowdin context with detailed debugging
                 const context = getEnhancedCrowdinContext();
                 console.log('🎵 === PLAY CURRENT AUDIO DEBUG ===');
@@ -1766,7 +2133,9 @@
             if (!langCode) return 'en';
             
             const lang = langCode.toLowerCase();
-            console.log('🌍 Mapping language code for GCP bucket:', lang);
+            console.log('🌍 === GCP LANGUAGE MAPPING DEBUG ===');
+            console.log('🌍 Input language code:', langCode);
+            console.log('🌍 Normalized language code:', lang);
             
             // Map regional language codes to match GCP bucket folder structure
             const gcpLanguageMappings = {
@@ -1780,7 +2149,15 @@
             };
             
             const mappedLang = gcpLanguageMappings[lang] || lang.split('-')[0] || 'en';
+            
+            console.log('🌍 Available GCP mappings for Spanish:');
+            console.log('  - "es" maps to:', gcpLanguageMappings['es']);
+            console.log('  - "es-co" maps to:', gcpLanguageMappings['es-co']);
+            console.log('  - "es-mx" maps to:', gcpLanguageMappings['es-mx']);
+            console.log('  - "es-es" maps to:', gcpLanguageMappings['es-es']);
             console.log('🌍 GCP language mapping result:', lang, '->', mappedLang);
+            console.log('🌍 === END GCP LANGUAGE MAPPING DEBUG ===');
+            
             return mappedLang;
         }
 
