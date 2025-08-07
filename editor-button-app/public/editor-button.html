@@ -2687,14 +2687,44 @@
                 etyp: event.data?.etyp
             }, null, 2));
             
-            // WEBHOOK-STYLE: Auto-play when string.selected with translation
+            // WEBHOOK-STYLE: Process string.selected events
             if (event.data && event.data.type === 'evt' && event.data.etyp === 'string.selected' && 
                 event.data.evnt && event.data.evnt.length > 0) {
+                
+                const stringInfo = event.data.evnt[0];
+                
+                // ALWAYS store context for manual play
+                if (stringInfo.string) {
+                    receivedContext.stringId = stringInfo.string.id;
+                    receivedContext.identifier = stringInfo.string.identifier;
+                    receivedContext.sourceString = stringInfo.string.text;
+                    receivedContext.stringKey = stringInfo.string.text;
+                    receivedContext.fileId = stringInfo.string.file?.id;
+                    
+                    // Store translation if available
+                    if (stringInfo.translations && Object.keys(stringInfo.translations).length > 0) {
+                        for (const [langCode, translationArray] of Object.entries(stringInfo.translations)) {
+                            if (translationArray && Array.isArray(translationArray) && translationArray.length > 0) {
+                                const translation = translationArray[0];
+                                if (translation && translation.text) {
+                                    receivedContext.targetString = translation.text;
+                                    receivedContext.targetLanguageId = langCode;
+                                    receivedContext.languageCode = langCode;
+                                    console.log(`🎵 WEBHOOK: Stored context with ${langCode} translation`);
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        // No translation, use source
+                        receivedContext.targetString = stringInfo.string.text;
+                        console.log('🎵 WEBHOOK: Stored context with source text (no translation)');
+                    }
+                }
                 
                 // Check if auto-play is enabled
                 const autoPlayCheckbox = document.getElementById('autoPlayCheckbox');
                 if (autoPlayCheckbox && autoPlayCheckbox.checked) {
-                    const stringInfo = event.data.evnt[0];
                     if (stringInfo.translations && Object.keys(stringInfo.translations).length > 0) {
                         console.log('🎵 WEBHOOK: Auto-playing audio for selected string with translations');
                         
@@ -2727,7 +2757,7 @@
                         console.log('🎵 WEBHOOK: No translations found, skipping auto-play');
                     }
                 } else {
-                    console.log('🎵 WEBHOOK: Auto-play disabled, storing context for manual play');
+                    console.log('🎵 WEBHOOK: Auto-play disabled, context stored for manual play');
                 }
             }
             
