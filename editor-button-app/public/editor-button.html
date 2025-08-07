@@ -2731,7 +2731,7 @@
                 etyp: event.data?.etyp
             }, null, 2));
             
-            // WEBHOOK-STYLE: Process string.selected events
+            // WEBHOOK-STYLE: Process string.selected events (side-by-side mode)
             if (event.data && event.data.type === 'evt' && event.data.etyp === 'string.selected' && 
                 event.data.evnt && event.data.evnt.length > 0) {
                 
@@ -2802,6 +2802,46 @@
                     }
                 } else {
                     console.log('🎵 WEBHOOK: Auto-play disabled, context stored for manual play');
+                }
+            }
+            
+            // WEBHOOK-STYLE: Process string.change events (comfortable mode)
+            if (event.data && event.data.type === 'evt' && event.data.etyp === 'string.change' && event.data.evnt) {
+                console.log('🎵 WEBHOOK: Processing string.change event for comfortable mode');
+                
+                const stringData = event.data.evnt;
+                if (stringData && stringData.id && stringData.identifier) {
+                    // Store basic context from string.change
+                    receivedContext.stringId = stringData.id;
+                    receivedContext.identifier = stringData.identifier;
+                    receivedContext.sourceString = stringData.text;
+                    receivedContext.stringKey = stringData.text;
+                    receivedContext.fileId = stringData.file?.id;
+                    
+                    // In comfortable mode, we don't have translation data in string.change
+                    // We'll try to get it from textarea.edited events or AP API
+                    console.log(`🎵 WEBHOOK: Stored basic context for comfortable mode: ${stringData.identifier}`);
+                }
+            }
+            
+            // WEBHOOK-STYLE: Process textarea.edited events (comfortable mode)
+            if (event.data && event.data.type === 'evt' && event.data.etyp === 'textarea.edited' && event.data.evnt) {
+                console.log('🎵 WEBHOOK: Processing textarea.edited event for comfortable mode');
+                
+                const textareaData = event.data.evnt;
+                if (textareaData && textareaData.text && receivedContext.stringId) {
+                    // Update the target string with the edited text
+                    receivedContext.targetString = textareaData.text;
+                    
+                    // Try to detect language from the translated text
+                    const detectedLang = detectLanguageFromText(textareaData.text);
+                    if (detectedLang) {
+                        receivedContext.targetLanguageId = detectedLang;
+                        receivedContext.languageCode = detectedLang;
+                        console.log(`🎵 WEBHOOK: Updated comfortable mode context with translation: ${detectedLang}`);
+                    } else {
+                        console.log('🎵 WEBHOOK: Updated comfortable mode context with text (language not detected)');
+                    }
                 }
             }
             
