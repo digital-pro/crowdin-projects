@@ -255,9 +255,9 @@
                         🔄 Refresh Context
             </button>
                 </div>
-                <div style="margin-top: 8px; padding: 6px; background: #f8f9fa; border-radius: 4px;">
+                <div id="autoPlayContainer" style="margin-top: 8px; padding: 6px; background: #f8f9fa; border-radius: 4px;">
                     <label style="color: #555; font-size: 12px; display: flex; align-items: center; gap: 6px;">
-                        <input type="checkbox" id="autoPlayCheckbox" checked> 
+                        <input type="checkbox" id="autoPlayCheckbox"> 
                         <span>🎵 Auto-play on string selection</span>
                     </label>
                 </div>
@@ -1881,11 +1881,31 @@
         function showAudioGeneration() {
             console.log('🎤 Show audio generation called');
             document.getElementById('audioGeneration').style.display = 'block';
+            
+            // Move auto-play checkbox inside audio generation panel
+            const autoPlayContainer = document.getElementById('autoPlayContainer');
+            const audioGeneration = document.getElementById('audioGeneration');
+            if (autoPlayContainer && audioGeneration) {
+                audioGeneration.appendChild(autoPlayContainer);
+                autoPlayContainer.style.marginTop = '12px';
+            }
         }
 
         function hideAudioGeneration() {
             console.log('🎤 Hide audio generation called');
             document.getElementById('audioGeneration').style.display = 'none';
+            
+            // Move auto-play checkbox back to main area
+            const autoPlayContainer = document.getElementById('autoPlayContainer');
+            const audioSection = document.querySelector('.audio-section');
+            if (autoPlayContainer && audioSection) {
+                // Insert after the audio buttons div
+                const audioButtons = audioSection.querySelector('.audio-buttons');
+                if (audioButtons) {
+                    audioButtons.parentNode.insertBefore(autoPlayContainer, audioButtons.nextSibling);
+                    autoPlayContainer.style.marginTop = '8px';
+                }
+            }
         }
 
         async function onServiceChange() {
