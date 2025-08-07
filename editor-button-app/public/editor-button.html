@@ -2673,6 +2673,69 @@
             
             console.log('🔧 All overlays closed');
         };
+
+        // WEBHOOK-STYLE MESSAGE HANDLER with Auto-Play
+        async function enhancedMessageHandler(event) {
+            // Only process messages from Crowdin origins
+            if (!event.origin || !event.origin.includes('crowdin.com')) {
+                return;
+            }
+            
+            console.log('📨 Received message from Crowdin:', JSON.stringify({
+                origin: event.origin,
+                type: event.data?.type,
+                etyp: event.data?.etyp
+            }, null, 2));
+            
+            // WEBHOOK-STYLE: Auto-play when string.selected with translation
+            if (event.data && event.data.type === 'evt' && event.data.etyp === 'string.selected' && 
+                event.data.evnt && event.data.evnt.length > 0) {
+                
+                // Check if auto-play is enabled
+                const autoPlayCheckbox = document.getElementById('autoPlayCheckbox');
+                if (autoPlayCheckbox && autoPlayCheckbox.checked) {
+                    const stringInfo = event.data.evnt[0];
+                    if (stringInfo.translations && Object.keys(stringInfo.translations).length > 0) {
+                        console.log('🎵 WEBHOOK: Auto-playing audio for selected string with translations');
+                        
+                        // Find the first available translation
+                        for (const [langCode, translationArray] of Object.entries(stringInfo.translations)) {
+                            if (translationArray && Array.isArray(translationArray) && translationArray.length > 0) {
+                                const translation = translationArray[0];
+                                if (translation && translation.text) {
+                                    console.log(`🎵 WEBHOOK: Found ${langCode} translation, playing audio`);
+                                    
+                                    // Map language for GCP bucket
+                                    const gcpLangCode = mapLanguageCodeForGCP(langCode);
+                                    const itemId = stringInfo.string.identifier;
+                                    
+                                    if (itemId) {
+                                        // Play immediately
+                                        playExistingAudioFromGCP(itemId, gcpLangCode);
+                                        return; // Exit early, don't process as normal context
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        console.log('🎵 WEBHOOK: No translations found, skipping auto-play');
+                    }
+                } else {
+                    console.log('🎵 WEBHOOK: Auto-play disabled, storing context for manual play');
+                }
+            }
+            
+            // Process as normal context (rest of the enhanced message handler logic)
+            // ... existing message processing logic would go here if needed
+        }
+
+        // Add event listener for webhook-style message handling
+        window.addEventListener('message', enhancedMessageHandler);
+        console.log('✅ Webhook-style message handler registered');
+        
+        // Update deployment timestamp
+        console.log('🔧 Webhook deployment v3 - ' + new Date().toISOString());
     </script>
 </body>
 </html> 
