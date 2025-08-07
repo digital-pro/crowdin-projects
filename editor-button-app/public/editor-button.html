@@ -1648,6 +1648,9 @@
                     const data = await response.json();
                     const allVoices = data.voices || [];
                     
+                    // Export all voices to CSV for reference
+                    await this.exportVoiceLibraryToCSV(allVoices);
+                    
                     // Only show your personal voice library - exclude all public/premade voices
                     const voiceLibrary = allVoices.filter(voice => {
                         const category = voice.category || '';
@@ -1664,12 +1667,16 @@
                     
                     if (voiceLibrary.length > 0) {
                         console.log('🎵 Using your personal ElevenLabs voice library');
+                        
+                        // Update default voices with actual voice IDs from our library
+                        this.updateDefaultVoicesFromLibrary(voiceLibrary);
+                        
                         return voiceLibrary.map(voice => ({
                             id: voice.voice_id,
                             name: voice.name,
                             category: voice.category,
-                            language: 'English',
-                            language_code: 'en',
+                            language: voice.language || 'English',
+                            language_code: voice.language_code || 'en',
                             description: voice.description || ''
                         }));
                     } else {
@@ -1681,6 +1688,104 @@
                     console.error('🚨 ElevenLabs Voice Library loading failed:', error);
                     return [];
                 }
+            }
+
+            async exportVoiceLibraryToCSV(voices) {
+                console.log('📝 Exporting voice library to CSV...');
+                
+                try {
+                    // Create CSV content
+                    const headers = ['voice_id', 'name', 'category', 'language', 'language_code', 'description', 'labels'];
+                    const csvRows = [headers.join(',')];
+                    
+                    voices.forEach(voice => {
+                        const row = [
+                            voice.voice_id || '',
+                            `"${(voice.name || '').replace(/"/g, '""')}"`, // Escape quotes
+                            voice.category || '',
+                            voice.language || '',
+                            voice.language_code || '',
+                            `"${(voice.description || '').replace(/"/g, '""')}"`, // Escape quotes
+                            `"${Object.keys(voice.labels || {}).join(';')}"` // Convert labels object to string
+                        ];
+                        csvRows.push(row.join(','));
+                    });
+                    
+                    const csvContent = csvRows.join('\n');
+                    
+                    // Create download link
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    if (link.download !== undefined) {
+                        const url = URL.createObjectURL(blob);
+                        link.setAttribute('href', url);
+                        link.setAttribute('download', `elevenlabs_voice_library_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`);
+                        link.style.visibility = 'hidden';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        console.log('✅ Voice library CSV exported successfully');
+                    }
+                } catch (error) {
+                    console.error('❌ Failed to export voice library CSV:', error);
+                }
+            }
+
+            updateDefaultVoicesFromLibrary(voiceLibrary) {
+                console.log('🔄 Updating default voices with actual voice IDs from library...');
+                
+                // Create a mapping of language preferences to voice names/patterns
+                const languageVoiceMap = {
+                    'en': ['Clara', 'Children', 'Storyteller', 'Female', 'English'],
+                    'es': ['Malena', 'Spanish', 'Español'],
+                    'de': ['Julia', 'German', 'Deutsch'],
+                    'fr': ['Caroline', 'French', 'Français'],
+                    'nl': ['Emma', 'Dutch', 'Nederlands']
+                };
+                
+                // Find best matching voices for each language
+                const updatedDefaults = {};
+                
+                Object.keys(languageVoiceMap).forEach(langCode => {
+                    const preferredNames = languageVoiceMap[langCode];
+                    
+                    // Find voice that matches preferred names or language
+                    let bestMatch = voiceLibrary.find(voice => {
+                        const voiceName = voice.name.toLowerCase();
+                        const voiceLang = (voice.language || voice.language_code || '').toLowerCase();
+                        
+                        // Check if voice name contains any preferred names
+                        const nameMatch = preferredNames.some(pref => voiceName.includes(pref.toLowerCase()));
+                        // Check if voice language matches
+                        const langMatch = voiceLang.includes(langCode) || voiceLang.includes(languageVoiceMap[langCode][2]?.toLowerCase() || '');
+                        
+                        return nameMatch || langMatch;
+                    });
+                    
+                    // If no specific match, try to find any voice with the language code
+                    if (!bestMatch) {
+                        bestMatch = voiceLibrary.find(voice => {
+                            const voiceLang = (voice.language || voice.language_code || '').toLowerCase();
+                            return voiceLang.includes(langCode);
+                        });
+                    }
+                    
+                    if (bestMatch) {
+                        updatedDefaults[langCode] = {
+                            id: bestMatch.voice_id,
+                            name: bestMatch.name,
+                            service: 'ElevenLabs',
+                            language_code: langCode
+                        };
+                        console.log(`✅ Found voice for ${langCode}: ${bestMatch.name} (${bestMatch.voice_id})`);
+                    } else {
+                        console.log(`⚠️ No suitable voice found for ${langCode}`);
+                    }
+                });
+                
+                // Store updated defaults globally for use by getDefaultVoiceForLanguage
+                window.updatedDefaultVoices = updatedDefaults;
+                console.log('📋 Updated default voices:', updatedDefaults);
             }
 
             async loadElevenLabsVoicesFromCSV(languageCode = 'en') {
@@ -2093,7 +2198,20 @@
         }
         
         function getDefaultVoiceForLanguage(languageCode) {
-            // Updated default voices based on language configuration
+            // Check if we have updated voices from the actual ElevenLabs library
+            if (window.updatedDefaultVoices && Object.keys(window.updatedDefaultVoices).length > 0) {
+                const normalizedLang = languageCode.toLowerCase();
+                const updatedVoice = window.updatedDefaultVoices[normalizedLang] || 
+                                   window.updatedDefaultVoices[normalizedLang.split('-')[0]] || // Try without region code
+                                   window.updatedDefaultVoices['en']; // Fallback to English
+                
+                if (updatedVoice) {
+                    console.log(`🎯 Using updated voice for ${languageCode}: ${updatedVoice.name} (${updatedVoice.id})`);
+                    return updatedVoice;
+                }
+            }
+            
+            // Fallback to static default voices if no updated voices available
             const defaultVoices = {
                 'en': { name: 'Clara', service: 'ElevenLabs', language_code: 'en' },
                 'es': { name: 'Malena Tango', service: 'ElevenLabs', language_code: 'es-CO' },
@@ -2106,7 +2224,9 @@
             };
             
             const normalizedLang = languageCode.toLowerCase();
-            return defaultVoices[normalizedLang] || defaultVoices['en'];
+            const fallbackVoice = defaultVoices[normalizedLang] || defaultVoices['en'];
+            console.log(`⚠️ Using fallback voice for ${languageCode}: ${fallbackVoice.name} (no ID)`);
+            return fallbackVoice;
         }
         
         function getDefaultServiceForLanguage(languageCode) {

@@ -1,0 +1,31 @@
+npm WARN config init.author.name Use `--init-author-name` instead.
+npm WARN config init.author.name Use `--init-author-name` instead.
+Vercel CLI 44.4.1
+Retrieving project…
+Deploying digitalpros-projects/editor-button-app
+Uploading [--------------------] (0.0B/160.9KB)
+Uploading [======--------------] (55.9KB/160.9KB)
+Uploading [==========----------] (87.9KB/160.9KB)
+Uploading [================----] (135.9KB/160.9KB)
+Uploading [====================] (160.9KB/160.9KB)
+Inspect: https://vercel.com/digitalpros-projects/editor-button-app/7VEzc18s4G6CTNfezJ5XwAj2VtvZ [2s]
+Production: https://editor-button-l0fye4qp4-digitalpros-projects.vercel.app [2s]
+https://editor-button-l0fye4qp4-digitalpros-projects.vercel.appQueued
+2025-08-07T19:06:53.193Z  Running build in Washington, D.C., USA (East) – iad1
+2025-08-07T19:06:53.193Z  Build machine configuration: 4 cores, 8 GB
+2025-08-07T19:06:53.214Z  Retrieving list of deployment files...
+2025-08-07T19:06:53.556Z  Downloading 28 deployment files...
+2025-08-07T19:06:53.776Z  Restored build cache from previous deployment (G8mAmwPU7saiArMF6FBNcU7PXkGE)
+2025-08-07T19:06:56.127Z  Running "vercel build"
+2025-08-07T19:06:56.638Z  Vercel CLI 44.7.3
+2025-08-07T19:06:56.804Z  WARN! Due to `builds` existing in your configuration file, the Build and Development Settings defined in your Project Settings will not apply. Learn More: https://vercel.link/unused-build-settings
+2025-08-07T19:06:57.516Z  Warning: Detected "engines": { "node": ">=14.0.0" } in your `package.json` that will automatically upgrade when a new major Node.js Version is released. Learn More: http://vercel.link/node-version
+2025-08-07T19:06:57.519Z  Installing dependencies...
+2025-08-07T19:06:58.420Z  
+2025-08-07T19:06:58.420Z  up to date in 687ms
+2025-08-07T19:06:58.420Z  
+2025-08-07T19:06:58.421Z  18 packages are looking for funding
+2025-08-07T19:06:58.421Z    run `npm fund` for details
+2025-08-07T19:06:59.233Z  Build Completed in /vercel/output [2s]
+2025-08-07T19:06:59.367Z  Deploying outputs...
+Due to `builds` existing in your configuration file, the Build and Development Settings defined in your Project Settings will not apply. Learn More: https://vercel.link/unused-build-settings
