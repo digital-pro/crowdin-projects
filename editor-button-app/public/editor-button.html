@@ -2174,9 +2174,20 @@
             console.log(`🎧 Previewing text: "${textToPreview.substring(0, 50)}..."`);
             console.log(`🎧 Detected language: ${detectedLanguage}`);
             
-            // Get default voice for the language
-            const defaultVoice = getDefaultVoiceForLanguage(detectedLanguage);
             const service = getDefaultServiceForLanguage(detectedLanguage);
+            
+            // Ensure ElevenLabs voices are loaded to populate updated defaults
+            if (service === 'ElevenLabs') {
+                console.log('🎧 Loading ElevenLabs voices to ensure updated defaults...');
+                try {
+                    await audioManager.loadElevenLabsVoices(detectedLanguage);
+                } catch (error) {
+                    console.warn('🎧 Failed to load ElevenLabs voices, using fallback:', error);
+                }
+            }
+            
+            // Get default voice for the language (now should have updated voices)
+            const defaultVoice = getDefaultVoiceForLanguage(detectedLanguage);
             
             if (!defaultVoice || !service) {
                 console.error(`🎧 No default voice/service found for language: ${detectedLanguage}`);
@@ -2184,7 +2195,14 @@
                 return;
             }
             
-            console.log(`🎧 Using ${service} voice: ${defaultVoice.name || defaultVoice.id}`);
+            console.log(`🎧 Using ${service} voice: ${defaultVoice.name || defaultVoice.id} (ID: ${defaultVoice.id})`);
+            
+            if (!defaultVoice.id) {
+                console.error('🎧 Voice ID is missing, cannot generate audio');
+                showStatus('Voice ID missing - please select ElevenLabs service first', 'error');
+                return;
+            }
+            
             showStatus(`Generating preview with ${service}...`, 'info');
             
             try {

@@ -46,7 +46,7 @@ try {
     # Step 3: Create alias
     Write-Host "[3/4] Vercel: Creating alias..." -ForegroundColor Blue
     
-    & npx vercel alias $deploymentUrl editor-button-app.vercel.app --yes
+    & npx vercel alias $deploymentUrl editor-button-app.vercel.app
     if ($LASTEXITCODE -ne 0) { throw "Vercel alias failed" }
     
     Write-Host "✅ Aliased to: https://editor-button-app.vercel.app" -ForegroundColor Green
