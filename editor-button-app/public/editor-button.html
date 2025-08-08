@@ -251,6 +251,9 @@
                     <button id="previewBtn" class="audio-btn" style="background: #28a745;">
                         🎧 Preview Translation
             </button>
+                    <button id="configBtn" class="audio-btn" style="background: #6c757d;" onclick="showCredentialsModal()">
+                        ⚙️ API Settings
+            </button>
                     <button id="generateAudioBtn" class="audio-btn" style="display: none;">
                         🎤 Generate New Audio
             </button>
@@ -2867,6 +2870,17 @@
                 console.log('✅ Preview button event listener added');
             } else {
                 console.error('❌ Preview button not found!');
+            }
+            
+            const configBtn = document.getElementById('configBtn');
+            if (configBtn) {
+                configBtn.addEventListener('click', function() {
+                    console.log('⚙️ Config button clicked!');
+                    showCredentialsModal();
+                });
+                console.log('✅ Config button event listener added');
+            } else {
+                console.error('❌ Config button not found!');
             }
             
             if (generateBtn) {
