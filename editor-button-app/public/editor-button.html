@@ -640,7 +640,7 @@
                     
                     const response = await fetch(`/api/crowdin/projects/${projectId}/strings/${stringId}`, {
                         method: 'GET',
-                        headers: {
+                    headers: {
                             'Authorization': `Bearer ${crowdinToken}`,
                             'Content-Type': 'application/json'
                         }
@@ -649,8 +649,8 @@
                     if (!response.ok) {
                         throw new Error(`API call failed: ${response.status}`);
                     }
-                    
-                    const result = await response.json();
+                
+                const result = await response.json();
                     if (result.success && result.identifier) {
                         console.log('✅ Successfully fetched identifier from Crowdin API:', result.identifier);
                         return result.identifier;
@@ -874,7 +874,7 @@
                         console.log('🎯 STORED CONTEXT:', receivedContext);
                         
                         // Set a timeout to check if context persists
-                        setTimeout(() => {
+            setTimeout(() => {
                             console.log('⏰ Context check after 2 seconds:', {
                                 stringId: receivedContext.stringId,
                                 identifier: receivedContext.identifier,
@@ -2154,46 +2154,76 @@
         }
 
         function getCurrentTextareaContent() {
+            console.log('🎧 === SEARCHING FOR ACTIVE TEXTAREA CONTENT ===');
+            
             // Try to find the active translation textarea in Crowdin
             const textareas = document.querySelectorAll('textarea');
-            for (const textarea of textareas) {
-                // Look for textareas that are visible and have content
-                if (textarea.offsetParent !== null && // visible
-                    textarea.value && 
-                    textarea.value.trim().length > 0 &&
-                    !textarea.disabled &&
-                    !textarea.readOnly) {
-                    
-                    // Additional checks to identify translation textareas
-                    const isTranslationTextarea = 
-                        textarea.placeholder?.toLowerCase().includes('translation') ||
-                        textarea.className?.includes('translation') ||
-                        textarea.getAttribute('data-cy')?.includes('translation') ||
-                        textarea.closest('[data-cy*="translation"]') ||
-                        // Check if this is in a translation panel/section
-                        textarea.closest('.translation-panel') ||
-                        textarea.closest('.target-editor') ||
-                        // Look for parent elements with translation-related classes/attributes
-                        (textarea.parentElement && (
-                            textarea.parentElement.className?.includes('translation') ||
-                            textarea.parentElement.getAttribute('data-cy')?.includes('translation')
-                        ));
-                    
-                    if (isTranslationTextarea) {
-                        console.log('🎧 Found active translation textarea with content:', textarea.value.substring(0, 50) + '...');
-                        return textarea.value.trim();
-                    }
+            console.log(`🎧 Found ${textareas.length} textareas total`);
+            
+            let candidateTextareas = [];
+            
+            for (let i = 0; i < textareas.length; i++) {
+                const textarea = textareas[i];
+                const isVisible = textarea.offsetParent !== null;
+                const hasContent = textarea.value && textarea.value.trim().length > 0;
+                const isEditable = !textarea.disabled && !textarea.readOnly;
+                
+                console.log(`🎧 Textarea ${i}:`, {
+                    visible: isVisible,
+                    hasContent: hasContent,
+                    editable: isEditable,
+                    content: hasContent ? textarea.value.substring(0, 30) + '...' : 'empty',
+                    placeholder: textarea.placeholder,
+                    className: textarea.className,
+                    dataCy: textarea.getAttribute('data-cy'),
+                    id: textarea.id
+                });
+                
+                if (isVisible && hasContent && isEditable) {
+                    candidateTextareas.push({
+                        textarea,
+                        content: textarea.value.trim(),
+                        score: 0
+                    });
                 }
             }
             
-            // Fallback: get any focused textarea with content
-            const activeElement = document.activeElement;
-            if (activeElement && activeElement.tagName === 'TEXTAREA' && activeElement.value && activeElement.value.trim()) {
-                console.log('🎧 Using focused textarea content:', activeElement.value.substring(0, 50) + '...');
-                return activeElement.value.trim();
+            console.log(`🎧 Found ${candidateTextareas.length} candidate textareas with content`);
+            
+            // Score textareas to find the most likely translation textarea
+            for (const candidate of candidateTextareas) {
+                const textarea = candidate.textarea;
+                
+                // Check for translation-related indicators
+                if (textarea.placeholder?.toLowerCase().includes('translation')) candidate.score += 10;
+                if (textarea.className?.includes('translation')) candidate.score += 10;
+                if (textarea.getAttribute('data-cy')?.includes('translation')) candidate.score += 10;
+                if (textarea.closest('[data-cy*="translation"]')) candidate.score += 8;
+                if (textarea.closest('.translation-panel')) candidate.score += 8;
+                if (textarea.closest('.target-editor')) candidate.score += 8;
+                if (textarea.parentElement?.className?.includes('translation')) candidate.score += 5;
+                if (textarea.parentElement?.getAttribute('data-cy')?.includes('translation')) candidate.score += 5;
+                
+                // Check if this textarea is focused
+                if (document.activeElement === textarea) candidate.score += 15;
+                
+                // Check if content looks like non-English (likely translation)
+                const hasNonEnglishChars = /[áéíóúñü¿¡àèìòùçâêîôûäöü]/i.test(candidate.content);
+                if (hasNonEnglishChars) candidate.score += 5;
+                
+                console.log(`🎧 Textarea scored ${candidate.score} points:`, candidate.content.substring(0, 50) + '...');
             }
             
-            console.log('🎧 No active textarea content found');
+            // Sort by score and return the highest scoring textarea
+            candidateTextareas.sort((a, b) => b.score - a.score);
+            
+            if (candidateTextareas.length > 0) {
+                const best = candidateTextareas[0];
+                console.log(`🎧 Selected best textarea (score: ${best.score}):`, best.content.substring(0, 50) + '...');
+                return best.content;
+            }
+            
+            console.log('🎧 No suitable textarea content found');
             return null;
         }
 
@@ -2203,17 +2233,41 @@
             // Get the current context 
             const context = getEnhancedCrowdinContext();
             
-            // Try to get current text from active textarea (for unsaved content)
-            let textToPreview = getCurrentTextareaContent();
+            // Try multiple sources for the most current text (prioritize recent edits)
+            let textToPreview = null;
+            let textSource = '';
             
-            // If no textarea content, fall back to context data
+            // 1. Check for latest edited text from textarea.edited events
+            if (window.latestEditedText && window.latestEditedText.trim()) {
+                textToPreview = window.latestEditedText;
+                textSource = 'latestEditedText (from textarea.edited event)';
+            }
+            
+            // 2. Try to get current text from active textarea (for unsaved content)
+            if (!textToPreview) {
+                textToPreview = getCurrentTextareaContent();
+                if (textToPreview) textSource = 'active textarea content';
+            }
+            
+            // 3. Check receivedContext for recent translation updates
+            if (!textToPreview && receivedContext.hasActiveTranslation && receivedContext.targetString) {
+                const timeSinceEdit = Date.now() - (receivedContext.translationTimestamp || 0);
+                if (timeSinceEdit < 30000) { // Use if edited within last 30 seconds
+                    textToPreview = receivedContext.targetString;
+                    textSource = 'receivedContext.targetString (recent edit)';
+                }
+            }
+            
+            // 4. Fall back to standard context data
             if (!textToPreview) {
                 textToPreview = context.targetString || receivedContext.targetString || 
                                context.sourceString || receivedContext.sourceString ||
                                context.stringKey || receivedContext.stringKey;
+                if (textToPreview) textSource = 'context/receivedContext fallback';
             }
             
-            console.log('🎧 Text source priority: textarea content → context.targetString → receivedContext → source');
+            console.log('🎧 Text source priority: latestEditedText → textarea → recent context → fallback');
+            console.log(`🎧 Selected text source: ${textSource}`);
             
             if (!textToPreview) {
                 console.error('🎧 No text found to preview');
@@ -3130,21 +3184,34 @@
             // WEBHOOK-STYLE: Process textarea.edited events (comfortable mode)
             if (event.data && event.data.type === 'evt' && event.data.etyp === 'textarea.edited' && event.data.evnt) {
                 console.log('🎵 WEBHOOK: Processing textarea.edited event for comfortable mode');
+                console.log('🎵 textarea.edited data:', JSON.stringify(event.data.evnt, null, 2));
                 
                 const textareaData = event.data.evnt;
-                if (textareaData && textareaData.text && receivedContext.stringId) {
+                
+                // Check for newText first (current edit), then text, then oldText
+                let editedText = textareaData.newText || textareaData.text || textareaData.oldText;
+                
+                if (editedText && editedText.trim() && receivedContext.stringId) {
                     // Update the target string with the edited text
-                    receivedContext.targetString = textareaData.text;
+                    receivedContext.targetString = editedText.trim();
+                    receivedContext.hasActiveTranslation = true;
+                    receivedContext.translationTimestamp = Date.now();
                     
                     // Try to detect language from the translated text
-                    const detectedLang = detectLanguageFromText(textareaData.text);
+                    const detectedLang = detectLanguageFromText(editedText);
                     if (detectedLang) {
                         receivedContext.targetLanguageId = detectedLang;
                         receivedContext.languageCode = detectedLang;
-                        console.log(`🎵 WEBHOOK: Updated comfortable mode context with translation: ${detectedLang}`);
+                        console.log(`🎵 WEBHOOK: Updated comfortable mode context with translation (${detectedLang}): "${editedText.substring(0, 50)}..."`);
                     } else {
-                        console.log('🎵 WEBHOOK: Updated comfortable mode context with text (language not detected)');
+                        console.log(`🎵 WEBHOOK: Updated comfortable mode context with text (no lang detected): "${editedText.substring(0, 50)}..."`);
                     }
+                    
+                    // Store the latest edited text globally for immediate access
+                    window.latestEditedText = editedText.trim();
+                    console.log('💾 Stored latest edited text globally for immediate access');
+                } else {
+                    console.log('🎵 WEBHOOK: No valid edited text found in textarea.edited event');
                 }
             }
             
