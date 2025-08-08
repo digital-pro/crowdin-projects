@@ -1651,8 +1651,8 @@
                     const data = await response.json();
                     const allVoices = data.voices || [];
                     
-                    // Export all voices to CSV for reference
-                    await this.exportVoiceLibraryToCSV(allVoices);
+                    // Store voices for optional CSV export (don't auto-download)
+                    window.elevenLabsVoiceLibrary = allVoices;
                     
                     // Only show your personal voice library - exclude all public/premade voices
                     const voiceLibrary = allVoices.filter(voice => {
@@ -2153,16 +2153,67 @@
             }
         }
 
+        function getCurrentTextareaContent() {
+            // Try to find the active translation textarea in Crowdin
+            const textareas = document.querySelectorAll('textarea');
+            for (const textarea of textareas) {
+                // Look for textareas that are visible and have content
+                if (textarea.offsetParent !== null && // visible
+                    textarea.value && 
+                    textarea.value.trim().length > 0 &&
+                    !textarea.disabled &&
+                    !textarea.readOnly) {
+                    
+                    // Additional checks to identify translation textareas
+                    const isTranslationTextarea = 
+                        textarea.placeholder?.toLowerCase().includes('translation') ||
+                        textarea.className?.includes('translation') ||
+                        textarea.getAttribute('data-cy')?.includes('translation') ||
+                        textarea.closest('[data-cy*="translation"]') ||
+                        // Check if this is in a translation panel/section
+                        textarea.closest('.translation-panel') ||
+                        textarea.closest('.target-editor') ||
+                        // Look for parent elements with translation-related classes/attributes
+                        (textarea.parentElement && (
+                            textarea.parentElement.className?.includes('translation') ||
+                            textarea.parentElement.getAttribute('data-cy')?.includes('translation')
+                        ));
+                    
+                    if (isTranslationTextarea) {
+                        console.log('🎧 Found active translation textarea with content:', textarea.value.substring(0, 50) + '...');
+                        return textarea.value.trim();
+                    }
+                }
+            }
+            
+            // Fallback: get any focused textarea with content
+            const activeElement = document.activeElement;
+            if (activeElement && activeElement.tagName === 'TEXTAREA' && activeElement.value && activeElement.value.trim()) {
+                console.log('🎧 Using focused textarea content:', activeElement.value.substring(0, 50) + '...');
+                return activeElement.value.trim();
+            }
+            
+            console.log('🎧 No active textarea content found');
+            return null;
+        }
+
         async function previewTranslation() {
             console.log('🎧 === PREVIEW TRANSLATION ===');
             
             // Get the current context 
             const context = getEnhancedCrowdinContext();
             
-            // Get the text to preview (prioritize target translation)
-            const textToPreview = context.targetString || receivedContext.targetString || 
-                                 context.sourceString || receivedContext.sourceString ||
-                                 context.stringKey || receivedContext.stringKey;
+            // Try to get current text from active textarea (for unsaved content)
+            let textToPreview = getCurrentTextareaContent();
+            
+            // If no textarea content, fall back to context data
+            if (!textToPreview) {
+                textToPreview = context.targetString || receivedContext.targetString || 
+                               context.sourceString || receivedContext.sourceString ||
+                               context.stringKey || receivedContext.stringKey;
+            }
+            
+            console.log('🎧 Text source priority: textarea content → context.targetString → receivedContext → source');
             
             if (!textToPreview) {
                 console.error('🎧 No text found to preview');
@@ -2764,12 +2815,29 @@
         console.log('🚀 App loaded at:', new Date().toISOString());
         console.log('🔧 Syntax fix deployment v2');
         
+        // Manual CSV export function
+        try {
+            window.exportVoiceLibraryCSV = function() {
+                if (window.elevenLabsVoiceLibrary && window.elevenLabsVoiceLibrary.length > 0) {
+                    audioManager.exportVoiceLibraryToCSV(window.elevenLabsVoiceLibrary);
+                    console.log('📝 ✅ Voice library exported to CSV');
+                } else {
+                    console.log('⚠️ No voice library loaded. Please select ElevenLabs service first to load voices.');
+                }
+            };
+            console.log('✅ exportVoiceLibraryCSV function defined successfully');
+            console.log('💡 To export voice library to CSV, run: exportVoiceLibraryCSV()');
+        } catch (error) {
+            console.error('❌ Failed to define exportVoiceLibraryCSV function:', error);
+        }
+
         // Test if functions are properly defined
         console.log('🔧 Debug functions status:');
         console.log('  - debugContext:', typeof window.debugContext);
         console.log('  - debugAudio:', typeof window.debugAudio);
         console.log('  - receivedContext:', typeof receivedContext);
         console.log('  - getEnhancedCrowdinContext:', typeof getEnhancedCrowdinContext);
+        console.log('  - exportVoiceLibraryCSV:', typeof window.exportVoiceLibraryCSV);
         
         // Add a manual context injection function for testing
         try {
