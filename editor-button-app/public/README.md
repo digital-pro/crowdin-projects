@@ -175,7 +175,7 @@ Voices are automatically filtered to match the detected language.
 **A**: All languages supported by PlayHT and ElevenLabs, with intelligent voice filtering for French, Spanish, English, German, Portuguese, Dutch, and more.
 
 ### Q: How are audio files stored?
-**A**: Existing audio files are stored in Google Cloud Platform storage buckets with the structure: `{language}/{itemId}.mp3`
+**A**: Existing audio files are stored in Google Cloud Platform storage buckets with the structure: `levante-assets-dev/audio/{language}/{itemId}.mp3`
 
 ## 🐛 Report Issues
 

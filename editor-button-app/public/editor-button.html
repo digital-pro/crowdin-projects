@@ -2373,6 +2373,13 @@
                     console.log('🛑 Stopped and cleared previous audio');
                 }
                 
+                // Clear any cached audio for this itemId to prevent language mixing
+                if (window.lastPlayedLanguage && window.lastPlayedItemId) {
+                    console.log('🗑️ Clearing cached audio references for language switch');
+                    // Force garbage collection of previous audio references
+                    window.lastPlayedAudio = null;
+                }
+                
                 // Also stop any other audio elements that might be playing
                 const audioElements = document.querySelectorAll('audio');
                 audioElements.forEach(audio => {
@@ -2459,6 +2466,19 @@
                     timestamp: new Date().toISOString()
                 });
                 
+                // Track language switches for the same item
+                if (window.lastPlayedItemId === itemId && window.lastPlayedLanguage !== languageCode) {
+                    console.log('🔄 Language switch detected for same item:', {
+                        itemId,
+                        from: window.lastPlayedLanguage,
+                        to: languageCode
+                    });
+                }
+                
+                // Store current playback info for next comparison
+                window.lastPlayedItemId = itemId;
+                window.lastPlayedLanguage = languageCode;
+                
                 // Use GCP bucket logic (adapted from source_dashboard.js)
                 await playExistingAudioFromGCP(itemId, languageCode);
                 
@@ -2508,7 +2528,7 @@
                 const gcpLangCode = mapLanguageCodeForGCP(langCode);
                 
                 // Construct GCS bucket URL for audio file using simplified structure
-                const audioUrl = `https://storage.googleapis.com/levante-audio-dev/${gcpLangCode}/${itemId}.mp3`;
+                const audioUrl = `https://storage.googleapis.com/levante-assets-dev/audio/${gcpLangCode}/${itemId}.mp3`;
                 
                 console.log('🎵 === GCP AUDIO ATTEMPT ===');
                 console.log('🎵 GCP bucket URL construction:');
@@ -2518,11 +2538,53 @@
                 console.log('  - Final URL:', audioUrl);
                 console.log('  - Timestamp:', new Date().toISOString());
                 
+                // Special debugging for German audio issues
+                if (gcpLangCode === 'de') {
+                    console.log('🇩🇪 === GERMAN AUDIO DEBUG ===');
+                    console.log('🇩🇪 This is a German audio request');
+                    console.log('🇩🇪 Previous language for this item:', window.lastPlayedLanguage);
+                    console.log('🇩🇪 URL will include lang parameter to prevent caching:', `lang=${gcpLangCode}`);
+                    console.log('🇩🇪 Will check for voice update fallback after attempting GCP');
+                    console.log('🇩🇪 === END GERMAN AUDIO DEBUG ===');
+                }
+                
                 showStatus(`Loading existing audio for ${itemId} (${gcpLangCode})...`, 'loading');
                 
-                // Try to load and play the audio with cache busting
-                const cacheBustUrl = `${audioUrl}?t=${Date.now()}`;
-                console.log('🎵 Cache-busted URL:', cacheBustUrl);
+                // Try to load and play the audio with enhanced cache busting
+                // Include language code to prevent cross-language caching issues
+                const cacheBustUrl = `${audioUrl}?lang=${gcpLangCode}&t=${Date.now()}`;
+                console.log('🎵 Cache-busted URL (with language):', cacheBustUrl);
+                
+                // INVESTIGATION MODE: Let's find out where the new German audio actually is
+                if (gcpLangCode === 'de') {
+                    console.log('🔍 === GERMAN AUDIO INVESTIGATION ===');
+                    console.log('🔍 Temporarily disabling force generation to debug where new audio is located');
+                    console.log('🔍 Will try multiple possible paths and log results');
+                    
+                    // Try alternative bucket structures that might be used for new audio
+                    const possibleUrls = [
+                        // Current structure
+                        `https://storage.googleapis.com/levante-assets-dev/audio/de/${itemId}.mp3`,
+                        // With voice ID suffix
+                        `https://storage.googleapis.com/levante-assets-dev/audio/de/${itemId}_new.mp3`,
+                        `https://storage.googleapis.com/levante-assets-dev/audio/de/${itemId}_updated.mp3`,
+                        // In a separate subfolder
+                        `https://storage.googleapis.com/levante-assets-dev/audio/de/new/${itemId}.mp3`,
+                        `https://storage.googleapis.com/levante-assets-dev/audio/de/updated/${itemId}.mp3`,
+                        // Production bucket
+                        `https://storage.googleapis.com/levante-assets-prod/audio/de/${itemId}.mp3`,
+                        // GitHub repository structure (like audio-previewer uses)
+                        `https://raw.githubusercontent.com/levante-framework/levante_translations/main/audio_files/de/shared/${itemId}.mp3`,
+                        `https://raw.githubusercontent.com/levante-framework/levante_translations/main/audio_files/general/de/shared/${itemId}.mp3`
+                    ];
+                    
+                    console.log('🔍 Will test these possible URLs for new German audio:');
+                    possibleUrls.forEach((url, index) => {
+                        console.log(`🔍 ${index + 1}. ${url}`);
+                    });
+                    console.log('🔍 === END GERMAN AUDIO INVESTIGATION ===');
+                }
+                
                 const audio = new Audio(cacheBustUrl);
                 audio.id = `audio_${itemId}_${Date.now()}`;
                 
@@ -2544,14 +2606,109 @@
                     });
                 });
                 
-                audio.addEventListener('error', (e) => {
-                    console.warn('Audio file not found in GCP bucket:', audioUrl);
+                audio.addEventListener('error', async (e) => {
+                    console.warn('Audio file not found in GCP bucket (levante-assets-dev/audio):', audioUrl);
                     console.warn('Audio error details:', e);
                     
-                    // Try alternative language mappings if the first one fails
+                    // INVESTIGATION MODE: For German, try alternative URLs to find new audio
+                    if (gcpLangCode === 'de') {
+                        console.log('🔍 === TESTING ALTERNATIVE GERMAN AUDIO LOCATIONS ===');
+                        
+                        const alternativeUrls = [
+                            // With voice ID suffix
+                            `https://storage.googleapis.com/levante-assets-dev/audio/de/${itemId}_new.mp3`,
+                            `https://storage.googleapis.com/levante-assets-dev/audio/de/${itemId}_updated.mp3`,
+                            // In a separate subfolder
+                            `https://storage.googleapis.com/levante-assets-dev/audio/de/new/${itemId}.mp3`,
+                            `https://storage.googleapis.com/levante-assets-dev/audio/de/updated/${itemId}.mp3`,
+                            // Production bucket
+                            `https://storage.googleapis.com/levante-assets-prod/audio/de/${itemId}.mp3`,
+                            // GitHub repository structure (like audio-previewer uses)
+                            `https://raw.githubusercontent.com/levante-framework/levante_translations/main/audio_files/de/shared/${itemId}.mp3`,
+                            `https://raw.githubusercontent.com/levante-framework/levante_translations/main/audio_files/general/de/shared/${itemId}.mp3`
+                        ];
+                        
+                        for (let i = 0; i < alternativeUrls.length; i++) {
+                            const testUrl = alternativeUrls[i];
+                            console.log(`🔍 Testing alternative URL ${i + 1}/${alternativeUrls.length}: ${testUrl}`);
+                            
+                            try {
+                                const testAudio = new Audio(testUrl + `?t=${Date.now()}`);
+                                
+                                // Test if this URL loads successfully
+                                const audioLoadPromise = new Promise((resolve, reject) => {
+                                    testAudio.addEventListener('canplaythrough', () => {
+                                        console.log(`🎯 SUCCESS! Found German audio at: ${testUrl}`);
+                                        showStatus(`Found updated German audio at alternative location!`, 'success');
+                                        
+                                        // Store reference and play
+                                        window.currentAudio = testAudio;
+                                        testAudio.play();
+                                        resolve(true);
+                                    });
+                                    
+                                    testAudio.addEventListener('error', () => {
+                                        console.log(`🔍 Alternative URL ${i + 1} failed: ${testUrl}`);
+                                        reject(false);
+                                    });
+                                    
+                                    // Timeout after 3 seconds
+                                    setTimeout(() => reject(false), 3000);
+                                });
+                                
+                                testAudio.load();
+                                const success = await audioLoadPromise;
+                                if (success) {
+                                    console.log('🔍 === INVESTIGATION COMPLETE - FOUND AUDIO ===');
+                                    return; // Exit early - we found and played the audio
+                                }
+                                
+                            } catch (error) {
+                                console.log(`🔍 Alternative URL ${i + 1} error:`, error);
+                            }
+                        }
+                        
+                        console.log('🔍 === NO ALTERNATIVE URLS WORKED - USING LIVE GENERATION ===');
+                        
+                        // If none of the alternative URLs worked, generate fresh audio
+                        try {
+                            let textToGenerate = receivedContext.targetString || receivedContext.sourceString;
+                            if (!textToGenerate) {
+                                const context = getEnhancedCrowdinContext();
+                                textToGenerate = context.targetString || context.sourceString || context.stringKey;
+                            }
+                            
+                            if (textToGenerate) {
+                                const detectedLanguage = detectTargetLanguage() || detectLanguageFromText(textToGenerate) || gcpLangCode;
+                                const defaultVoice = getDefaultVoiceForLanguage(detectedLanguage);
+                                const service = getDefaultServiceForLanguage(detectedLanguage);
+                                
+                                console.log(`🔄 No stored audio found - generating live ${detectedLanguage} audio`);
+                                showStatus(`No German audio found in any location - generating fresh audio...`, 'info');
+                                
+                                if (defaultVoice && defaultVoice.id && service) {
+                                    if (service === 'ElevenLabs') {
+                                        await audioManager.loadElevenLabsVoices(detectedLanguage);
+                                    }
+                                    
+                                    await audioManager.generateAudio(service, defaultVoice.id, textToGenerate);
+                                    showStatus(`Generated fresh ${detectedLanguage} audio!`, 'success');
+                                    return;
+                                }
+                            }
+                        } catch (liveGenError) {
+                            console.error('Live generation fallback failed:', liveGenError);
+                            showStatus(`All German audio options failed: ${liveGenError.message}`, 'error');
+                        }
+                        
+                        console.log('🔍 === INVESTIGATION COMPLETE - NO AUDIO FOUND ===');
+                        return; // Exit early for German - we've exhausted all options
+                    }
+                    
+                    // Original fallback logic - try alternative language mappings
                     if (gcpLangCode !== langCode && gcpLangCode !== 'en') {
                         console.log('🎵 Trying fallback to English...');
-                        const fallbackUrl = `https://storage.googleapis.com/levante-audio-dev/en/${itemId}.mp3`;
+                        const fallbackUrl = `https://storage.googleapis.com/levante-assets-dev/audio/en/${itemId}.mp3`;
                         console.log('🎵 Fallback URL:', fallbackUrl);
                         
                         const fallbackAudio = new Audio(fallbackUrl);
@@ -3237,8 +3394,53 @@
         document.addEventListener('keydown', enableAutoplay, { once: true });
         document.addEventListener('touchstart', enableAutoplay, { once: true });
         
+        // Debug helper function to investigate German audio locations
+        window.debugGermanAudio = function(testItemId) {
+            const itemId = testItemId || (receivedContext.identifier || receivedContext.stringKey || 'test-string-id');
+            console.log('🔍 === MANUAL GERMAN AUDIO DEBUG ===');
+            console.log('🔍 Testing itemId:', itemId);
+            
+            const testUrls = [
+                `https://storage.googleapis.com/levante-assets-dev/audio/de/${itemId}.mp3`,
+                `https://storage.googleapis.com/levante-assets-dev/audio/de/${itemId}_new.mp3`,
+                `https://storage.googleapis.com/levante-assets-dev/audio/de/${itemId}_updated.mp3`,
+                `https://storage.googleapis.com/levante-assets-dev/audio/de/new/${itemId}.mp3`,
+                `https://storage.googleapis.com/levante-assets-dev/audio/de/updated/${itemId}.mp3`,
+                `https://storage.googleapis.com/levante-assets-prod/audio/de/${itemId}.mp3`,
+                `https://raw.githubusercontent.com/levante-framework/levante_translations/main/audio_files/de/shared/${itemId}.mp3`,
+                `https://raw.githubusercontent.com/levante-framework/levante_translations/main/audio_files/general/de/shared/${itemId}.mp3`
+            ];
+            
+            testUrls.forEach((url, index) => {
+                const audio = new Audio(url + `?t=${Date.now()}`);
+                audio.addEventListener('canplaythrough', () => {
+                    console.log(`🎯 FOUND AUDIO at location ${index + 1}: ${url}`);
+                });
+                audio.addEventListener('error', () => {
+                    console.log(`❌ No audio at location ${index + 1}: ${url}`);
+                });
+                audio.load();
+            });
+            
+            console.log('🔍 === Check console for results in a few seconds ===');
+        };
+        
+        // Quick debug function to show all possible German audio URLs for current string
+        window.showGermanAudioUrls = function() {
+            const itemId = receivedContext.identifier || receivedContext.stringKey || 'current-string-id';
+            console.log('🔍 === ALL POSSIBLE GERMAN AUDIO URLS ===');
+            console.log('🔍 For itemId:', itemId);
+            console.log('🔍 Primary GCP bucket:', `https://storage.googleapis.com/levante-assets-dev/audio/de/${itemId}.mp3`);
+            console.log('🔍 With suffix:', `https://storage.googleapis.com/levante-assets-dev/audio/de/${itemId}_new.mp3`);
+            console.log('🔍 In subfolder:', `https://storage.googleapis.com/levante-assets-dev/audio/de/new/${itemId}.mp3`);
+            console.log('🔍 Prod bucket:', `https://storage.googleapis.com/levante-assets-prod/audio/de/${itemId}.mp3`);
+            console.log('🔍 GitHub repo:', `https://raw.githubusercontent.com/levante-framework/levante_translations/main/audio_files/de/shared/${itemId}.mp3`);
+            console.log('🔍 Call debugGermanAudio() to test which ones work');
+        };
+
         // Update deployment timestamp
-        console.log('🔧 Webhook deployment v3 - ' + new Date().toISOString());
+        console.log('🔧 GCP Bucket Path Corrected: levante-assets-dev/audio - ' + new Date().toISOString());
+        console.log('🔧 Available debug functions: debugGermanAudio(), showGermanAudioUrls()');
     </script>
 </body>
 </html> 
