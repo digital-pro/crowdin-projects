@@ -1466,11 +1466,16 @@
 
             async loadVoices(service, languageCode = 'en') {
                 const cacheKey = `${service}_${languageCode}`;
+                
+                console.log(`🗂️ Loading voices for ${service} (${languageCode}), cache key: ${cacheKey}`);
+                
                 if (this.voiceCache[cacheKey]) {
+                    console.log(`✅ Using cached voices for ${cacheKey}: ${this.voiceCache[cacheKey].length} voices`);
                     return this.voiceCache[cacheKey];
                 }
 
                 try {
+                    console.log(`🔄 Loading fresh voices for ${service} (${languageCode})`);
                     let voices = [];
                     if (service === 'PlayHT') {
                         voices = await this.loadPlayHTVoices(languageCode);
@@ -1478,6 +1483,7 @@
                         voices = await this.loadElevenLabsVoices(languageCode);
                     }
                     
+                    console.log(`💾 Caching ${voices.length} voices for ${cacheKey}`);
                     this.voiceCache[cacheKey] = voices;
                     return voices;
                 } catch (error) {
@@ -1968,18 +1974,44 @@
         // Voice Dropdown Helper Function
         function populateVoiceDropdown(voices, serviceName) {
             const voiceSelect = document.getElementById('voiceSelect');
+            
+            // Clear dropdown completely first
             voiceSelect.innerHTML = '<option value="">Select Voice</option>';
             
             console.log(`📋 Populating ${serviceName} dropdown with ${voices.length} voices`);
+            console.log(`📋 Current dropdown children before population: ${voiceSelect.children.length}`);
+            
+            // Check for duplicate voice IDs in the input array
+            const voiceIds = new Set();
+            const duplicateIds = [];
+            voices.forEach(voice => {
+                if (voiceIds.has(voice.id)) {
+                    duplicateIds.push(voice.id);
+                } else {
+                    voiceIds.add(voice.id);
+                }
+            });
+            
+            if (duplicateIds.length > 0) {
+                console.warn(`⚠️ DUPLICATE VOICE IDs DETECTED in ${serviceName}:`, duplicateIds);
+                console.warn(`⚠️ This may cause voices to appear twice in dropdown`);
+            }
+            
+            // Remove duplicates by creating a Map with voice.id as key
+            const uniqueVoices = Array.from(new Map(voices.map(voice => [voice.id, voice])).values());
+            
+            if (uniqueVoices.length !== voices.length) {
+                console.warn(`⚠️ Removed ${voices.length - uniqueVoices.length} duplicate voices from ${serviceName}`);
+            }
             
             // Sort voices alphabetically by name
-            const sortedVoices = voices.sort((a, b) => {
+            const sortedVoices = uniqueVoices.sort((a, b) => {
                 const nameA = (a.name || 'Unnamed Voice').toLowerCase();
                 const nameB = (b.name || 'Unnamed Voice').toLowerCase();
                 return nameA.localeCompare(nameB);
             });
             
-            console.log(`🔤 Voices sorted alphabetically for ${serviceName}`);
+            console.log(`🔤 Voices sorted alphabetically for ${serviceName} (${sortedVoices.length} unique voices)`);
             
             sortedVoices.forEach(voice => {
                 const option = document.createElement('option');
@@ -1988,7 +2020,8 @@
                 voiceSelect.appendChild(option);
             });
             
-            console.log(`✅ ${serviceName} dropdown populated successfully with ${sortedVoices.length} sorted voices`);
+            console.log(`✅ ${serviceName} dropdown populated successfully with ${sortedVoices.length} unique voices`);
+            console.log(`📋 Final dropdown children count: ${voiceSelect.children.length}`);
         }
         
         function showAudioGeneration() {
@@ -2080,9 +2113,9 @@
                 
                 let voices = [];
                 if (selectedService === 'PlayHT') {
-                    voices = await audioManager.loadPlayHTVoices(languageCode);
+                    voices = await audioManager.loadVoices('PlayHT', languageCode);
                 } else if (selectedService === 'ElevenLabs') {
-                    voices = await audioManager.loadElevenLabsVoices(languageCode);
+                    voices = await audioManager.loadVoices('ElevenLabs', languageCode);
                 }
                 
                 populateVoiceDropdown(voices, selectedService);
@@ -2288,7 +2321,7 @@
             if (service === 'ElevenLabs') {
                 console.log('🎧 Loading ElevenLabs voices to ensure updated defaults...');
                 try {
-                    await audioManager.loadElevenLabsVoices(detectedLanguage);
+                    await audioManager.loadVoices('ElevenLabs', detectedLanguage);
                 } catch (error) {
                     console.warn('🎧 Failed to load ElevenLabs voices, using fallback:', error);
                 }
@@ -2688,7 +2721,7 @@
                                 
                                 if (defaultVoice && defaultVoice.id && service) {
                                     if (service === 'ElevenLabs') {
-                                        await audioManager.loadElevenLabsVoices(detectedLanguage);
+                                        await audioManager.loadVoices('ElevenLabs', detectedLanguage);
                                     }
                                     
                                     await audioManager.generateAudio(service, defaultVoice.id, textToGenerate);
