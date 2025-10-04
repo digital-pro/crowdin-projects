@@ -2437,6 +2437,11 @@
 
         async function playCurrentAudio() {
             try {
+                console.log('🎵 === PLAY CURRENT AUDIO DEBUG START ===');
+                console.log('🎵 Current URL:', window.location.href);
+                console.log('🎵 Parent URL:', window.parent ? window.parent.location.href : 'No parent');
+                console.log('🎵 receivedContext:', JSON.stringify(receivedContext, null, 2));
+                
                 showStatus('Looking for existing audio...', 'loading');
                 
                 // Stop any currently playing audio and clear references
@@ -3096,10 +3101,51 @@
             console.error('❌ Failed to define debugAudio function:', error);
         }
         
+        // Debug language detection specifically
+        try {
+            window.debugLanguageDetection = function() {
+                console.log('🌍 === LANGUAGE DETECTION DEBUG ===');
+                console.log('🌍 receivedContext:', JSON.stringify(receivedContext, null, 2));
+                
+                // Test the language detection function
+                const enhancedContext = { ...receivedContext };
+                console.log('🌍 Enhanced context:', enhancedContext);
+                
+                const detectedLanguage = detectTargetLanguage(enhancedContext);
+                console.log('🌍 Detected language result:', detectedLanguage);
+                
+                // Test URL detection manually
+                try {
+                    if (window.parent && window.parent.location) {
+                        const parentUrl = window.parent.location.href;
+                        console.log('🌍 Parent URL for manual check:', parentUrl);
+                        
+                        // Check for es-CO patterns
+                        const hasEsCO = parentUrl.includes('es-CO') || parentUrl.includes('es_CO') || parentUrl.includes('esco');
+                        console.log('🌍 Contains es-CO pattern:', hasEsCO);
+                        
+                        if (hasEsCO) {
+                            console.log('🌍 ✅ URL contains es-CO - should detect Spanish!');
+                        } else {
+                            console.log('🌍 ❌ URL does not contain es-CO pattern');
+                        }
+                    }
+                } catch (e) {
+                    console.log('🌍 Cannot access parent URL:', e.message);
+                }
+                
+                return detectedLanguage;
+            };
+            console.log('✅ debugLanguageDetection function defined successfully');
+        } catch (error) {
+            console.error('❌ Failed to define debugLanguageDetection function:', error);
+        }
+
         console.log('💡 To debug context manually, run: debugContext()');
         console.log('💡 To debug audio extraction, run: debugAudio()');
+        console.log('💡 To debug language detection, run: debugLanguageDetection()');
         console.log('🚀 App loaded at:', new Date().toISOString());
-        console.log('🔧 Syntax fix deployment v2');
+        console.log('🔧 Comfortable mode language detection fix v1');
         
         // Manual CSV export function
         try {

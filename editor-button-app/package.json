@@ -10,15 +10,21 @@
     "deploy-clean": "npm run deploy && npm run cleanup-old-deployments",
     "cleanup-old-deployments": "node cleanup-deployments.js"
   },
-  "keywords": ["crowdin", "editor", "button", "app"],
+  "keywords": [
+    "crowdin",
+    "editor",
+    "button",
+    "app"
+  ],
   "author": "David Cardinal",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
     "body-parser": "^1.20.2",
-    "node-fetch": "^2.6.7"
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "node-fetch": "^2.6.7",
+    "vercel": "^48.2.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
