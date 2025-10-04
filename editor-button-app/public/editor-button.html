@@ -1338,8 +1338,10 @@
                             
                             // Multiple patterns to match different Crowdin URL formats
                             const patterns = [
+                                /\/en-([a-z]+)(?:\/|#|\?|$)/,                    // en-esco format (Crowdin comfortable mode)
                                 /\/enus-([a-z]{2}(?:-[A-Z]{2})?)(?:\/|#|$)/,     // enus-es-CO format (with country code)
                                 /\/([a-z]{2}(?:-[A-Z]{2})?)-enus(?:\/|#|$)/,     // es-CO-enus format (with country code)
+                                /editor\/[^\/]+\/\d+\/en-([a-z]+)/,              // editor/project/83/en-esco
                                 /editor\/[^\/]+\/\d+\/enus-([a-z]{2}(?:-[A-Z]{2})?)/,  // editor/project/83/enus-es-CO
                                 /\/enus-([a-z]{2})(?:[-_][A-Z]{2})?(?:\/|#|$)/,  // enus-fr format (legacy)
                                 /\/([a-z]{2})(?:[-_][A-Z]{2})?-enus(?:\/|#|$)/,  // fr-enus format (legacy)
@@ -1352,8 +1354,22 @@
                             for (const pattern of patterns) {
                                 const match = parentUrl.match(pattern);
                                 if (match && match[1] && match[1] !== 'en') {
-                                    console.log('🌍 ✅ Detected language from parent URL pattern:', match[1]);
-                                    detectedLanguage = match[1];
+                                    let langCode = match[1];
+                                    
+                                    // Map Crowdin shorthand codes to proper language codes
+                                    if (langCode === 'esco') {
+                                        langCode = 'es-CO';
+                                        console.log('🌍 ✅ Detected esco -> mapping to es-CO');
+                                    } else if (langCode === 'frca') {
+                                        langCode = 'fr-CA';
+                                        console.log('🌍 ✅ Detected frca -> mapping to fr-CA');
+                                    } else if (langCode === 'dede') {
+                                        langCode = 'de-DE';
+                                        console.log('🌍 ✅ Detected dede -> mapping to de-DE');
+                                    }
+                                    
+                                    console.log('🌍 ✅ Detected language from parent URL pattern:', langCode);
+                                    detectedLanguage = langCode;
                                     break;
                                 }
                             }
@@ -1404,8 +1420,8 @@
                         console.log('🌍 Full parent URL for aggressive detection:', fullUrl);
                         
                         // Look for es-CO specifically in the URL (common in Crowdin comfortable mode)
-                        if (fullUrl.includes('es-CO') || fullUrl.includes('es_CO') || fullUrl.includes('esco')) {
-                            console.log('🌍 ✅ AGGRESSIVE: Found es-CO in URL');
+                        if (fullUrl.includes('es-CO') || fullUrl.includes('es_CO') || fullUrl.includes('esco') || fullUrl.includes('en-esco')) {
+                            console.log('🌍 ✅ AGGRESSIVE: Found es-CO pattern in URL');
                             return 'es-CO';
                         }
                         
