@@ -1338,12 +1338,15 @@
                             
                             // Multiple patterns to match different Crowdin URL formats
                             const patterns = [
-                                /\/enus-([a-z]{2})(?:[-_][A-Z]{2})?(?:\/|#|$)/,  // enus-fr format
-                                /\/([a-z]{2})(?:[-_][A-Z]{2})?-enus(?:\/|#|$)/,  // fr-enus format  
-                                /editor\/[^\/]+\/\d+\/enus-([a-z]{2})(?:[-_][A-Z]{2})?/,  // editor/project/83/enus-frca
-                                /\/([a-z]{2})(?:[-_][A-Z]{2})?(?:\/|#|$)/,       // generic /fr/ format
-                                /target_language=([a-z]{2})/,                    // URL parameter
-                                /lang=([a-z]{2})/                               // URL parameter
+                                /\/enus-([a-z]{2}(?:-[A-Z]{2})?)(?:\/|#|$)/,     // enus-es-CO format (with country code)
+                                /\/([a-z]{2}(?:-[A-Z]{2})?)-enus(?:\/|#|$)/,     // es-CO-enus format (with country code)
+                                /editor\/[^\/]+\/\d+\/enus-([a-z]{2}(?:-[A-Z]{2})?)/,  // editor/project/83/enus-es-CO
+                                /\/enus-([a-z]{2})(?:[-_][A-Z]{2})?(?:\/|#|$)/,  // enus-fr format (legacy)
+                                /\/([a-z]{2})(?:[-_][A-Z]{2})?-enus(?:\/|#|$)/,  // fr-enus format (legacy)
+                                /editor\/[^\/]+\/\d+\/enus-([a-z]{2})(?:[-_][A-Z]{2})?/,  // editor/project/83/enus-frca (legacy)
+                                /\/([a-z]{2}(?:-[A-Z]{2})?)(?:\/|#|$)/,          // generic /es-CO/ format
+                                /target_language=([a-z]{2}(?:-[A-Z]{2})?)/,      // URL parameter with country code
+                                /lang=([a-z]{2}(?:-[A-Z]{2})?)/                 // URL parameter with country code
                             ];
                             
                             for (const pattern of patterns) {
@@ -1389,6 +1392,45 @@
                 mapped: mappedLanguage,
                 fallback: mappedLanguage || 'en'
             });
+            
+            // COMFORTABLE MODE FALLBACK: If we still don't have a language, try harder URL detection
+            if (!mappedLanguage) {
+                console.log('🌍 ⚠️ No language detected via normal methods - trying aggressive URL detection for comfortable mode');
+                
+                try {
+                    // Try to get the full parent window URL and extract language more aggressively
+                    if (window.parent && window.parent.location) {
+                        const fullUrl = window.parent.location.href;
+                        console.log('🌍 Full parent URL for aggressive detection:', fullUrl);
+                        
+                        // Look for es-CO specifically in the URL (common in Crowdin comfortable mode)
+                        if (fullUrl.includes('es-CO') || fullUrl.includes('es_CO') || fullUrl.includes('esco')) {
+                            console.log('🌍 ✅ AGGRESSIVE: Found es-CO in URL');
+                            return 'es-CO';
+                        }
+                        
+                        // Look for other Spanish variants
+                        if (fullUrl.includes('es-MX') || fullUrl.includes('es_MX')) {
+                            console.log('🌍 ✅ AGGRESSIVE: Found es-MX in URL');
+                            return 'es-MX';
+                        }
+                        
+                        // Look for German variants
+                        if (fullUrl.includes('de-DE') || fullUrl.includes('de_DE') || fullUrl.includes('/de/')) {
+                            console.log('🌍 ✅ AGGRESSIVE: Found German in URL');
+                            return 'de';
+                        }
+                        
+                        // Look for French variants
+                        if (fullUrl.includes('fr-CA') || fullUrl.includes('fr_CA')) {
+                            console.log('🌍 ✅ AGGRESSIVE: Found fr-CA in URL');
+                            return 'fr-CA';
+                        }
+                    }
+                } catch (e) {
+                    console.log('🌍 Aggressive URL detection failed:', e.message);
+                }
+            }
             
             return mappedLanguage || 'en'; // Default to English if nothing detected
         }
