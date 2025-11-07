@@ -2433,6 +2433,7 @@
                 'en': { name: 'Clara', service: 'ElevenLabs', language_code: 'en' },
                 'es': { name: 'Malena Tango', service: 'ElevenLabs', language_code: 'es-CO' },
                 'es-CO': { name: 'Malena Tango', service: 'ElevenLabs', language_code: 'es-CO' },
+                'es-AR': { name: 'Melanie', service: 'ElevenLabs', language_code: 'es-CO' },
                 'de': { name: 'Julia', service: 'ElevenLabs', language_code: 'de' },
                 'de-CH': { name: 'Julia', service: 'ElevenLabs', language_code: 'de-CH' },
                 'fr': { name: 'Caroline', service: 'ElevenLabs', language_code: 'fr-CA' },
@@ -2455,7 +2456,19 @@
             try {
                 console.log('🎵 === PLAY CURRENT AUDIO DEBUG START ===');
                 console.log('🎵 Current URL:', window.location.href);
-                console.log('🎵 Parent URL:', window.parent ? window.parent.location.href : 'No parent');
+                // Safely log parent URL info without triggering cross-origin errors
+                let parentUrlInfo = 'No parent';
+                try {
+                    if (window.parent && window.parent.location) {
+                        // Access to parent href/origin may throw if cross-origin
+                        parentUrlInfo = (window.parent.location.origin === window.location.origin)
+                            ? window.parent.location.href
+                            : 'Cross-origin (blocked)';
+                    }
+                } catch (e) {
+                    parentUrlInfo = 'Cross-origin (blocked)';
+                }
+                console.log('🎵 Parent URL:', parentUrlInfo);
                 console.log('🎵 receivedContext:', JSON.stringify(receivedContext, null, 2));
                 
                 showStatus('Looking for existing audio...', 'loading');
