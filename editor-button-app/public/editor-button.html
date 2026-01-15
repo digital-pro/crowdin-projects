@@ -1130,7 +1130,7 @@
         }
         
         // Listen for messages from parent window (if in iframe)
-        window.addEventListener('message', enhancedMessageHandler);
+        // (Removed duplicate registration below to prevent double-handling)
         
         // Enhanced context getter that includes received messages
         function getEnhancedCrowdinContext() {
@@ -2633,6 +2633,28 @@
         // GCP bucket audio player (based on source_dashboard.js logic)
         async function playExistingAudioFromGCP(itemId, langCode) {
             try {
+                // Ensure no previous audio is playing before starting a new one
+                if (window.currentAudio) {
+                    try {
+                        window.currentAudio.pause();
+                        window.currentAudio.currentTime = 0;
+                        window.currentAudio.src = '';
+                    } catch (e) {
+                        console.warn('Could not fully stop previous audio:', e);
+                    }
+                    window.currentAudio = null;
+                }
+                // Also stop any stray <audio> elements
+                const strayAudios = document.querySelectorAll('audio');
+                strayAudios.forEach(a => {
+                    if (!a.paused) {
+                        try {
+                            a.pause();
+                            a.currentTime = 0;
+                        } catch {}
+                    }
+                });
+
                 // Map the language code for GCP bucket structure
                 const gcpLangCode = mapLanguageCodeForGCP(langCode);
                 
@@ -3400,6 +3422,28 @@
                 event.data.evnt && event.data.evnt.length > 0) {
                 
                 const stringInfo = event.data.evnt[0];
+
+                // Stop any currently playing audio when selection changes
+                if (window.currentAudio) {
+                    try {
+                        window.currentAudio.pause();
+                        window.currentAudio.currentTime = 0;
+                        window.currentAudio.src = '';
+                    } catch (e) {
+                        console.warn('Could not fully stop previous audio on selection:', e);
+                    }
+                    window.currentAudio = null;
+                }
+                // Also stop any stray <audio> elements
+                const playingAudios = document.querySelectorAll('audio');
+                playingAudios.forEach(a => {
+                    if (!a.paused) {
+                        try {
+                            a.pause();
+                            a.currentTime = 0;
+                        } catch {}
+                    }
+                });
                 
                 // ALWAYS store context for manual play
                 if (stringInfo.string) {
