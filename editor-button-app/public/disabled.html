@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Editor Button App Disabled</title>
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			height: 100%;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+			background: #0b0d12;
+			color: #e5e7eb;
+		}
+		.container {
+			min-height: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			text-align: center;
+			padding: 24px;
+		}
+		.card {
+			max-width: 640px;
+			width: 100%;
+			background: #111827;
+			border: 1px solid #1f2937;
+			border-radius: 12px;
+			padding: 28px;
+			box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+		}
+		h1 {
+			margin: 0 0 8px;
+			font-size: 20px;
+			font-weight: 600;
+			color: #f3f4f6;
+		}
+		p {
+			margin: 0 0 16px;
+			color: #9ca3af;
+			line-height: 1.5;
+		}
+		.small {
+			font-size: 12px;
+			color: #6b7280;
+		}
+	</style>
+	<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Expires" content="0">
+	<script>
+		console.log('Editor Button App is currently disabled. ' + new Date().toISOString());
+		window.addEventListener('message', function() {
+			// Intentionally do nothing; app is disabled.
+		});
+	</script>
+	<link rel="icon" href="/public/favicon.ico">
+	<link rel="apple-touch-icon" href="/public/favicon.ico">
+	<meta name="robots" content="noindex,nofollow">
+	<meta name="turbo-visit-control" content="disable">
+	<meta name="vercel-deployment" content="disabled-mode">
+	<meta name="x-levante-editor-app" content="disabled">
+	</head>
+<body>
+	<div class="container">
+		<div class="card">
+			<h1>Editor Button App is disabled</h1>
+			<p>This app has been temporarily turned off for maintenance.</p>
+			<p class="small">If you believe this is an error, contact the administrator.</p>
+		</div>
+	</div>
+</body>
+</html>
+
